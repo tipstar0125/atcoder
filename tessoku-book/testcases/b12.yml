@@ -1,0 +1,17 @@
+---
+type: Batch
+timelimit: 2s
+match: Lines
+
+cases:
+  - name: sample1
+    in: |
+      2
+    out: |
+      1.000000
+
+extend:
+  - type: Text
+    path: "./b12"
+    in: /in/*.txt
+    out: /out/*.txt

@@ -1,0 +1,24 @@
+---
+type: Batch
+timelimit: 1s
+match: Lines
+
+cases:
+  - name: sample1
+    in: |
+      mynavi
+      monday
+    out: |
+      3
+  - name: sample2
+    in: |
+      tokyo
+      kyoto
+    out: |
+      3
+
+extend:
+  - type: Text
+    path: "./a20"
+    in: /in/*.txt
+    out: /out/*.txt

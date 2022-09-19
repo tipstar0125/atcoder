@@ -1,0 +1,39 @@
+---
+type: Batch
+timelimit: 3s
+match:
+  Float:
+    relative_error: 1e-6
+    absolute_error: ~
+
+cases:
+  - name: sample1
+    in: |
+      4 10
+      1000000 700000 300000 180000
+    out: |
+      5 3 1 1
+  - name: sample2
+    in: |
+      2 3
+      6000 3000
+    out: |
+      2 1
+  - name: sample3
+    in: |
+      15 50
+      18256245 7845995 6771945 6181431 3618432 3159625 2319156 1768385 1258501 1253872 193724 148020 109045 77861 65107
+    out: |
+      18 8 7 6 3 3 2 1 1 1 0 0 0 0 0
+  - name: sample4
+    in: |
+      2 1
+      900000000 100000000
+    out: |
+      1 0
+
+extend:
+  - type: Text
+    path: "./c11"
+    in: /in/*.txt
+    out: /out/*.txt

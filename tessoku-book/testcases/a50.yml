@@ -1,0 +1,12 @@
+---
+type: Batch
+timelimit: ~
+match: Lines
+
+cases: []
+
+extend:
+  - type: Text
+    path: "./a50"
+    in: /in/*.txt
+    out: /out/*.txt

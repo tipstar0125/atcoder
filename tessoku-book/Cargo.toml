@@ -1,0 +1,804 @@
+[package]
+name = "tessoku-book"
+version = "0.1.0"
+edition = "2018"
+
+[package.metadata.cargo-compete.bin]
+tessoku-book-a01 = { alias = "a01", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_a" }
+tessoku-book-a02 = { alias = "a02", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_b" }
+tessoku-book-a03 = { alias = "a03", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_c" }
+tessoku-book-a04 = { alias = "a04", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_d" }
+tessoku-book-a05 = { alias = "a05", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_e" }
+tessoku-book-a06 = { alias = "a06", problem = "https://atcoder.jp/contests/tessoku-book/tasks/math_and_algorithm_ai" }
+tessoku-book-a07 = { alias = "a07", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_g" }
+tessoku-book-a08 = { alias = "a08", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_h" }
+tessoku-book-a09 = { alias = "a09", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_i" }
+tessoku-book-a10 = { alias = "a10", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_j" }
+tessoku-book-a11 = { alias = "a11", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_k" }
+tessoku-book-a12 = { alias = "a12", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_l" }
+tessoku-book-a13 = { alias = "a13", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_m" }
+tessoku-book-a14 = { alias = "a14", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_n" }
+tessoku-book-a15 = { alias = "a15", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_o" }
+tessoku-book-a16 = { alias = "a16", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_p" }
+tessoku-book-a17 = { alias = "a17", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_q" }
+tessoku-book-a18 = { alias = "a18", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_r" }
+tessoku-book-a19 = { alias = "a19", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_s" }
+tessoku-book-a20 = { alias = "a20", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_t" }
+tessoku-book-a21 = { alias = "a21", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_u" }
+tessoku-book-a22 = { alias = "a22", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_v" }
+tessoku-book-a23 = { alias = "a23", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_w" }
+tessoku-book-a24 = { alias = "a24", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_x" }
+tessoku-book-a25 = { alias = "a25", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_y" }
+tessoku-book-a26 = { alias = "a26", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_z" }
+tessoku-book-a27 = { alias = "a27", problem = "https://atcoder.jp/contests/tessoku-book/tasks/math_and_algorithm_o" }
+tessoku-book-a28 = { alias = "a28", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_ab" }
+tessoku-book-a29 = { alias = "a29", problem = "https://atcoder.jp/contests/tessoku-book/tasks/math_and_algorithm_aq" }
+tessoku-book-a30 = { alias = "a30", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_ad" }
+tessoku-book-a31 = { alias = "a31", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_ae" }
+tessoku-book-a32 = { alias = "a32", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_af" }
+tessoku-book-a33 = { alias = "a33", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_ag" }
+tessoku-book-a34 = { alias = "a34", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_ah" }
+tessoku-book-a35 = { alias = "a35", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_ai" }
+tessoku-book-a36 = { alias = "a36", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_aj" }
+tessoku-book-a37 = { alias = "a37", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_ak" }
+tessoku-book-a38 = { alias = "a38", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_al" }
+tessoku-book-a39 = { alias = "a39", problem = "https://atcoder.jp/contests/tessoku-book/tasks/math_and_algorithm_bn" }
+tessoku-book-a40 = { alias = "a40", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_an" }
+tessoku-book-a41 = { alias = "a41", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_ao" }
+tessoku-book-a42 = { alias = "a42", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_ap" }
+tessoku-book-a43 = { alias = "a43", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_aq" }
+tessoku-book-a44 = { alias = "a44", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_ar" }
+tessoku-book-a45 = { alias = "a45", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_as" }
+tessoku-book-a46 = { alias = "a46", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_at" }
+tessoku-book-a49 = { alias = "a49", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_aw" }
+tessoku-book-a50 = { alias = "a50", problem = "https://atcoder.jp/contests/tessoku-book/tasks/future_contest_2018_qual_a" }
+tessoku-book-a51 = { alias = "a51", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_ay" }
+tessoku-book-a52 = { alias = "a52", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_az" }
+tessoku-book-a53 = { alias = "a53", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_ba" }
+tessoku-book-a54 = { alias = "a54", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_bb" }
+tessoku-book-a55 = { alias = "a55", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_bc" }
+tessoku-book-a56 = { alias = "a56", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_bd" }
+tessoku-book-a57 = { alias = "a57", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_be" }
+tessoku-book-a58 = { alias = "a58", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_bf" }
+tessoku-book-a59 = { alias = "a59", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_bg" }
+tessoku-book-a60 = { alias = "a60", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_bh" }
+tessoku-book-a61 = { alias = "a61", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_bi" }
+tessoku-book-a62 = { alias = "a62", problem = "https://atcoder.jp/contests/tessoku-book/tasks/math_and_algorithm_am" }
+tessoku-book-a63 = { alias = "a63", problem = "https://atcoder.jp/contests/tessoku-book/tasks/math_and_algorithm_an" }
+tessoku-book-a64 = { alias = "a64", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_bl" }
+tessoku-book-a65 = { alias = "a65", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_bm" }
+tessoku-book-a66 = { alias = "a66", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_bn" }
+tessoku-book-a67 = { alias = "a67", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_bo" }
+tessoku-book-a68 = { alias = "a68", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_bp" }
+tessoku-book-a69 = { alias = "a69", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_bq" }
+tessoku-book-a70 = { alias = "a70", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_br" }
+tessoku-book-a71 = { alias = "a71", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_bs" }
+tessoku-book-a72 = { alias = "a72", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_bt" }
+tessoku-book-a73 = { alias = "a73", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_bu" }
+tessoku-book-a74 = { alias = "a74", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_bv" }
+tessoku-book-a75 = { alias = "a75", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_bw" }
+tessoku-book-a76 = { alias = "a76", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_bx" }
+tessoku-book-a77 = { alias = "a77", problem = "https://atcoder.jp/contests/tessoku-book/tasks/typical90_a" }
+tessoku-book-b01 = { alias = "b01", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_bz" }
+tessoku-book-b02 = { alias = "b02", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_ca" }
+tessoku-book-b03 = { alias = "b03", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_cb" }
+tessoku-book-b04 = { alias = "b04", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_cc" }
+tessoku-book-b06 = { alias = "b06", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_ce" }
+tessoku-book-b07 = { alias = "b07", problem = "https://atcoder.jp/contests/tessoku-book/tasks/math_and_algorithm_al" }
+tessoku-book-b08 = { alias = "b08", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_cg" }
+tessoku-book-b09 = { alias = "b09", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_ch" }
+tessoku-book-b11 = { alias = "b11", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_cj" }
+tessoku-book-b12 = { alias = "b12", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_ck" }
+tessoku-book-b13 = { alias = "b13", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_cl" }
+tessoku-book-b14 = { alias = "b14", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_cm" }
+tessoku-book-b16 = { alias = "b16", problem = "https://atcoder.jp/contests/tessoku-book/tasks/dp_a" }
+tessoku-book-b17 = { alias = "b17", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_cp" }
+tessoku-book-b18 = { alias = "b18", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_cq" }
+tessoku-book-b19 = { alias = "b19", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_cr" }
+tessoku-book-b20 = { alias = "b20", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_cs" }
+tessoku-book-b21 = { alias = "b21", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_ct" }
+tessoku-book-b23 = { alias = "b23", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_cv" }
+tessoku-book-b24 = { alias = "b24", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_cw" }
+tessoku-book-b26 = { alias = "b26", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_cy" }
+tessoku-book-b27 = { alias = "b27", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_cz" }
+tessoku-book-b28 = { alias = "b28", problem = "https://atcoder.jp/contests/tessoku-book/tasks/math_and_algorithm_ap" }
+tessoku-book-b29 = { alias = "b29", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_db" }
+tessoku-book-b30 = { alias = "b30", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_dc" }
+tessoku-book-b31 = { alias = "b31", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_dd" }
+tessoku-book-b32 = { alias = "b32", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_de" }
+tessoku-book-b33 = { alias = "b33", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_df" }
+tessoku-book-b34 = { alias = "b34", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_dg" }
+tessoku-book-b36 = { alias = "b36", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_di" }
+tessoku-book-b37 = { alias = "b37", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_dj" }
+tessoku-book-b38 = { alias = "b38", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_dk" }
+tessoku-book-b39 = { alias = "b39", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_dl" }
+tessoku-book-b40 = { alias = "b40", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_dm" }
+tessoku-book-b41 = { alias = "b41", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_dn" }
+tessoku-book-b42 = { alias = "b42", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_do" }
+tessoku-book-b43 = { alias = "b43", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_dp" }
+tessoku-book-b44 = { alias = "b44", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_dq" }
+tessoku-book-b45 = { alias = "b45", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_dr" }
+tessoku-book-b51 = { alias = "b51", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_dx" }
+tessoku-book-b52 = { alias = "b52", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_dy" }
+tessoku-book-b54 = { alias = "b54", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_ea" }
+tessoku-book-b55 = { alias = "b55", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_eb" }
+tessoku-book-b56 = { alias = "b56", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_ec" }
+tessoku-book-b57 = { alias = "b57", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_ed" }
+tessoku-book-b58 = { alias = "b58", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_ee" }
+tessoku-book-b59 = { alias = "b59", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_ef" }
+tessoku-book-b61 = { alias = "b61", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_eh" }
+tessoku-book-b62 = { alias = "b62", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_ei" }
+tessoku-book-b63 = { alias = "b63", problem = "https://atcoder.jp/contests/tessoku-book/tasks/abc007_3" }
+tessoku-book-b64 = { alias = "b64", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_ek" }
+tessoku-book-b65 = { alias = "b65", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_el" }
+tessoku-book-b66 = { alias = "b66", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_em" }
+tessoku-book-b67 = { alias = "b67", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_en" }
+tessoku-book-b68 = { alias = "b68", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_eo" }
+tessoku-book-b69 = { alias = "b69", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_ep" }
+tessoku-book-c01 = { alias = "c01", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_ey" }
+tessoku-book-c02 = { alias = "c02", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_ez" }
+tessoku-book-c03 = { alias = "c03", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_fa" }
+tessoku-book-c04 = { alias = "c04", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_fb" }
+tessoku-book-c05 = { alias = "c05", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_fc" }
+tessoku-book-c06 = { alias = "c06", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_fd" }
+tessoku-book-c07 = { alias = "c07", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_fe" }
+tessoku-book-c08 = { alias = "c08", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_ff" }
+tessoku-book-c09 = { alias = "c09", problem = "https://atcoder.jp/contests/tessoku-book/tasks/math_and_algorithm_ac" }
+tessoku-book-c10 = { alias = "c10", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_fh" }
+tessoku-book-c11 = { alias = "c11", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_fi" }
+tessoku-book-c12 = { alias = "c12", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_fj" }
+tessoku-book-c13 = { alias = "c13", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_fk" }
+tessoku-book-c14 = { alias = "c14", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_fl" }
+tessoku-book-c15 = { alias = "c15", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_fm" }
+tessoku-book-c16 = { alias = "c16", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_fn" }
+tessoku-book-c17 = { alias = "c17", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_fo" }
+tessoku-book-c18 = { alias = "c18", problem = "https://atcoder.jp/contests/tessoku-book/tasks/typical90_s" }
+tessoku-book-c19 = { alias = "c19", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_fq" }
+tessoku-book-c20 = { alias = "c20", problem = "https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_fr" }
+
+[[bin]]
+name = "tessoku-book-a01"
+path = "src/bin/a01.rs"
+
+[[bin]]
+name = "tessoku-book-a02"
+path = "src/bin/a02.rs"
+
+[[bin]]
+name = "tessoku-book-a03"
+path = "src/bin/a03.rs"
+
+[[bin]]
+name = "tessoku-book-a04"
+path = "src/bin/a04.rs"
+
+[[bin]]
+name = "tessoku-book-a05"
+path = "src/bin/a05.rs"
+
+[[bin]]
+name = "tessoku-book-a06"
+path = "src/bin/a06.rs"
+
+[[bin]]
+name = "tessoku-book-a07"
+path = "src/bin/a07.rs"
+
+[[bin]]
+name = "tessoku-book-a08"
+path = "src/bin/a08.rs"
+
+[[bin]]
+name = "tessoku-book-a09"
+path = "src/bin/a09.rs"
+
+[[bin]]
+name = "tessoku-book-a10"
+path = "src/bin/a10.rs"
+
+[[bin]]
+name = "tessoku-book-a11"
+path = "src/bin/a11.rs"
+
+[[bin]]
+name = "tessoku-book-a12"
+path = "src/bin/a12.rs"
+
+[[bin]]
+name = "tessoku-book-a13"
+path = "src/bin/a13.rs"
+
+[[bin]]
+name = "tessoku-book-a14"
+path = "src/bin/a14.rs"
+
+[[bin]]
+name = "tessoku-book-a15"
+path = "src/bin/a15.rs"
+
+[[bin]]
+name = "tessoku-book-a16"
+path = "src/bin/a16.rs"
+
+[[bin]]
+name = "tessoku-book-a17"
+path = "src/bin/a17.rs"
+
+[[bin]]
+name = "tessoku-book-a18"
+path = "src/bin/a18.rs"
+
+[[bin]]
+name = "tessoku-book-a19"
+path = "src/bin/a19.rs"
+
+[[bin]]
+name = "tessoku-book-a20"
+path = "src/bin/a20.rs"
+
+[[bin]]
+name = "tessoku-book-a21"
+path = "src/bin/a21.rs"
+
+[[bin]]
+name = "tessoku-book-a22"
+path = "src/bin/a22.rs"
+
+[[bin]]
+name = "tessoku-book-a23"
+path = "src/bin/a23.rs"
+
+[[bin]]
+name = "tessoku-book-a24"
+path = "src/bin/a24.rs"
+
+[[bin]]
+name = "tessoku-book-a25"
+path = "src/bin/a25.rs"
+
+[[bin]]
+name = "tessoku-book-a26"
+path = "src/bin/a26.rs"
+
+[[bin]]
+name = "tessoku-book-a27"
+path = "src/bin/a27.rs"
+
+[[bin]]
+name = "tessoku-book-a28"
+path = "src/bin/a28.rs"
+
+[[bin]]
+name = "tessoku-book-a29"
+path = "src/bin/a29.rs"
+
+[[bin]]
+name = "tessoku-book-a30"
+path = "src/bin/a30.rs"
+
+[[bin]]
+name = "tessoku-book-a31"
+path = "src/bin/a31.rs"
+
+[[bin]]
+name = "tessoku-book-a32"
+path = "src/bin/a32.rs"
+
+[[bin]]
+name = "tessoku-book-a33"
+path = "src/bin/a33.rs"
+
+[[bin]]
+name = "tessoku-book-a34"
+path = "src/bin/a34.rs"
+
+[[bin]]
+name = "tessoku-book-a35"
+path = "src/bin/a35.rs"
+
+[[bin]]
+name = "tessoku-book-a36"
+path = "src/bin/a36.rs"
+
+[[bin]]
+name = "tessoku-book-a37"
+path = "src/bin/a37.rs"
+
+[[bin]]
+name = "tessoku-book-a38"
+path = "src/bin/a38.rs"
+
+[[bin]]
+name = "tessoku-book-a39"
+path = "src/bin/a39.rs"
+
+[[bin]]
+name = "tessoku-book-a40"
+path = "src/bin/a40.rs"
+
+[[bin]]
+name = "tessoku-book-a41"
+path = "src/bin/a41.rs"
+
+[[bin]]
+name = "tessoku-book-a42"
+path = "src/bin/a42.rs"
+
+[[bin]]
+name = "tessoku-book-a43"
+path = "src/bin/a43.rs"
+
+[[bin]]
+name = "tessoku-book-a44"
+path = "src/bin/a44.rs"
+
+[[bin]]
+name = "tessoku-book-a45"
+path = "src/bin/a45.rs"
+
+[[bin]]
+name = "tessoku-book-a46"
+path = "src/bin/a46.rs"
+
+[[bin]]
+name = "tessoku-book-a49"
+path = "src/bin/a49.rs"
+
+[[bin]]
+name = "tessoku-book-a50"
+path = "src/bin/a50.rs"
+
+[[bin]]
+name = "tessoku-book-a51"
+path = "src/bin/a51.rs"
+
+[[bin]]
+name = "tessoku-book-a52"
+path = "src/bin/a52.rs"
+
+[[bin]]
+name = "tessoku-book-a53"
+path = "src/bin/a53.rs"
+
+[[bin]]
+name = "tessoku-book-a54"
+path = "src/bin/a54.rs"
+
+[[bin]]
+name = "tessoku-book-a55"
+path = "src/bin/a55.rs"
+
+[[bin]]
+name = "tessoku-book-a56"
+path = "src/bin/a56.rs"
+
+[[bin]]
+name = "tessoku-book-a57"
+path = "src/bin/a57.rs"
+
+[[bin]]
+name = "tessoku-book-a58"
+path = "src/bin/a58.rs"
+
+[[bin]]
+name = "tessoku-book-a59"
+path = "src/bin/a59.rs"
+
+[[bin]]
+name = "tessoku-book-a60"
+path = "src/bin/a60.rs"
+
+[[bin]]
+name = "tessoku-book-a61"
+path = "src/bin/a61.rs"
+
+[[bin]]
+name = "tessoku-book-a62"
+path = "src/bin/a62.rs"
+
+[[bin]]
+name = "tessoku-book-a63"
+path = "src/bin/a63.rs"
+
+[[bin]]
+name = "tessoku-book-a64"
+path = "src/bin/a64.rs"
+
+[[bin]]
+name = "tessoku-book-a65"
+path = "src/bin/a65.rs"
+
+[[bin]]
+name = "tessoku-book-a66"
+path = "src/bin/a66.rs"
+
+[[bin]]
+name = "tessoku-book-a67"
+path = "src/bin/a67.rs"
+
+[[bin]]
+name = "tessoku-book-a68"
+path = "src/bin/a68.rs"
+
+[[bin]]
+name = "tessoku-book-a69"
+path = "src/bin/a69.rs"
+
+[[bin]]
+name = "tessoku-book-a70"
+path = "src/bin/a70.rs"
+
+[[bin]]
+name = "tessoku-book-a71"
+path = "src/bin/a71.rs"
+
+[[bin]]
+name = "tessoku-book-a72"
+path = "src/bin/a72.rs"
+
+[[bin]]
+name = "tessoku-book-a73"
+path = "src/bin/a73.rs"
+
+[[bin]]
+name = "tessoku-book-a74"
+path = "src/bin/a74.rs"
+
+[[bin]]
+name = "tessoku-book-a75"
+path = "src/bin/a75.rs"
+
+[[bin]]
+name = "tessoku-book-a76"
+path = "src/bin/a76.rs"
+
+[[bin]]
+name = "tessoku-book-a77"
+path = "src/bin/a77.rs"
+
+[[bin]]
+name = "tessoku-book-b01"
+path = "src/bin/b01.rs"
+
+[[bin]]
+name = "tessoku-book-b02"
+path = "src/bin/b02.rs"
+
+[[bin]]
+name = "tessoku-book-b03"
+path = "src/bin/b03.rs"
+
+[[bin]]
+name = "tessoku-book-b04"
+path = "src/bin/b04.rs"
+
+[[bin]]
+name = "tessoku-book-b06"
+path = "src/bin/b06.rs"
+
+[[bin]]
+name = "tessoku-book-b07"
+path = "src/bin/b07.rs"
+
+[[bin]]
+name = "tessoku-book-b08"
+path = "src/bin/b08.rs"
+
+[[bin]]
+name = "tessoku-book-b09"
+path = "src/bin/b09.rs"
+
+[[bin]]
+name = "tessoku-book-b11"
+path = "src/bin/b11.rs"
+
+[[bin]]
+name = "tessoku-book-b12"
+path = "src/bin/b12.rs"
+
+[[bin]]
+name = "tessoku-book-b13"
+path = "src/bin/b13.rs"
+
+[[bin]]
+name = "tessoku-book-b14"
+path = "src/bin/b14.rs"
+
+[[bin]]
+name = "tessoku-book-b16"
+path = "src/bin/b16.rs"
+
+[[bin]]
+name = "tessoku-book-b17"
+path = "src/bin/b17.rs"
+
+[[bin]]
+name = "tessoku-book-b18"
+path = "src/bin/b18.rs"
+
+[[bin]]
+name = "tessoku-book-b19"
+path = "src/bin/b19.rs"
+
+[[bin]]
+name = "tessoku-book-b20"
+path = "src/bin/b20.rs"
+
+[[bin]]
+name = "tessoku-book-b21"
+path = "src/bin/b21.rs"
+
+[[bin]]
+name = "tessoku-book-b23"
+path = "src/bin/b23.rs"
+
+[[bin]]
+name = "tessoku-book-b24"
+path = "src/bin/b24.rs"
+
+[[bin]]
+name = "tessoku-book-b26"
+path = "src/bin/b26.rs"
+
+[[bin]]
+name = "tessoku-book-b27"
+path = "src/bin/b27.rs"
+
+[[bin]]
+name = "tessoku-book-b28"
+path = "src/bin/b28.rs"
+
+[[bin]]
+name = "tessoku-book-b29"
+path = "src/bin/b29.rs"
+
+[[bin]]
+name = "tessoku-book-b30"
+path = "src/bin/b30.rs"
+
+[[bin]]
+name = "tessoku-book-b31"
+path = "src/bin/b31.rs"
+
+[[bin]]
+name = "tessoku-book-b32"
+path = "src/bin/b32.rs"
+
+[[bin]]
+name = "tessoku-book-b33"
+path = "src/bin/b33.rs"
+
+[[bin]]
+name = "tessoku-book-b34"
+path = "src/bin/b34.rs"
+
+[[bin]]
+name = "tessoku-book-b36"
+path = "src/bin/b36.rs"
+
+[[bin]]
+name = "tessoku-book-b37"
+path = "src/bin/b37.rs"
+
+[[bin]]
+name = "tessoku-book-b38"
+path = "src/bin/b38.rs"
+
+[[bin]]
+name = "tessoku-book-b39"
+path = "src/bin/b39.rs"
+
+[[bin]]
+name = "tessoku-book-b40"
+path = "src/bin/b40.rs"
+
+[[bin]]
+name = "tessoku-book-b41"
+path = "src/bin/b41.rs"
+
+[[bin]]
+name = "tessoku-book-b42"
+path = "src/bin/b42.rs"
+
+[[bin]]
+name = "tessoku-book-b43"
+path = "src/bin/b43.rs"
+
+[[bin]]
+name = "tessoku-book-b44"
+path = "src/bin/b44.rs"
+
+[[bin]]
+name = "tessoku-book-b45"
+path = "src/bin/b45.rs"
+
+[[bin]]
+name = "tessoku-book-b51"
+path = "src/bin/b51.rs"
+
+[[bin]]
+name = "tessoku-book-b52"
+path = "src/bin/b52.rs"
+
+[[bin]]
+name = "tessoku-book-b54"
+path = "src/bin/b54.rs"
+
+[[bin]]
+name = "tessoku-book-b55"
+path = "src/bin/b55.rs"
+
+[[bin]]
+name = "tessoku-book-b56"
+path = "src/bin/b56.rs"
+
+[[bin]]
+name = "tessoku-book-b57"
+path = "src/bin/b57.rs"
+
+[[bin]]
+name = "tessoku-book-b58"
+path = "src/bin/b58.rs"
+
+[[bin]]
+name = "tessoku-book-b59"
+path = "src/bin/b59.rs"
+
+[[bin]]
+name = "tessoku-book-b61"
+path = "src/bin/b61.rs"
+
+[[bin]]
+name = "tessoku-book-b62"
+path = "src/bin/b62.rs"
+
+[[bin]]
+name = "tessoku-book-b63"
+path = "src/bin/b63.rs"
+
+[[bin]]
+name = "tessoku-book-b64"
+path = "src/bin/b64.rs"
+
+[[bin]]
+name = "tessoku-book-b65"
+path = "src/bin/b65.rs"
+
+[[bin]]
+name = "tessoku-book-b66"
+path = "src/bin/b66.rs"
+
+[[bin]]
+name = "tessoku-book-b67"
+path = "src/bin/b67.rs"
+
+[[bin]]
+name = "tessoku-book-b68"
+path = "src/bin/b68.rs"
+
+[[bin]]
+name = "tessoku-book-b69"
+path = "src/bin/b69.rs"
+
+[[bin]]
+name = "tessoku-book-c01"
+path = "src/bin/c01.rs"
+
+[[bin]]
+name = "tessoku-book-c02"
+path = "src/bin/c02.rs"
+
+[[bin]]
+name = "tessoku-book-c03"
+path = "src/bin/c03.rs"
+
+[[bin]]
+name = "tessoku-book-c04"
+path = "src/bin/c04.rs"
+
+[[bin]]
+name = "tessoku-book-c05"
+path = "src/bin/c05.rs"
+
+[[bin]]
+name = "tessoku-book-c06"
+path = "src/bin/c06.rs"
+
+[[bin]]
+name = "tessoku-book-c07"
+path = "src/bin/c07.rs"
+
+[[bin]]
+name = "tessoku-book-c08"
+path = "src/bin/c08.rs"
+
+[[bin]]
+name = "tessoku-book-c09"
+path = "src/bin/c09.rs"
+
+[[bin]]
+name = "tessoku-book-c10"
+path = "src/bin/c10.rs"
+
+[[bin]]
+name = "tessoku-book-c11"
+path = "src/bin/c11.rs"
+
+[[bin]]
+name = "tessoku-book-c12"
+path = "src/bin/c12.rs"
+
+[[bin]]
+name = "tessoku-book-c13"
+path = "src/bin/c13.rs"
+
+[[bin]]
+name = "tessoku-book-c14"
+path = "src/bin/c14.rs"
+
+[[bin]]
+name = "tessoku-book-c15"
+path = "src/bin/c15.rs"
+
+[[bin]]
+name = "tessoku-book-c16"
+path = "src/bin/c16.rs"
+
+[[bin]]
+name = "tessoku-book-c17"
+path = "src/bin/c17.rs"
+
+[[bin]]
+name = "tessoku-book-c18"
+path = "src/bin/c18.rs"
+
+[[bin]]
+name = "tessoku-book-c19"
+path = "src/bin/c19.rs"
+
+[[bin]]
+name = "tessoku-book-c20"
+path = "src/bin/c20.rs"
+
+[dependencies]
+num = "=0.2.1"
+num-bigint = "=0.2.6"
+num-complex = "=0.2.4"
+num-integer = "=0.1.42"
+num-iter = "=0.1.40"
+num-rational = "=0.2.4"
+num-traits = "=0.2.11"
+num-derive = "=0.3.0"
+ndarray = "=0.13.0"
+nalgebra = "=0.20.0"
+alga = "=0.9.3"
+libm = "=0.2.1"
+rand = { version = "=0.7.3", features = ["small_rng"] }
+getrandom = "=0.1.14"
+rand_chacha = "=0.2.2"
+rand_core = "=0.5.1"
+rand_hc = "=0.2.0"
+rand_pcg = "=0.2.1"
+rand_distr = "=0.2.2"
+petgraph = "=0.5.0"
+indexmap = "=1.3.2"
+regex = "=1.3.6"
+lazy_static = "=1.4.0"
+ordered-float = "=1.0.2"
+ascii = "=1.0.0"
+permutohedron = "=0.2.4"
+superslice = "=1.0.0"
+itertools = "=0.9.0"
+itertools-num = "=0.1.3"
+maplit = "=1.0.2"
+either = "=1.5.3"
+im-rc = "=14.3.0"
+fixedbitset = "=0.2.0"
+bitset-fixed = "=0.1.0"
+proconio = { version = "=0.3.6", features = ["derive"] }
+text_io = "=0.1.8"
+whiteread = "=0.5.0"
+rustc-hash = "=1.1.0"
+smallvec = "=1.2.0"
+
+[dev-dependencies]

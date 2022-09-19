@@ -1,0 +1,18 @@
+---
+type: Batch
+timelimit: 1s
+match: Lines
+
+cases:
+  - name: sample1
+    in: |
+      6 30
+      5 1 18 7 2 9
+    out: |
+      Yes
+
+extend:
+  - type: Text
+    path: "./b14"
+    in: /in/*.txt
+    out: /out/*.txt

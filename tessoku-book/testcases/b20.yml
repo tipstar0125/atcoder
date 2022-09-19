@@ -1,0 +1,30 @@
+---
+type: Batch
+timelimit: 1s
+match: Lines
+
+cases:
+  - name: sample1
+    in: |
+      tokyo
+      kyoto
+    out: |
+      4
+  - name: sample2
+    in: |
+      competitive
+      programming
+    out: |
+      10
+  - name: sample3
+    in: |
+      abcdef
+      bdf
+    out: |
+      3
+
+extend:
+  - type: Text
+    path: "./b20"
+    in: /in/*.txt
+    out: /out/*.txt

@@ -1,0 +1,45 @@
+---
+type: Batch
+timelimit: 2s
+match: Lines
+
+cases:
+  - name: sample1
+    in: |
+      4 7
+      3 13
+      3 17
+      5 29
+      1 10
+    out: |
+      40
+  - name: sample2
+    in: |
+      4 100
+      25 47
+      25 53
+      25 62
+      25 88
+    out: |
+      250
+  - name: sample3
+    in: |
+      10 285
+      29 8000
+      43 11000
+      47 10000
+      51 13000
+      52 16000
+      66 14000
+      72 25000
+      79 18000
+      82 23000
+      86 27000
+    out: |
+      87000
+
+extend:
+  - type: Text
+    path: "./a19"
+    in: /in/*.txt
+    out: /out/*.txt

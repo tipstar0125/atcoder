@@ -1,0 +1,22 @@
+---
+type: Batch
+timelimit: 1s
+match: Lines
+
+cases:
+  - name: sample1
+    in: |
+      8 2 3
+    out: |
+      First
+  - name: sample2
+    in: |
+      6 2 3
+    out: |
+      Second
+
+extend:
+  - type: Text
+    path: "./a32"
+    in: /in/*.txt
+    out: /out/*.txt
