@@ -1,5 +1,3 @@
-use std::collections::VecDeque;
-
 use proconio::input;
 
 #[allow(non_snake_case)]
@@ -8,12 +6,13 @@ fn main() {
         mut N: u32
     }
 
-    let mut vec_deque: VecDeque<String> = VecDeque::new();
+    let mut vec: Vec<u32> = Vec::new();
     for _ in 0..10 {
         let m = N % 2;
-        vec_deque.push_front(m.to_string());
+        vec.push(m);
         N /= 2;
     }
-    let vec = Vec::from(vec_deque);
-    println!("{:?}", vec.join(""));
+    for v in vec.iter().rev() {
+        print!("{:?}", v);
+    }
 }
