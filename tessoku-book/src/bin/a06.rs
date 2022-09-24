@@ -1,3 +1,21 @@
+use proconio::input;
+
+#[allow(non_snake_case)]
 fn main() {
-    todo!();
+    input! {
+     N: usize,
+     Q: usize,
+     A: [usize; N],
+     LR: [(usize, usize); Q]
+    }
+
+    let mut S: Vec<usize> = vec![0];
+
+    for i in 0..N {
+        S.push(A[i] + S[i])
+    }
+
+    for (L, R) in &LR {
+        println!("{:?}", S[*R] - S[*L - 1]);
+    }
 }
