@@ -1,12 +1,21 @@
 use proconio::input;
+
+#[allow(non_snake_case)]
 fn main() {
     input! {
-        n: u32,
-        x: u32,
-        a: [u32; n]
+        N: usize,
+        X: usize,
+        A: [usize; N]
+    }
+    let mut ans = false;
+
+    for a in &A {
+        if *a == X {
+            ans = true;
+        }
     }
 
-    if a.iter().any(|e| *e == x) {
+    if ans {
         println!("Yes");
     } else {
         println!("No");

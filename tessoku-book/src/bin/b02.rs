@@ -1,19 +1,20 @@
 use proconio::input;
 
+#[allow(non_snake_case)]
 fn main() {
     input! {
-        a: u32,
-        b: u32
+        A: usize,
+        B: usize
     }
+    let mut ans = false;
 
-    let mut exists = false;
-    for i in a..=b {
+    for i in A..=B {
         if (100 % i) == 0 {
-            exists = true;
-            break;
+            ans = true;
         }
     }
-    if exists {
+
+    if ans {
         println!("Yes");
     } else {
         println!("No");

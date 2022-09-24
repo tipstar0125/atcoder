@@ -3,22 +3,22 @@ use proconio::input;
 #[allow(non_snake_case)]
 fn main() {
     input! {
-        N: u32,
-        K: u32,
-        P: [u32; N],
-        Q: [u32; N],
+        N: usize,
+        K: usize,
+        P: [usize; N],
+        Q: [usize; N]
     }
 
-    let mut exists = false;
+    let mut ans = false;
     for p in &P {
         for q in &Q {
             if p + q == K {
-                exists = true;
+                ans = true;
             }
         }
     }
     
-    if exists {
+    if ans {
         println!("Yes");
     } else {
         println!("No");

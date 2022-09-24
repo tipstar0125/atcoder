@@ -1,10 +1,11 @@
 use proconio::input;
 
+#[allow(non_snake_case)]
 fn main() {
     input! {
-        a: u32,
-        b: u32
+        A: usize,
+        B: usize
     }
-    
-    println!("{:?}", a + b);
+
+    println!("{:?}", A + B);
 }
