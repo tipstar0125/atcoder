@@ -9,7 +9,7 @@ fn main() {
      LR: [(usize, usize); Q]
     }
 
-    let mut S: Vec<usize> = vec![0];
+    let mut S = vec![0];
 
     for i in 0..N {
         S.push(A[i] + S[i])
