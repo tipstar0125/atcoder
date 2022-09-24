@@ -11,7 +11,7 @@ fn main() {
     for i in 1..=N {
         for j in 1..=N {
             let x = K - i - j;
-            if x >= 1 && x <= N {
+            if 1 <= x && x <= N {
                 ans += 1;
             }
         }
