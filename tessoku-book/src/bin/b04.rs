@@ -1,6 +1,7 @@
-use proconio::{input, marker::Chars};
+use proconio::{fastout, input, marker::Chars};
 
 #[allow(non_snake_case)]
+#[fastout]
 fn main() {
     input! {
         N: Chars

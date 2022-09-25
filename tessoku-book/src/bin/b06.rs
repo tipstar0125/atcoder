@@ -1,7 +1,8 @@
-use proconio::input;
+use proconio::{fastout, input};
 use std::cmp::Ordering;
 
 #[allow(non_snake_case)]
+#[fastout]
 fn main() {
     input! {
         N: usize,
