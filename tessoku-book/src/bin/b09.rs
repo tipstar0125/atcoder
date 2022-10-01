@@ -1,7 +1,5 @@
 use proconio::{fastout, input};
 
-const MAX: usize = 1500;
-
 #[allow(non_snake_case)]
 #[allow(clippy::needless_range_loop)]
 #[fastout]
@@ -11,6 +9,7 @@ fn main() {
         N: usize,
         ABCD: [(usize, usize, usize, usize); N]
     }
+    const MAX: usize = 1500;
 
     let mut T = vec![vec![0; MAX + 1]; MAX + 1];
 

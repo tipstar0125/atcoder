@@ -1,7 +1,5 @@
 use proconio::{fastout, input};
 
-const MAX: usize = 1500;
-
 #[allow(non_snake_case)]
 #[fastout]
 fn main() {
@@ -11,6 +9,7 @@ fn main() {
         Q: usize,
         abcd: [(usize, usize, usize, usize); Q]
     }
+    const MAX: usize = 1500;
 
     let mut S = vec![vec![0; MAX + 1]; MAX + 1];
 
