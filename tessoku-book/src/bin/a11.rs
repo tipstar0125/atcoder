@@ -10,11 +10,11 @@ fn main() {
         A: [usize; N]
     }
 
-    let ans = binary_search(&X, &A).unwrap() + 1;
+    let ans = binary_search(&A, &X).unwrap() + 1;
     println!("{:?}", ans);
 }
 
-fn binary_search(x: &usize, v: &Vec<usize>) -> Option<usize> {
+fn binary_search(v: &Vec<usize>, x: &usize) -> Option<usize> {
     let mut left = 0;
     let mut right = v.len() - 1;
 
