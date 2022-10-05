@@ -1,4 +1,3 @@
-use im_rc::HashMap;
 use proconio::{fastout, input, marker::Usize1};
 
 #[allow(non_snake_case)]
