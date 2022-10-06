@@ -5,39 +5,33 @@ use proconio::{fastout, input};
 fn main() {
     input! {
         N: usize,
-        mut a: [usize; N]
-    }
-    a.sort();
-    a.dedup();
-    while a.len() < N {
-        a.push(0);
+        a: [usize; N]
     }
 
-    let mut target = 1;
-    let mut ans = 0;
-    let mut continues = true;
-    let mut i = 0;
+    let mut ok = 0;
+    let mut ng = N + 1;
 
-    while continues {
-        if a[i] == target {
-            ans += 1;
-            i += 1;
-            if a.len() < i + 1 {
-                continues = false;
+    let mut b = vec![false; N + 1];
+    for &x in &a {
+        if x < N + 1 {
+            b[x] = true;
+        }
+    }
+
+    while ng - ok > 1 {
+        let med = (ok + ng) / 2;
+        let mut sum = 0;
+        for i in 1..=med {
+            if b[i] {
+                sum += 1;
             }
-        } else if a.len() >= i + 2 {
-            a.pop();
-            a.pop();
-            ans += 1;
-            if a.len() < i + 1 {
-                continues = false;
-            }
-        } else {
-            continues = false;
         }
 
-        target += 1;
+        if sum + (N - sum) / 2 >= med {
+            ok = med;
+        } else {
+            ng = med;
+        }
     }
-
-    println!("{:?}", ans);
+    println!("{:?}", ok);
 }
