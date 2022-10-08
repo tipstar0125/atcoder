@@ -11,13 +11,13 @@ fn main() {
         A: [usize; N]
     }
 
-    let mut r = 0;
+    let mut right = 0;
     let mut ans = 0;
-    for l in 0..N - 1 {
-        while r + 1 < N && A[r + 1] - A[l] <= K {
-            r += 1;
+    for left in 0..N - 1 {
+        while right + 1 < N && A[right + 1] - A[left] <= K {
+            right += 1;
         }
-        ans += r - l;
+        ans += right - left;
     }
 
     println!("{:?}", ans);
