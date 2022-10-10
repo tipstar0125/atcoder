@@ -12,7 +12,6 @@ fn main() {
     }
 
     let mut dp = vec![0; N + 1];
-    dp[1] = 0;
     dp[2] = A[0];
 
     for i in 3..=N {
