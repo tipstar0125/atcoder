@@ -1,7 +1,7 @@
+#![allow(non_snake_case)]
+#![allow(unused_imports)]
 use proconio::{fastout, input};
 
-#[allow(non_snake_case)]
-#[allow(clippy::needless_range_loop)]
 #[fastout]
 fn main() {
     input! {
