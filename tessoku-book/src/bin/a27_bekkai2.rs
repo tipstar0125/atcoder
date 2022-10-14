@@ -1,3 +1,4 @@
+use num::integer::gcd;
 use proconio::{fastout, input};
 
 #[allow(non_snake_case)]
@@ -9,12 +10,4 @@ fn main() {
     }
 
     println!("{:?}", gcd(A, B));
-}
-
-fn gcd(a: usize, b: usize) -> usize {
-    if a == 0 {
-        b
-    } else {
-        gcd(b % a, a)
-    }
 }
