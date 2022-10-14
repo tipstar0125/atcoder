@@ -17,21 +17,24 @@ fn main() {
         G[B].push(A);
     }
 
+    let mut stack = vec![1];
     let mut visited = vec![false; N + 1];
-    dfs(1, &G, &mut visited);
+
+    while !stack.is_empty() {
+        let x = stack.pop().unwrap();
+        let vec = G.get(x).unwrap();
+        visited[x] = true;
+
+        for &v in vec {
+            if !visited[v] {
+                stack.push(v);
+            }
+        }
+    }
 
     if visited[1..].iter().all(|&x| x) {
         println!("The graph is connected.");
     } else {
         println!("The graph is not connected.");
-    }
-}
-
-fn dfs(pos: usize, G: &[Vec<usize>], visited: &mut [bool]) {
-    visited[pos] = true;
-    for &next in &G[pos] {
-        if !visited[next] {
-            dfs(next, G, visited);
-        }
     }
 }
