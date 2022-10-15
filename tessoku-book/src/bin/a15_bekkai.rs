@@ -1,5 +1,7 @@
 #![allow(non_snake_case)]
 #![allow(unused_imports)]
+use std::collections::BTreeMap;
+
 use itertools::Itertools;
 use proconio::{
     fastout, input,
@@ -14,14 +16,15 @@ fn main() {
         A: [usize; N]
     }
 
-    let mut B: Vec<_> = A.clone();
+    let mut B = A.clone();
     B.sort();
     B.dedup();
 
+    let map: BTreeMap<_, _> = B.iter().enumerate().map(|(i, x)| (x, i + 1)).collect();
     let mut ans = vec![0; N];
 
     for (i, a) in A.iter().enumerate() {
-        ans[i] = B.lower_bound(a) + 1;
+        ans[i] = map[a];
     }
     println!("{}", ans.iter().join(" "));
 }
