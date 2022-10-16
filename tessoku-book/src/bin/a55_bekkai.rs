@@ -19,16 +19,14 @@ fn main() {
     for q in &Query {
         match q {
             (1, x) => {
-                set.insert(x);
+                set.insert(*x);
             }
             (2, x) => {
                 set.remove(x);
             }
             (3, x) => {
-                let vec: Vec<_> = set.iter().cloned().collect();
-                let index = vec.lower_bound(&x);
-                if index != vec.len() {
-                    println!("{}", vec[index]);
+                if let Some(ans) = set.range(x..).next() {
+                    println!("{}", ans);
                 } else {
                     println!("-1");
                 }
