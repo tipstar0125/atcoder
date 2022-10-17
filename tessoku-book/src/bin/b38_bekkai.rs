@@ -12,23 +12,17 @@ fn main() {
         S: Chars
     }
 
-    let mut ret1 = vec![1; N];
-    let mut ret2 = vec![1; N];
+    let mut count = vec![1; N];
 
     for (i, &s) in S.iter().enumerate() {
         if s == 'A' {
-            ret1[i + 1] = ret1[i] + 1;
+            count[i + 1] = count[i] + 1;
         }
     }
     for (i, &s) in S.iter().enumerate().rev() {
         if s == 'B' {
-            ret2[i] = ret2[i + 1] + 1;
+            count[i] = count[i].max(count[i + 1] + 1);
         }
     }
-    let ans = ret1
-        .iter()
-        .zip(ret2.iter())
-        .map(|(x, y)| x.max(y))
-        .sum::<usize>();
-    println!("{}", ans);
+    println!("{}", count.iter().sum::<usize>());
 }
