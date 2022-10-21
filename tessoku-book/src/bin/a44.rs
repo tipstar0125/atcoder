@@ -33,10 +33,7 @@ fn main() {
         }
     }
 
-    let mut A = vec![];
-    for i in 1..=N {
-        A.push(i);
-    }
+    let mut A: Vec<usize> = (1..=N).collect();
     let mut is_reversed = false;
 
     for &q in &query {
