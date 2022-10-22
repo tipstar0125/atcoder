@@ -27,7 +27,7 @@ fn main() {
     }
 }
 
-fn dfs(pos: usize, G: &[Vec<usize>], visited: &mut [bool]) {
+fn dfs(pos: usize, G: &Vec<Vec<usize>>, visited: &mut Vec<bool>) {
     visited[pos] = true;
     for &next in &G[pos] {
         if !visited[next] {

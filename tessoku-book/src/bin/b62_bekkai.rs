@@ -20,29 +20,35 @@ fn main() {
     }
 
     let mut visited = vec![false; N + 1];
-    let mut path = vec![1];
-    let mut ans = vec![];
-    dfs(1, &G, &mut visited, &mut path, &mut ans);
-    println!("{}", ans.iter().join(" "));
+    let mut memo = vec![0; N + 1];
+    let mut finish = false;
+    dfs(1, &G, &mut visited, &mut memo, 1, &mut finish);
+    println!(
+        "{}",
+        memo[1..=memo.iter().position(|&x| x == N).unwrap()]
+            .iter()
+            .join(" ")
+    );
 }
 
 fn dfs(
     pos: usize,
-    G: &Vec<Vec<usize>>,
-    visited: &mut Vec<bool>,
-    path: &mut Vec<usize>,
-    ans: &mut Vec<usize>,
+    G: &[Vec<usize>],
+    visited: &mut [bool],
+    memo: &mut [usize],
+    index: usize,
+    finish: &mut bool,
 ) {
-    if pos == visited.len() - 1 {
-        *ans = path.clone();
-        return;
-    }
     visited[pos] = true;
+    if !*finish {
+        memo[index] = pos;
+    }
+    if pos == visited.len() - 1 {
+        *finish = true;
+    }
     for &next in &G[pos] {
         if !visited[next] {
-            path.push(next);
-            dfs(next, G, visited, path, ans);
-            path.pop();
+            dfs(next, G, visited, memo, index + 1, finish);
         }
     }
 }
