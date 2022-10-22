@@ -29,18 +29,18 @@ fn main() {
         }
     }
 
-    if !dp[N][S] {
+    let mut ans = VecDeque::new();
+    let mut target = S;
+    for i in (1..=N).rev() {
+        let a = A[i - 1];
+        if dp[i][target] && target >= a && dp[i][target - a] {
+            ans.push_front(i);
+            target -= a;
+        }
+    }
+    if ans.is_empty() {
         println!("-1");
     } else {
-        let mut ans = VecDeque::new();
-        let mut place = S;
-        for i in (1..=N).rev() {
-            let a = A[i - 1];
-            if !dp[i - 1][place] {
-                ans.push_front(i);
-                place -= a;
-            }
-        }
         println!("{}", ans.len());
         println!("{}", ans.iter().join(" "));
     }

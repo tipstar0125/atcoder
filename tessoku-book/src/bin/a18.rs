@@ -26,15 +26,8 @@ fn main() {
             }
         }
     }
-    let mut exists = false;
 
-    for i in 1..=N {
-        if dp[i][S] {
-            exists = true;
-        }
-    }
-
-    if exists {
+    if dp[N][S] {
         println!("Yes");
     } else {
         println!("No");
