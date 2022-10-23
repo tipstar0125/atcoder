@@ -20,10 +20,9 @@ fn main() {
     for i in 1..=N {
         let a = A[i - 1];
         for j in 0..=S {
-            if j < a {
-                dp[i][j] = dp[i - 1][j];
-            } else {
-                dp[i][j] = dp[i - 1][j] || dp[i - 1][j - a];
+            dp[i][j] |= dp[i - 1][j];
+            if dp[i - 1][j] && a + j <= S {
+                dp[i][a + j] = true;
             }
         }
     }

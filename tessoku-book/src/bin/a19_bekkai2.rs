@@ -18,10 +18,9 @@ fn main() {
         let w = wv[i - 1].0;
         let v = wv[i - 1].1;
         for j in 0..=W {
-            if j < w {
-                dp[i][j] = dp[i - 1][j];
-            } else {
-                dp[i][j] = dp[i - 1][j].max(dp[i - 1][j - w] + v);
+            dp[i][j] = dp[i][j].max(dp[i - 1][j]);
+            if (j == 0 || dp[i - 1][j] != 0) && j + w <= W {
+                dp[i][j + w] = dp[i - 1][j] + v;
             }
         }
     }
