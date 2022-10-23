@@ -10,10 +10,12 @@ fn main() {
     input! {
         N: usize,
         W: usize,
-        wv: [(usize, usize); N]
+        wv: [(usize, isize); N]
     }
 
-    let mut dp = vec![vec![0; W + 1]; N + 1];
+    let INF = 1 << 60;
+    let mut dp = vec![vec![-INF; W + 1]; N + 1];
+    dp[0][0] = 0;
     for i in 1..=N {
         let (w, v) = wv[i - 1];
         for j in 0..=W {
