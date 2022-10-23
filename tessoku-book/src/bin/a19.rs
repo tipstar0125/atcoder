@@ -15,8 +15,7 @@ fn main() {
 
     let mut dp = vec![vec![0; W + 1]; N + 1];
     for i in 1..=N {
-        let w = wv[i - 1].0;
-        let v = wv[i - 1].1;
+        let (w, v) = wv[i - 1];
         for j in 0..=W {
             if j < w {
                 dp[i][j] = dp[i - 1][j];

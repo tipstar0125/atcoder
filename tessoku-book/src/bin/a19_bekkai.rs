@@ -17,8 +17,7 @@ fn main() {
     let mut dp_v = vec![vec![0; W + 1]; N + 1];
     dp[0][0] = true;
     for i in 1..=N {
-        let w = wv[i - 1].0;
-        let v = wv[i - 1].1;
+        let (w, v) = wv[i - 1];
         for j in 0..=W {
             dp[i][j] |= dp[i - 1][j];
             dp_v[i][j] = dp_v[i][j].max(dp_v[i - 1][j]);
