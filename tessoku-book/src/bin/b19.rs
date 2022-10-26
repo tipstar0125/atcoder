@@ -8,17 +8,17 @@ use proconio::{
 
 pub mod macros {
     #[macro_export]
-    macro_rules !max {
+    macro_rules! max {
         ($x: expr) => ($x);
-        ($x: expr, $($y: expr), +) => {
-            std::cmp::max($x, max!($($y), +))
+        ($x: expr, $( $y: expr ),+) => {
+            std::cmp::max($x, max!($( $y ),+))
         }
     }
     #[macro_export]
-    macro_rules !min {
+    macro_rules! min {
         ($x: expr) => ($x);
-        ($x: expr, $($y: expr), +) => {
-            std::cmp::min($x, min!($($y), +))
+        ($x: expr, $( $y: expr ),+) => {
+            std::cmp::min($x, min!($( $y ),+))
         }
     }
 }
