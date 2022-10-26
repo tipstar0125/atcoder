@@ -1,8 +1,6 @@
 #![allow(non_snake_case)]
 #![allow(unused_imports)]
 #![allow(unused_macros)]
-use std::collections::VecDeque;
-
 use proconio::{
     fastout, input,
     marker::{Chars, Usize1},
@@ -39,18 +37,20 @@ fn main() {
         G[B].push(A);
     }
     let mut dist = vec![-1; N + 1];
-    let mut Q = VecDeque::new();
+    let mut Q: Vec<usize> = vec![1];
     dist[1] = 0;
-    Q.push_back(1);
 
-    while !Q.is_empty() {
-        let pos = Q.pop_front().unwrap();
-        for &n in &G[pos] {
-            if dist[n] == -1 {
-                dist[n] = dist[pos] + 1;
-                Q.push_back(n);
+    for i in 1..N {
+        let mut next = vec![];
+        for &q in &Q {
+            for &pos in &G[q] {
+                if dist[pos] == -1 {
+                    next.push(pos);
+                    dist[pos] = i as isize;
+                }
             }
         }
+        Q = next;
     }
 
     for a in &dist[1..] {
