@@ -30,8 +30,17 @@ fn main() {
         N:usize
     }
 
-    println!("{}", N);
+    let mut ans = vec![];
     for i in 1..=N {
-        println!("{} {}", i, i % N + 1);
+        if i != N {
+            ans.push((i, i + 1))
+        } else {
+            ans.push((i, 1))
+        }
+    }
+
+    println!("{}", N);
+    for &a in &ans {
+        println!("{} {}", a.0, a.1);
     }
 }
