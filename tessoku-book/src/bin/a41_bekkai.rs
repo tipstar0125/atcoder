@@ -32,7 +32,7 @@ fn main() {
 
     let mut ans = "No";
     for i in 0..N - 2 {
-        if S[i..i + 3] == ['R', 'R', 'R'] || S[i..i + 3] == ['B', 'B', 'B'] {
+        if S[i] == S[i + 1] && S[i + 1] == S[i + 2] {
             ans = "Yes";
         }
     }
