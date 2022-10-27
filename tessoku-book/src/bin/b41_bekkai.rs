@@ -33,16 +33,18 @@ fn main() {
     }
 
     let mut ans = VecDeque::new();
+    ans.push_front((X, Y));
 
     while !(X == 1 && Y == 1) {
-        ans.push_front((X, Y));
         if X > Y {
             X -= Y;
         } else {
             Y -= X;
         }
+        ans.push_front((X, Y));
     }
 
+    ans.pop_front();
     println!("{}", ans.len());
     for &a in &ans {
         let (x, y) = a;
