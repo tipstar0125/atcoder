@@ -35,14 +35,13 @@ fn main() {
     while i * i <= N {
         if N % i == 0 {
             ans.push(i);
-            if i * i != N {
-                ans.push(N / i);
-            }
+            ans.push(N / i);
         }
         i += 1;
     }
 
     ans.sort();
+    ans.dedup();
 
     for &a in &ans {
         println!("{}", a);
