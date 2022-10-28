@@ -3,8 +3,6 @@
 #![allow(unused_macros)]
 #![allow(clippy::comparison_chain)]
 #![allow(dead_code)]
-use std::vec;
-
 use proconio::{
     fastout, input,
     marker::{Chars, Usize1},
