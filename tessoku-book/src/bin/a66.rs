@@ -10,21 +10,39 @@ use proconio::{
     marker::{Chars, Usize1},
 };
 
-pub mod macros {
-    #[macro_export]
-    macro_rules! max {
+#[macro_export]
+macro_rules! max {
         ($x: expr) => ($x);
         ($x: expr, $( $y: expr ),+) => {
             std::cmp::max($x, max!($( $y ),+))
         }
     }
-    #[macro_export]
-    macro_rules! min {
+#[macro_export]
+macro_rules! min {
         ($x: expr) => ($x);
         ($x: expr, $( $y: expr ),+) => {
             std::cmp::min($x, min!($( $y ),+))
         }
     }
+#[macro_export]
+macro_rules! abs {
+    ($x: expr) => {
+        if $x < 0_isize {
+            $x * (-1)
+        } else {
+            $x
+        }
+    };
+}
+#[macro_export]
+macro_rules! absf {
+    ($x: expr) => {
+        if $x < 0.0 {
+            $x * (-1.0)
+        } else {
+            $x
+        }
+    };
 }
 
 #[derive(Debug, Clone)]
