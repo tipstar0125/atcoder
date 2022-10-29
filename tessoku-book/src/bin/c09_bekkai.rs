@@ -50,11 +50,14 @@ fn main() {
         A: [usize; N]
     }
 
-    let mut dp1 = vec![0; N];
-    let mut dp2 = vec![0; N];
-    for i in 1..N {
-        dp1[i] = A[i] + dp2[i - 1];
-        dp2[i] = max!(dp1[i - 1], dp2[i - 1]);
+    let mut dp = vec![0; N];
+    let mut max = 0;
+    dp[0] = A[0];
+    dp[1] = A[1];
+    for i in 2..N {
+        max = max!(max, dp[i - 2]);
+        dp[i] = A[i] + max;
     }
-    println!("{}", max!(dp1[N - 1], dp2[N - 1]));
+
+    println!("{}", dp.iter().max().unwrap());
 }
