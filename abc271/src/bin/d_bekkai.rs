@@ -115,16 +115,16 @@ fn main() {
     dp[0][0] = true;
 
     for i in 1..=N {
-        let (a, b) = ab[i - 1];
+        let (mut a, mut b) = ab[i - 1];
+        if a > b {
+            std::mem::swap(&mut a, &mut b);
+        }
 
         for j in 0..=S {
-            if dp[i - 1][j] {
-                if j + a <= S {
-                    dp[i][j + a] = true;
-                }
-                if j + b <= S {
-                    dp[i][j + b] = true;
-                }
+            if j >= b {
+                dp[i][j] = dp[i - 1][j - a] || dp[i - 1][j - b];
+            } else if j >= a {
+                dp[i][j] = dp[i - 1][j - a];
             }
         }
     }
