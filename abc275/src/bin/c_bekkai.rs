@@ -110,23 +110,20 @@ fn main() {
 
     let mut ans = 0;
 
-    for i1 in 0..9 {
-        for j1 in 0..9 {
-            for i2 in 0..9 {
-                for j2 in 0..9 {
-                    if i2 > i1 && j2 >= j1 && S[i1][j1] == '#' && S[i2][j2] == '#' {
-                        let di = i2 as isize - i1 as isize;
-                        let dj = j2 as isize - j1 as isize;
-                        let i3 = i2 as isize + dj;
-                        let j3 = j2 as isize - di;
-                        let i4 = i3 as isize - di;
-                        let j4 = j3 as isize - dj;
-                        if j3 >= 0
-                            && i4 >= 0
-                            && j4 >= 0
-                            && i3 < 9
-                            && S[i3 as usize][j3 as usize] == '#'
-                            && S[i4 as usize][j4 as usize] == '#'
+    for i in 0..9 {
+        for j in 0..9 {
+            if S[i][j] == '#' {
+                for m in j + 1..9 {
+                    for n in i..9 {
+                        let diff_row = n - i;
+                        let diff_col = m - j;
+                        if n + diff_col < 9
+                            && m >= diff_row
+                            && i + diff_col < 9
+                            && j >= diff_row
+                            && S[n][m] == '#'
+                            && S[n + diff_col][m - diff_row] == '#'
+                            && S[i + diff_col][j - diff_row] == '#'
                         {
                             ans += 1;
                         }
