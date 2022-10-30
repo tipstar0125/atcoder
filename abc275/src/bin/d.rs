@@ -136,9 +136,7 @@ fn floor_sum(n: usize, memo: &mut HashMap<usize, usize>) -> usize {
         return *memo.get(&n).unwrap();
     }
 
-    let a = (n as f64 / 2.0).floor() as usize;
-    let b = (n as f64 / 3.0).floor() as usize;
-    let result = floor_sum(a, memo) + floor_sum(b, memo);
+    let result = floor_sum(n/2, memo) + floor_sum(n/3, memo);
     memo.insert(n, result);
     result
 }
