@@ -4,7 +4,6 @@
 #![allow(clippy::comparison_chain)]
 #![allow(clippy::nonminimal_bool)]
 #![allow(dead_code)]
-use num_traits::Pow;
 use proconio::{
     fastout, input,
     marker::{Chars, Usize1},
@@ -116,26 +115,42 @@ impl Solver {
 
         let mut ans = vec![];
 
-        for num in 0..10000 {
-            let mut is_ok = true;
-            for &(s, t) in &ST {
-                let mut matched_num = 0;
-                for i in 0..4 {
-                    if num / 10_usize.pow(i) % 10 == s / 10_usize.pow(i) % 10 {
-                        matched_num += 1;
+        for i in 0..10 {
+            for j in 0..10 {
+                for k in 0..10 {
+                    for l in 0..10 {
+                        let mut is_ok = true;
+                        for &(s, t) in &ST {
+                            let v1 = s % 10;
+                            let v10 = s / 10 % 10;
+                            let v100 = s / 100 % 10;
+                            let v1000 = s / 1000 % 10;
+                            let mut sum_same = 0;
+                            if i == v1000 {
+                                sum_same += 1;
+                            }
+                            if j == v100 {
+                                sum_same += 1;
+                            }
+                            if k == v10 {
+                                sum_same += 1;
+                            }
+                            if l == v1 {
+                                sum_same += 1;
+                            }
+                            if (t == 1 && sum_same != 4)
+                                || (t == 2 && sum_same != 3)
+                                || (t == 3 && sum_same >= 3)
+                            {
+                                is_ok &= false;
+                            }
+                        }
+                        
+                        if is_ok {
+                            ans.push(i * 1000 + j * 100 + k * 10 + l);
+                        }
                     }
                 }
-
-                if (t == 1 && matched_num != 4)
-                    || (t == 2 && matched_num != 3)
-                    || (t == 3 && matched_num >= 3)
-                {
-                    is_ok &= false;
-                }
-            }
-
-            if is_ok {
-                ans.push(num);
             }
         }
         if ans.len() == 1 {
