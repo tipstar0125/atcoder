@@ -132,34 +132,35 @@ impl Solver {
             if remaining_steps < 0 {
                 continue;
             }
-
-            let mut column = vec![];
-            for j in 0..W {
-                let mut count = 0;
-                for i in 0..H {
-                    if d[i][j] == '.' {
-                        count += 1;
+            for _ in 0..remaining_steps {
+                let mut max_index = 0;
+                let mut max_white_num = 0;
+                for j in 0..W {
+                    let mut white_num = 0;
+                    for i in 0..H {
+                        if d[i][j] == '.' {
+                            white_num += 1;
+                        }
+                    }
+                    if white_num >= max_white_num {
+                        max_white_num = white_num;
+                        max_index = j;
                     }
                 }
-                column.push((j, count));
-            }
-            column.sort_by(|(_, a), (_, b)| b.cmp(a));
-            for j in 0..remaining_steps {
-                let (index, _) = column[j as usize];
                 for i in 0..H {
-                    d[i][index] = '#';
+                    d[i][max_index] = '#';
                 }
             }
 
-            let mut black_count = 0;
+            let mut black_num = 0;
             for i in 0..H {
                 for j in 0..W {
                     if d[i][j] == '#' {
-                        black_count += 1;
+                        black_num += 1;
                     }
                 }
             }
-            ans = max!(ans, black_count);
+            ans = max!(ans, black_num);
         }
         println!("{}", ans);
     }
