@@ -137,44 +137,64 @@ impl Solver {
         for &(d, l) in &dl {
             match d {
                 'L' => {
-                    let mut wall = 0;
                     if map_row.get(&rs).is_some() {
                         let set = &map_row[&rs];
-                        wall = *set.range(..cs).next_back().unwrap();
-                    }
-                    if cs > l {
-                        cs = max!(cs - l, wall + 1);
+                        let wall = set.range(..cs).next_back().unwrap();
+                        if cs - wall <= l {
+                            cs = wall + 1;
+                        } else {
+                            cs -= l;
+                        }
+                    } else if cs <= l {
+                        cs = 1;
                     } else {
-                        cs = wall + 1;
+                        cs -= l;
                     }
                 }
                 'R' => {
-                    let mut wall = W + 1;
                     if map_row.get(&rs).is_some() {
                         let set = &map_row[&rs];
-                        wall = *set.range(cs..).next().unwrap();
+                        let wall = set.range(cs..).next().unwrap();
+                        if wall - cs <= l {
+                            cs = wall - 1;
+                        } else {
+                            cs += l;
+                        }
+                    } else if cs + l > W {
+                        cs = W;
+                    } else {
+                        cs += l;
                     }
-                    cs = min!(cs + l, wall - 1);
                 }
                 'U' => {
-                    let mut wall = 0;
                     if map_col.get(&cs).is_some() {
                         let set = &map_col[&cs];
-                        wall = *set.range(..rs).next_back().unwrap();
-                    }
-                    if rs > l {
-                        rs = max!(rs - l, wall + 1);
+                        let wall = set.range(..rs).next_back().unwrap();
+                        if rs - wall <= l {
+                            rs = wall + 1;
+                        } else {
+                            rs -= l;
+                        }
+                    } else if rs <= l {
+                        rs = 1;
                     } else {
-                        rs = wall + 1;
+                        rs -= l;
                     }
                 }
                 'D' => {
-                    let mut wall = H + 1;
                     if map_col.get(&cs).is_some() {
                         let set = &map_col[&cs];
-                        wall = *set.range(rs..).next().unwrap();
+                        let wall = set.range(rs..).next().unwrap();
+                        if wall - rs <= l {
+                            rs = wall - 1;
+                        } else {
+                            rs += l;
+                        }
+                    } else if rs + l > H {
+                        rs = H;
+                    } else {
+                        rs += l;
                     }
-                    rs = min!(rs + l, wall - 1);
                 }
                 _ => unreachable!(),
             }
