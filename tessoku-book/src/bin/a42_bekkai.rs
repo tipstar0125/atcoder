@@ -113,19 +113,22 @@ impl Solver {
         input! {
             N: usize,
             K: usize,
-            AB: [(usize, usize); N]
+            mut AB: [(usize, usize); N]
         }
 
+        AB.sort_by(|(a, _), (b, _)| a.cmp(b));
+        let A = AB.iter().map(|&(a, _)| a).collect::<Vec<usize>>();
+        let B = AB.iter().map(|&(_, b)| b).collect::<Vec<usize>>();
         let mut ans = 0;
-        for i in 1..=100 {
-            for j in 1..=100 {
-                let mut count = 0;
-                for &(a, b) in &AB {
-                    if a >= i && a <= i + K && b >= j && b <= j + K {
-                        count += 1;
-                    }
-                }
-                ans = max!(ans, count);
+
+        for i in 0..N {
+            let index_a = A.upper_bound(&(K + A[i]));
+            let mut C = vec![0; index_a - i];
+            C.clone_from_slice(&B[i..index_a]);
+            C.sort();
+            for j in 0..C.len() {
+                let index_c = C.upper_bound(&(K + C[j]));
+                ans = max!(ans, index_c - j);
             }
         }
         println!("{}", ans);
