@@ -114,27 +114,44 @@ impl Solver {
             AB: [(isize, isize); N]
         }
 
-        let mut ans1 = 0; // (+, +)
-        let mut ans2 = 0; // (+, -)
-        let mut ans3 = 0; // (-, +)
-        let mut ans4 = 0; // (-, -)
+        let mut p1 = 0_isize; // (+, +)
+        let mut p2 = 0_isize; // (+, -)
+        let mut p3 = 0_isize; // (-, +)
+        let mut p4 = 0_isize; // (-, -)
 
         for &(a, b) in &AB {
-            if a + b > 0 {
-                ans1 += a + b;
-            }
-            if a - b > 0 {
-                ans2 += a - b;
-            }
-            if -a + b > 0 {
-                ans3 += -a + b;
-            }
-            if -a - b > 0 {
-                ans4 += -a - b;
+            if a >= 0 && b >= 0 {
+                p1 += a + b;
+                if a > b {
+                    p2 += a - b;
+                } else {
+                    p3 += b - a;
+                }
+            } else if a >= 0 && b < 0 {
+                p2 += a - b;
+                if a > abs!(b) {
+                    p1 += a + b;
+                } else {
+                    p4 += a + b;
+                }
+            } else if a < 0 && b >= 0 {
+                p3 += b - a;
+                if abs!(a) < b {
+                    p1 += a + b;
+                } else {
+                    p4 += a + b;
+                }
+            } else {
+                p4 += a + b;
+                if a > b {
+                    p2 += a - b;
+                } else {
+                    p3 += b - a;
+                }
             }
         }
 
-        let ans = max!(ans1, ans2, ans3, ans4);
+        let ans = max!(abs!(p1), abs!(p2), abs!(p3), abs!(p4));
         println!("{}", ans);
     }
 }
