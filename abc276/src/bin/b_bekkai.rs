@@ -5,7 +5,9 @@
 #![allow(clippy::nonminimal_bool)]
 #![allow(clippy::neg_multiply)]
 #![allow(dead_code)]
-use num_integer::gcd;
+use std::collections::BTreeSet;
+
+use itertools::Itertools;
 use proconio::{
     fastout, input,
     marker::{Chars, Usize1},
@@ -111,33 +113,20 @@ impl Solver {
     #[fastout]
     fn solve(&mut self) {
         input! {
-            N: usize,
-            a: [usize; N]
+            N:usize,
+            M:usize,
+            AB: [(usize, usize); M]
         }
 
-        let mut ans = 0;
-        let mut g = 0;
-        for i in 0..N {
-            g = gcd(g, a[i]);
+        let mut G = vec![BTreeSet::new(); N + 1];
+        for &(a, b) in &AB {
+            G[a].insert(b);
+            G[b].insert(a);
         }
 
-        for &ai in &a {
-            let mut c = ai / g;
-            while c % 2 == 0 {
-                c /= 2;
-                ans += 1;
-            }
-            while c % 3 == 0 {
-                c /= 3;
-                ans += 1;
-            }
-            if c != 1 {
-                println!("-1");
-                return;
-            }
+        for i in 1..=N {
+            println!("{} {}", G[i].len(), G[i].iter().join(" "))
         }
-
-        println!("{}", ans);
     }
 }
 

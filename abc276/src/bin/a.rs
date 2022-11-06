@@ -113,13 +113,14 @@ impl Solver {
             S: Chars
         }
 
-        let mut ans = -1_isize;
-        for (i, &s) in S.iter().enumerate() {
+        for (i, &s) in S.iter().enumerate().rev() {
             if s == 'a' {
-                ans = i as isize + 1;
+                let ans = i as isize + 1;
+                println!("{}", ans);
+                return;
             }
         }
-        println!("{}", ans);
+        println!("-1");
     }
 }
 

@@ -114,30 +114,42 @@ impl Solver {
             N: usize,
             a: [usize; N]
         }
-
+        let mut b = vec![];
         let mut ans = 0;
-        let mut g = 0;
-        for i in 0..N {
+
+        let mut g = gcd(a[0], a[1]);
+        let mut is_ok = true;
+        for i in 2..N {
             g = gcd(g, a[i]);
         }
 
         for &ai in &a {
-            let mut c = ai / g;
-            while c % 2 == 0 {
+            let mut c = ai;
+            let mut d = ai / g;
+            while d % 2 == 0 {
                 c /= 2;
+                d /= 2;
                 ans += 1;
             }
-            while c % 3 == 0 {
+            while d % 3 == 0 {
                 c /= 3;
+                d /= 3;
                 ans += 1;
             }
-            if c != 1 {
-                println!("-1");
-                return;
+            b.push(c);
+        }
+
+        for i in 0..N - 1 {
+            if b[i] != b[i + 1] {
+                is_ok = false;
             }
         }
 
-        println!("{}", ans);
+        if is_ok {
+            println!("{}", ans);
+        } else {
+            println!("-1");
+        }
     }
 }
 

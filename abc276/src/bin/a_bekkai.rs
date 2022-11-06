@@ -5,7 +5,6 @@
 #![allow(clippy::nonminimal_bool)]
 #![allow(clippy::neg_multiply)]
 #![allow(dead_code)]
-use num_integer::gcd;
 use proconio::{
     fastout, input,
     marker::{Chars, Usize1},
@@ -111,32 +110,15 @@ impl Solver {
     #[fastout]
     fn solve(&mut self) {
         input! {
-            N: usize,
-            a: [usize; N]
+            S: Chars
         }
 
-        let mut ans = 0;
-        let mut g = 0;
-        for i in 0..N {
-            g = gcd(g, a[i]);
-        }
-
-        for &ai in &a {
-            let mut c = ai / g;
-            while c % 2 == 0 {
-                c /= 2;
-                ans += 1;
-            }
-            while c % 3 == 0 {
-                c /= 3;
-                ans += 1;
-            }
-            if c != 1 {
-                println!("-1");
-                return;
+        let mut ans = -1_isize;
+        for (i, &s) in S.iter().enumerate() {
+            if s == 'a' {
+                ans = i as isize + 1;
             }
         }
-
         println!("{}", ans);
     }
 }

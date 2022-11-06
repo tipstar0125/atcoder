@@ -5,11 +5,12 @@
 #![allow(clippy::nonminimal_bool)]
 #![allow(clippy::neg_multiply)]
 #![allow(dead_code)]
-use num_integer::gcd;
+use itertools::Itertools;
 use proconio::{
     fastout, input,
     marker::{Chars, Usize1},
 };
+use superslice::Ext;
 
 #[macro_export]
 macro_rules! max {
@@ -112,32 +113,34 @@ impl Solver {
     fn solve(&mut self) {
         input! {
             N: usize,
-            a: [usize; N]
+            P: [usize; N]
         }
 
-        let mut ans = 0;
-        let mut g = 0;
-        for i in 0..N {
-            g = gcd(g, a[i]);
-        }
-
-        for &ai in &a {
-            let mut c = ai / g;
-            while c % 2 == 0 {
-                c /= 2;
-                ans += 1;
-            }
-            while c % 3 == 0 {
-                c /= 3;
-                ans += 1;
-            }
-            if c != 1 {
-                println!("-1");
-                return;
+        let mut rev_point = 0_usize;
+        for i in (0..N - 1).rev() {
+            if P[i] > P[i + 1] {
+                rev_point = i;
+                break;
             }
         }
 
-        println!("{}", ans);
+        let mut A = vec![0; rev_point];
+        let rev_num = P[rev_point];
+        let mut C = vec![0; P.len() - rev_point - 1];
+        A.clone_from_slice(&P[..rev_point]);
+        C.clone_from_slice(&P[rev_point + 1..]);
+        let index = C.lower_bound(&rev_num) - 1;
+        let changed_num = C[index];
+        C.remove(index);
+        C.push(rev_num);
+        C.sort_by(|a, b| b.cmp(a));
+
+        println!(
+            "{} {} {}",
+            A.iter().join(" "),
+            changed_num,
+            C.iter().join(" ")
+        );
     }
 }
 

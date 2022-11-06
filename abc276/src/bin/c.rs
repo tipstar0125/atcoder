@@ -10,7 +10,6 @@ use proconio::{
     fastout, input,
     marker::{Chars, Usize1},
 };
-use superslice::Ext;
 
 #[macro_export]
 macro_rules! max {
@@ -113,34 +112,24 @@ impl Solver {
     fn solve(&mut self) {
         input! {
             N: usize,
-            P: [usize; N]
+            mut P: [usize; N]
         }
 
-        let mut rev_point = 0_usize;
-        for i in (0..N - 1).rev() {
-            if P[i] > P[i + 1] {
-                rev_point = i;
-                break;
-            }
+        let mut j = N - 2;
+        while P[j] < P[j + 1] {
+            j -= 1;
         }
 
-        let mut A = vec![0; rev_point];
-        let rev_num = P[rev_point];
-        let mut C = vec![0; P.len() - rev_point - 1];
-        A.clone_from_slice(&P[..rev_point]);
-        C.clone_from_slice(&P[rev_point + 1..]);
-        let index = C.lower_bound(&rev_num) - 1;
-        let changed_num = C[index];
-        C.remove(index);
-        C.push(rev_num);
-        C.sort_by(|a, b| b.cmp(a));
+        let mut k = N - 1;
+        while P[j] < P[k] {
+            k -= 1;
+        }
 
-        println!(
-            "{} {} {}",
-            A.iter().join(" "),
-            changed_num,
-            C.iter().join(" ")
-        );
+        P.swap(j, k);
+        let mut Q = vec![0; P.len() - j - 1];
+        Q.clone_from_slice(&P[j + 1..]);
+        Q.reverse();
+        println!("{} {}", &P[..j + 1].iter().join(" "), Q.iter().join(" "));
     }
 }
 

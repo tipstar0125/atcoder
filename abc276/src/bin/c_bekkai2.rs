@@ -5,11 +5,12 @@
 #![allow(clippy::nonminimal_bool)]
 #![allow(clippy::neg_multiply)]
 #![allow(dead_code)]
-use num_integer::gcd;
+use itertools::Itertools;
 use proconio::{
     fastout, input,
     marker::{Chars, Usize1},
 };
+use superslice::Ext;
 
 #[macro_export]
 macro_rules! max {
@@ -112,32 +113,11 @@ impl Solver {
     fn solve(&mut self) {
         input! {
             N: usize,
-            a: [usize; N]
+            mut P: [usize; N]
         }
 
-        let mut ans = 0;
-        let mut g = 0;
-        for i in 0..N {
-            g = gcd(g, a[i]);
-        }
-
-        for &ai in &a {
-            let mut c = ai / g;
-            while c % 2 == 0 {
-                c /= 2;
-                ans += 1;
-            }
-            while c % 3 == 0 {
-                c /= 3;
-                ans += 1;
-            }
-            if c != 1 {
-                println!("-1");
-                return;
-            }
-        }
-
-        println!("{}", ans);
+        P.prev_permutation();
+        println!("{}", P.iter().join(" "));
     }
 }
 

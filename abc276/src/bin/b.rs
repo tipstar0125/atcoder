@@ -118,14 +118,16 @@ impl Solver {
             AB: [(usize, usize); M]
         }
 
-        let mut G = vec![BTreeSet::new(); N + 1];
+        let mut G = vec![vec![]; N + 1];
         for &(a, b) in &AB {
-            G[a].insert(b);
-            G[b].insert(a);
+            G[a].push(b);
+            G[b].push(a);
         }
 
         for i in 1..=N {
-            println!("{} {}", G[i].len(), G[i].iter().join(" "))
+            let mut gi = G[i].clone();
+            gi.sort();
+            println!("{} {}", gi.len(), gi.iter().join(" "))
         }
     }
 }
