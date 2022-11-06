@@ -5,8 +5,6 @@
 #![allow(clippy::nonminimal_bool)]
 #![allow(clippy::neg_multiply)]
 #![allow(dead_code)]
-use std::collections::VecDeque;
-
 use proconio::{
     fastout, input,
     marker::{Chars, Usize1},
@@ -151,27 +149,9 @@ impl Solver {
             }
         }
 
-        let mut visited = vec![-1; H * W];
+        let mut visited = vec![false; H * W];
         let mut is_ok = false;
-        let mut Q = VecDeque::new();
-
-        visited[start] = 0;
-        for (i, &x) in G[start].iter().enumerate() {
-            visited[x] = i as isize + 1;
-            Q.push_back(x);
-        }
-
-        while !Q.is_empty() {
-            let pos = Q.pop_front().unwrap();
-            for &n in &G[pos] {
-                if visited[n] == -1 {
-                    visited[n] = visited[pos];
-                    Q.push_back(n);
-                } else if visited[n] != 0 && visited[n] != visited[pos] {
-                    is_ok = true;
-                }
-            }
-        }
+        dfs(start, &G, &mut visited, 0, start, &mut is_ok);
 
         if is_ok {
             println!("Yes");
@@ -188,4 +168,23 @@ fn main() {
         .unwrap()
         .join()
         .unwrap();
+}
+
+fn dfs(
+    pos: usize,
+    G: &Vec<Vec<usize>>,
+    visited: &mut Vec<bool>,
+    depth: usize,
+    end: usize,
+    is_ok: &mut bool,
+) {
+    visited[pos] = true;
+    for &next in &G[pos] {
+        if next == end && depth > 1 {
+            *is_ok = true;
+        }
+        if !visited[next] {
+            dfs(next, G, visited, depth + 1, end, is_ok);
+        }
+    }
 }

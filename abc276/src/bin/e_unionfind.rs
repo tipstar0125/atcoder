@@ -5,8 +5,6 @@
 #![allow(clippy::nonminimal_bool)]
 #![allow(clippy::neg_multiply)]
 #![allow(dead_code)]
-use std::collections::VecDeque;
-
 use proconio::{
     fastout, input,
     marker::{Chars, Usize1},
@@ -118,61 +116,62 @@ impl Solver {
         }
 
         let mut G = vec![vec![]; H * W];
-        let mut start = 0;
-
-        for i in 0..H {
-            for j in 0..W {
-                if C[i][j] == 'S' {
-                    start = i * W + j;
-                }
-            }
-        }
+        let mut start_adjacency = vec![];
 
         for i in 0..H {
             for j in 0..W - 1 {
-                if (C[i][j] == '.' || C[i][j] == 'S') && (C[i][j + 1] == '.' || C[i][j + 1] == 'S')
-                {
+                if C[i][j] == '.' && C[i][j + 1] == '.' {
                     let index1 = i * W + j;
                     let index2 = i * W + j + 1;
                     G[index1].push(index2);
                     G[index2].push(index1);
                 }
+                if C[i][j] == '.' && C[i][j + 1] == 'S' {
+                    start_adjacency.push(i * W + j);
+                }
+                if C[i][j] == 'S' && C[i][j + 1] == '.' {
+                    start_adjacency.push(i * W + j + 1);
+                }
             }
         }
         for j in 0..W {
             for i in 0..H - 1 {
-                if (C[i][j] == '.' || C[i][j] == 'S') && (C[i + 1][j] == '.' || C[i + 1][j] == 'S')
-                {
+                if C[i][j] == '.' && C[i + 1][j] == '.' {
                     let index1 = i * W + j;
                     let index2 = (i + 1) * W + j;
                     G[index1].push(index2);
                     G[index2].push(index1);
                 }
+                if C[i][j] == '.' && C[i + 1][j] == 'S' {
+                    start_adjacency.push(i * W + j);
+                }
+                if C[i][j] == 'S' && C[i + 1][j] == '.' {
+                    start_adjacency.push((i + 1) * W + j);
+                }
+            }
+        }
+        start_adjacency.dedup();
+        let mut uf = UnionFind::new(H * W);
+        for i in 0..H * W {
+            for &x in &G[i] {
+                uf.unite(i, x);
             }
         }
 
-        let mut visited = vec![-1; H * W];
-        let mut is_ok = false;
-        let mut Q = VecDeque::new();
-
-        visited[start] = 0;
-        for (i, &x) in G[start].iter().enumerate() {
-            visited[x] = i as isize + 1;
-            Q.push_back(x);
+        if start_adjacency.len() < 2 {
+            println!("No");
+            return;
         }
 
-        while !Q.is_empty() {
-            let pos = Q.pop_front().unwrap();
-            for &n in &G[pos] {
-                if visited[n] == -1 {
-                    visited[n] = visited[pos];
-                    Q.push_back(n);
-                } else if visited[n] != 0 && visited[n] != visited[pos] {
+        let mut is_ok = false;
+        for i in 0..start_adjacency.len() {
+            for j in i + 1..start_adjacency.len() {
+                if uf.is_same(start_adjacency[i], start_adjacency[j]) {
                     is_ok = true;
                 }
             }
         }
-
+        
         if is_ok {
             println!("Yes");
         } else {
@@ -183,7 +182,7 @@ impl Solver {
 
 fn main() {
     std::thread::Builder::new()
-        .stack_size(128 * 1024 * 1024)
+        .stack_size(64 * 1024 * 1024)
         .spawn(|| Solver::default().solve())
         .unwrap()
         .join()
