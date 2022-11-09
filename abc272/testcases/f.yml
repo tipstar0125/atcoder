@@ -1,0 +1,26 @@
+---
+type: Batch
+timelimit: 2s
+match: Lines
+
+cases:
+  - name: sample1
+    in: |
+      3
+      adb
+      cab
+    out: |
+      4
+  - name: sample2
+    in: |
+      10
+      wsiuhwijsl
+      pwqoketvun
+    out: |
+      56
+
+extend:
+  - type: Text
+    path: "./f"
+    in: /in/*.txt
+    out: /out/*.txt
