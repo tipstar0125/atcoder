@@ -133,16 +133,12 @@ impl Solver {
                 j += 1;
             }
             yakusu.dedup();
-            if yakusu.len() % 2 == 1 {
+            if yakusu.len() % 2 == 1 || yakusu.is_empty() {
                 dist.push(((a as f64).sqrt() as usize, (b as f64).sqrt() as usize));
-                dist.push(((b as f64).sqrt() as usize, (a as f64).sqrt() as usize));
             }
 
             i += 1;
         }
-
-        dist.sort();
-        dist.dedup();
 
         let mut ans = vec![vec![-1; N]; N];
         ans[0][0] = 0;
