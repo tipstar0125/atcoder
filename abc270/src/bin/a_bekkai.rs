@@ -110,22 +110,16 @@ impl Solver {
     #[fastout]
     fn solve(&mut self) {
         input! {
-            X: isize,
-            Y: isize,
-            Z: isize
+            A: usize,
+            B: usize
         }
 
-        if f(X, Y) {
-            println!("{}", X.abs());
-            return;
-        }
-        if f(Z, Y) {
-            let mut ans = Z.abs();
-            ans += (Z - X).abs();
-            println!("{}", ans);
-            return;
-        }
-        println!("-1")
+        let mut vec = vec![];
+        f(A, &mut vec);
+        f(B, &mut vec);
+        vec.sort();
+        vec.dedup();
+        println!("{}", vec.iter().sum::<usize>());
     }
 }
 
@@ -138,12 +132,38 @@ fn main() {
         .unwrap();
 }
 
-fn f(x: isize, y: isize) -> bool {
-    if x > 0 && y > 0 {
-        x < y
-    } else if x < 0 && y < 0 {
-        y < x
-    } else {
-        true
+fn f(x: usize, vec: &mut Vec<usize>) {
+    if x == 1 {
+        vec.push(1);
+        return;
+    }
+    if x == 2 {
+        vec.push(2);
+        return;
+    }
+    if x == 4 {
+        vec.push(4);
+        return;
+    }
+    if x == 3 {
+        vec.push(1);
+        vec.push(2);
+        return;
+    }
+    if x == 5 {
+        vec.push(1);
+        vec.push(4);
+        return;
+    }
+    if x == 6 {
+        vec.push(2);
+        vec.push(4);
+        return;
+    }
+    if x == 7 {
+        vec.push(1);
+        vec.push(2);
+        vec.push(4);
+        return;
     }
 }
