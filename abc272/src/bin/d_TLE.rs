@@ -117,35 +117,63 @@ impl Solver {
             M:usize
         }
 
+        let mut i = 0;
         let mut dist = vec![];
-        for i in 0..=N {
-            for j in 0..=N {
-                if i * i + j * j == M {
-                    dist.push((i as isize, j as isize));
-                    dist.push((i as isize * -1, j as isize));
-                    dist.push((i as isize, j as isize * -1));
-                    dist.push((i as isize * -1, j as isize * -1));
+        while i * i <= M {
+            let a = i * i;
+            let b = M - a;
+
+            let mut j = 1;
+            let mut yakusu = vec![];
+            while j * j <= b {
+                if b % j == 0 {
+                    yakusu.push(j);
+                    yakusu.push(b / j);
+                }
+                j += 1;
+            }
+            yakusu.dedup();
+            if yakusu.len() % 2 == 1 || yakusu.is_empty() {
+                dist.push(((a as f64).sqrt() as usize, (b as f64).sqrt() as usize));
+            }
+
+            i += 1;
+        }
+
+        let mut G = vec![vec![]; N * N];
+        for i in 0..N {
+            for j in 0..N {
+                for &(a, b) in &dist {
+                    if is_area(i as isize + a as isize, j as isize + b as isize, N, N) {
+                        let index1 = i * N + j;
+                        let index2 = (i + a) * N + j + b;
+                        G[index1].push(index2);
+                        G[index2].push(index1);
+                    }
+                    if is_area(i as isize + a as isize, j as isize - b as isize, N, N) {
+                        let index1 = i * N + j;
+                        let index2 = (i + a) * N + j - b;
+                        G[index1].push(index2);
+                        G[index2].push(index1);
+                    }
                 }
             }
         }
 
-        let mut ans = vec![vec![-1; N]; N];
-        ans[0][0] = 0;
         let mut Q = VecDeque::new();
-        for &(a, b) in &dist {
-            Q.push_back(((0, 0), (a, b)));
-        }
+        let mut ans = vec![vec![-1; N]; N];
+        Q.push_back((0, -1));
 
         while !Q.is_empty() {
-            let ((x0, y0), (c, d)) = Q.pop_front().unwrap();
-
-            if is_area(x0 + c, y0 + d, N, N) && ans[(x0 + c) as usize][(y0 + d) as usize] == -1 {
-                ans[(x0 + c) as usize][(y0 + d) as usize] = ans[x0 as usize][y0 as usize] + 1;
-                for &(a, b) in &dist {
-                    Q.push_back(((x0 + c, y0 + d), (a, b)));
+            let (pos, before) = Q.pop_front().unwrap();
+            ans[pos / N][pos % N] = before + 1;
+            for &next in &G[pos] {
+                if ans[next / N][next % N] == -1 {
+                    Q.push_back((next, before + 1));
                 }
             }
         }
+
         for row in &ans {
             println!("{}", row.iter().join(" "));
         }

@@ -117,16 +117,27 @@ impl Solver {
             M:usize
         }
 
+        let mut i = 0;
         let mut dist = vec![];
-        for i in 0..=N {
-            for j in 0..=N {
-                if i * i + j * j == M {
-                    dist.push((i as isize, j as isize));
-                    dist.push((i as isize * -1, j as isize));
-                    dist.push((i as isize, j as isize * -1));
-                    dist.push((i as isize * -1, j as isize * -1));
+        while i * i <= M {
+            let a = i * i;
+            let b = M - a;
+
+            let mut j = 1;
+            let mut yakusu = vec![];
+            while j * j <= b {
+                if b % j == 0 {
+                    yakusu.push(j);
+                    yakusu.push(b / j);
                 }
+                j += 1;
             }
+            yakusu.dedup();
+            if yakusu.len() % 2 == 1 || yakusu.is_empty() {
+                dist.push(((a as f64).sqrt() as usize, (b as f64).sqrt() as usize));
+            }
+
+            i += 1;
         }
 
         let mut ans = vec![vec![-1; N]; N];
@@ -137,12 +148,38 @@ impl Solver {
         }
 
         while !Q.is_empty() {
-            let ((x0, y0), (c, d)) = Q.pop_front().unwrap();
+            let ((x0, y0), (a, b)) = Q.pop_front().unwrap();
 
-            if is_area(x0 + c, y0 + d, N, N) && ans[(x0 + c) as usize][(y0 + d) as usize] == -1 {
-                ans[(x0 + c) as usize][(y0 + d) as usize] = ans[x0 as usize][y0 as usize] + 1;
-                for &(a, b) in &dist {
-                    Q.push_back(((x0 + c, y0 + d), (a, b)));
+            if is_area(x0 as isize + a as isize, y0 as isize + b as isize, N, N)
+                && ans[x0 + a][y0 + b] == -1
+            {
+                ans[x0 + a][y0 + b] = ans[x0][y0] + 1;
+                for &(c, d) in &dist {
+                    Q.push_back(((x0 + a, y0 + b), (c, d)));
+                }
+            }
+            if is_area(x0 as isize + a as isize, y0 as isize - b as isize, N, N)
+                && ans[x0 + a][y0 - b] == -1
+            {
+                ans[x0 + a][y0 - b] = ans[x0][y0] + 1;
+                for &(c, d) in &dist {
+                    Q.push_back(((x0 + a, y0 - b), (c, d)));
+                }
+            }
+            if is_area(x0 as isize - a as isize, y0 as isize + b as isize, N, N)
+                && ans[x0 - a][y0 + b] == -1
+            {
+                ans[x0 - a][y0 + b] = ans[x0][y0] + 1;
+                for &(c, d) in &dist {
+                    Q.push_back(((x0 - a, y0 + b), (c, d)));
+                }
+            }
+            if is_area(x0 as isize - a as isize, y0 as isize - b as isize, N, N)
+                && ans[x0 - a][y0 - b] == -1
+            {
+                ans[x0 - a][y0 - b] = ans[x0][y0] + 1;
+                for &(c, d) in &dist {
+                    Q.push_back(((x0 - a, y0 - b), (c, d)));
                 }
             }
         }
