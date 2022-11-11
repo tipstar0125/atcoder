@@ -117,27 +117,16 @@ impl Solver {
             M:usize
         }
 
-        let mut i = 0;
         let mut dist = vec![];
-        while i * i <= M {
-            let a = i * i;
-            let b = M - a;
-
-            let mut j = 1;
-            let mut yakusu = vec![];
-            while j * j <= b {
-                if b % j == 0 {
-                    yakusu.push(j);
-                    yakusu.push(b / j);
+        for i in 0..=N {
+            for j in 0..=N {
+                if i * i + j * j == M {
+                    dist.push((i as isize, j as isize));
+                    dist.push((i as isize * -1, j as isize));
+                    dist.push((i as isize, j as isize * -1));
+                    dist.push((i as isize * -1, j as isize * -1));
                 }
-                j += 1;
             }
-            yakusu.dedup();
-            if yakusu.len() % 2 == 1 || yakusu.is_empty() {
-                dist.push(((a as f64).sqrt() as usize, (b as f64).sqrt() as usize));
-            }
-
-            i += 1;
         }
 
         let mut G = vec![vec![]; N * N];
@@ -146,15 +135,8 @@ impl Solver {
                 for &(a, b) in &dist {
                     if is_area(i as isize + a as isize, j as isize + b as isize, N, N) {
                         let index1 = i * N + j;
-                        let index2 = (i + a) * N + j + b;
+                        let index2 = (i as isize + a) as usize * N + (j as isize + b) as usize;
                         G[index1].push(index2);
-                        G[index2].push(index1);
-                    }
-                    if is_area(i as isize + a as isize, j as isize - b as isize, N, N) {
-                        let index1 = i * N + j;
-                        let index2 = (i + a) * N + j - b;
-                        G[index1].push(index2);
-                        G[index2].push(index1);
                     }
                 }
             }
@@ -162,14 +144,14 @@ impl Solver {
 
         let mut Q = VecDeque::new();
         let mut ans = vec![vec![-1; N]; N];
-        Q.push_back((0, -1));
+        Q.push_back((0, 0));
 
         while !Q.is_empty() {
-            let (pos, before) = Q.pop_front().unwrap();
-            ans[pos / N][pos % N] = before + 1;
+            let (pos, cost) = Q.pop_front().unwrap();
+            ans[pos / N][pos % N] = cost;
             for &next in &G[pos] {
                 if ans[next / N][next % N] == -1 {
-                    Q.push_back((next, before + 1));
+                    Q.push_back((next, cost + 1));
                 }
             }
         }
