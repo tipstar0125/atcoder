@@ -102,27 +102,23 @@ impl Solver {
     #[fastout]
     fn solve(&mut self) {
         input! {
-            N: usize,
-            XY: [(isize, isize); N]
+            N:usize
         }
 
-        let mut uf = UnionFind::new(N);
-        for i in 0..N {
-            for j in i + 1..N {
-                let (x0, y0) = XY[i];
-                let (x1, y1) = XY[j];
-                if ((x0 - x1) == 1 && (y0 - y1) == 1)
-                    || ((x0 - x1) == 1 && y0 == y1)
-                    || (x0 == x1 && (y0 - y1) == 1)
-                    || (x0 == x1 && (y1 - y0) == 1)
-                    || ((x1 - x0) == 1 && y0 == y1)
-                    || ((x1 - x0) == 1 && (y1 - y0) == 1)
-                {
-                    uf.unite(i, j);
-                }
+        let mut v = vec![];
+        for i in 0..60 {
+            if (N >> i) % 2 == 1 {
+                v.push(i);
             }
         }
-        println!("{}", uf.get_size());
+
+        for i in 0..1 << v.len() {
+            let mut ans = 0_usize;
+            for j in 0..v.len() {
+                ans |= (i >> j & 1) << v[j];
+            }
+            println!("{}", ans);
+        }
     }
 }
 fn main() {

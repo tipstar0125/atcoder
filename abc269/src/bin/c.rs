@@ -6,6 +6,9 @@
 #![allow(clippy::nonminimal_bool)]
 #![allow(clippy::neg_multiply)]
 #![allow(dead_code)]
+use std::collections::VecDeque;
+
+use itertools::Itertools;
 use proconio::{
     fastout, input,
     marker::{Chars, Usize1},
@@ -105,11 +108,14 @@ impl Solver {
             N:usize
         }
 
-        for i in 0..1 << 16 {
-            if i & !N == 0 {
-                println!("{}", i);
-            }
+        let mut ans = VecDeque::new();
+        let mut i: isize = (1 << 60) - 1;
+        while i >= 0 {
+            i &= N as isize;
+            ans.push_front(i);
+            i -= 1;
         }
+        println!("{}", ans.iter().join("\n"))
     }
 }
 fn main() {

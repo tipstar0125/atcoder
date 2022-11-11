@@ -6,6 +6,7 @@
 #![allow(clippy::nonminimal_bool)]
 #![allow(clippy::neg_multiply)]
 #![allow(dead_code)]
+use itertools::Itertools;
 use proconio::{
     fastout, input,
     marker::{Chars, Usize1},
@@ -102,27 +103,19 @@ impl Solver {
     #[fastout]
     fn solve(&mut self) {
         input! {
-            N: usize,
-            XY: [(isize, isize); N]
+            N:usize
         }
 
-        let mut uf = UnionFind::new(N);
-        for i in 0..N {
-            for j in i + 1..N {
-                let (x0, y0) = XY[i];
-                let (x1, y1) = XY[j];
-                if ((x0 - x1) == 1 && (y0 - y1) == 1)
-                    || ((x0 - x1) == 1 && y0 == y1)
-                    || (x0 == x1 && (y0 - y1) == 1)
-                    || (x0 == x1 && (y1 - y0) == 1)
-                    || ((x1 - x0) == 1 && y0 == y1)
-                    || ((x1 - x0) == 1 && (y1 - y0) == 1)
-                {
-                    uf.unite(i, j);
+        let mut ans = vec![0_usize];
+        for i in 0..60_usize {
+            if (N >> i) % 2 == 1 {
+                for j in 0..ans.len() {
+                    ans.push(ans[j] | (1 << i));
                 }
             }
         }
-        println!("{}", uf.get_size());
+        ans.sort();
+        println!("{}", ans.iter().join("\n"));
     }
 }
 fn main() {
