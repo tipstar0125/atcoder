@@ -82,15 +82,16 @@ impl Solver {
     #[fastout]
     fn solve(&mut self) {
         input! {
-            N: usize
-        }
-        if N % 2 == 1 {
-            return;
+            N: usize,
+            X: usize,
+            P: [usize; N]
         }
 
-        for i in N / 2 - 1..N - 1 {
-            let base = 1_usize << i;
-            println!("{:b}", base);
+        for (i, &p) in P.iter().enumerate() {
+            if p == X {
+                println!("{}", i + 1);
+                return;
+            }
         }
     }
 }

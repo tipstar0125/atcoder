@@ -6,6 +6,8 @@
 #![allow(clippy::nonminimal_bool)]
 #![allow(clippy::neg_multiply)]
 #![allow(dead_code)]
+use std::collections::BTreeMap;
+
 use proconio::{
     fastout, input,
     marker::{Chars, Usize1},
@@ -13,16 +15,16 @@ use proconio::{
 
 #[macro_export]
 macro_rules! max {
-    (x: expr) => (x);
-    (x: expr, $( y: expr ),+) => {
-        std::cmp::max(x, max!($( y ),+))
+    ($x: expr) => ($x);
+    ($x: expr, $( $y: expr ),+) => {
+        std::cmp::max($x, max!($( $y ),+))
     }
 }
 #[macro_export]
 macro_rules! min {
-    (x: expr) => (x);
-    (x: expr, $( y: expr ),+) => {
-        std::cmp::min(x, min!($( y ),+))
+    ($x: expr) => ($x);
+    ($x: expr, $( $y: expr ),+) => {
+        std::cmp::min($x, min!($( $y ),+))
     }
 }
 #[derive(Debug, Clone)]
@@ -82,16 +84,59 @@ impl Solver {
     #[fastout]
     fn solve(&mut self) {
         input! {
-            N: usize
+            N: usize,
+            M: usize,
+            mut A: [usize; N]
         }
-        if N % 2 == 1 {
-            return;
+        let sum = A.iter().sum::<usize>();
+        let mut map = BTreeMap::new();
+
+        for &a in &A {
+            *map.entry(a).or_insert(0) += 1;
         }
 
-        for i in N / 2 - 1..N - 1 {
-            let base = 1_usize << i;
-            println!("{:b}", base);
+        A.sort();
+        A.dedup();
+
+        let mut group = vec![];
+        let mut vec = vec![A[0]];
+        for i in 0..A.len() {
+            if i == A.len() - 1 {
+                if vec.is_empty() {
+                    vec.push(A[i]);
+                }
+                vec.sort();
+                vec.dedup();
+                group.push(vec.clone());
+            } else if A[i + 1] - A[i] == 1 {
+                vec.push(A[i]);
+                vec.push(A[i + 1]);
+            } else {
+                if vec.is_empty() {
+                    vec.push(A[i]);
+                }
+                vec.sort();
+                vec.dedup();
+                group.push(vec.clone());
+                vec = vec![];
+            }
         }
+
+        if group.len() >= 2 && group[0].contains(&0) && group[group.len() - 1].contains(&(M - 1)) {
+            let mut b = group[group.len() - 1].clone();
+            group[0].append(&mut b);
+            group.pop();
+        }
+
+        let mut ans = 1_usize << 60;
+        for g in group {
+            let mut c = sum;
+            for &gi in &g {
+                c -= gi * map[&gi];
+            }
+            ans = min!(ans, c);
+        }
+        println!("{}", ans);
     }
 }
 fn main() {

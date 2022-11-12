@@ -6,6 +6,8 @@
 #![allow(clippy::nonminimal_bool)]
 #![allow(clippy::neg_multiply)]
 #![allow(dead_code)]
+use std::collections::HashSet;
+
 use proconio::{
     fastout, input,
     marker::{Chars, Usize1},
@@ -82,15 +84,45 @@ impl Solver {
     #[fastout]
     fn solve(&mut self) {
         input! {
-            N: usize
-        }
-        if N % 2 == 1 {
-            return;
+            N: usize,
         }
 
-        for i in N / 2 - 1..N - 1 {
-            let base = 1_usize << i;
-            println!("{:b}", base);
+        let mut set = HashSet::new();
+        let mut is_ok = true;
+        for _ in 0..N {
+            input! {
+                s: Chars
+            }
+
+            if !(s[0] == 'H' || s[0] == 'D' || s[0] == 'C' || s[0] == 'S') {
+                is_ok = false;
+            }
+            if !(s[1] == 'A'
+                || s[1] == '2'
+                || s[1] == '3'
+                || s[1] == '4'
+                || s[1] == '5'
+                || s[1] == '6'
+                || s[1] == '7'
+                || s[1] == '8'
+                || s[1] == '9'
+                || s[1] == 'T'
+                || s[1] == 'J'
+                || s[1] == 'Q'
+                || s[1] == 'K')
+            {
+                is_ok = false;
+            }
+            set.insert(s);
+        }
+        if set.len() < N {
+            is_ok = false;
+        }
+
+        if is_ok {
+            println!("Yes");
+        } else {
+            println!("No");
         }
     }
 }

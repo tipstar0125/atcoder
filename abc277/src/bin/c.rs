@@ -6,6 +6,8 @@
 #![allow(clippy::nonminimal_bool)]
 #![allow(clippy::neg_multiply)]
 #![allow(dead_code)]
+use std::collections::{BTreeMap, BTreeSet};
+
 use proconio::{
     fastout, input,
     marker::{Chars, Usize1},
@@ -82,16 +84,25 @@ impl Solver {
     #[fastout]
     fn solve(&mut self) {
         input! {
-            N: usize
-        }
-        if N % 2 == 1 {
-            return;
+            N: usize,
+            AB: [(usize, usize); N]
         }
 
-        for i in N / 2 - 1..N - 1 {
-            let base = 1_usize << i;
-            println!("{:b}", base);
+        let mut G = BTreeMap::new();
+
+        for &(a, b) in &AB {
+            G.entry(a).or_insert(Vec::new()).push(b);
+            G.entry(b).or_insert(Vec::new()).push(a);
         }
+
+        let mut visited = BTreeSet::new();
+        let mut ans = 1;
+        if !G.contains_key(&1) {
+            println!("1");
+            return;
+        }
+        dfs(1, &mut G, &mut visited, &mut ans);
+        println!("{}", ans);
     }
 }
 fn main() {
@@ -101,4 +112,21 @@ fn main() {
         .unwrap()
         .join()
         .unwrap();
+}
+
+fn dfs(
+    pos: usize,
+    G: &mut BTreeMap<usize, Vec<usize>>,
+    visited: &mut BTreeSet<usize>,
+    ans: &mut usize,
+) {
+    visited.insert(pos);
+    if pos > *ans {
+        *ans = pos;
+    }
+    for next in G[&pos].clone() {
+        if !visited.contains(&next) {
+            dfs(next, G, visited, ans);
+        }
+    }
 }
