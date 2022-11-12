@@ -90,16 +90,11 @@ impl Solver {
 
         let mut ans = 0;
         for i in 0..N {
-            let x = A[i];
             for j in i + 1..N {
-                let x = x * A[j] % P;
                 for k in j + 1..N {
-                    let x = x * A[k] % P;
                     for l in k + 1..N {
-                        let x = x * A[l] % P;
                         for m in l + 1..N {
-                            let x = x * A[m] % P;
-                            if x == Q {
+                            if (A[i] * A[j] % P * A[k] % P * A[l] % P * A[m] % P) == Q {
                                 ans += 1;
                             }
                         }
