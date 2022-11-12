@@ -89,15 +89,11 @@ impl Solver {
         }
 
         let mut G = BTreeMap::new();
+        G.insert(1, vec![]);
 
         for &(a, b) in &AB {
             G.entry(a).or_insert(vec![]).push(b);
             G.entry(b).or_insert(vec![]).push(a);
-        }
-
-        if !G.contains_key(&1) {
-            println!("1");
-            return;
         }
 
         let mut Q = VecDeque::new();

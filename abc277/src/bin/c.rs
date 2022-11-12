@@ -6,7 +6,7 @@
 #![allow(clippy::nonminimal_bool)]
 #![allow(clippy::neg_multiply)]
 #![allow(dead_code)]
-use std::collections::{BTreeMap, BTreeSet};
+use std::collections::{vec_deque, BTreeMap, BTreeSet};
 
 use proconio::{
     fastout, input,
@@ -89,6 +89,7 @@ impl Solver {
         }
 
         let mut G = BTreeMap::new();
+        G.insert(1, vec![]);
 
         for &(a, b) in &AB {
             G.entry(a).or_insert(vec![]).push(b);
@@ -97,11 +98,6 @@ impl Solver {
 
         let mut visited = BTreeSet::new();
         visited.insert(1);
-
-        if !G.contains_key(&1) {
-            println!("1");
-            return;
-        }
 
         dfs(1, &mut G, &mut visited);
         println!("{}", visited.iter().max().unwrap());
