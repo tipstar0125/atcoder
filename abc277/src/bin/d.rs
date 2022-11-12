@@ -99,7 +99,7 @@ impl Solver {
         A.dedup();
 
         let mut group = vec![];
-        let mut vec = vec![A[0]];
+        let mut vec = vec![];
         for i in 0..A.len() {
             if i == A.len() - 1 {
                 if vec.is_empty() {

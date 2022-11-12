@@ -129,23 +129,34 @@ impl Solver {
             }
         }
 
-        let mut ans = vec![vec![-1; N]; N];
-        ans[0][0] = 0;
-        let mut Q = VecDeque::new();
-        for &(a, b) in &dist {
-            Q.push_back(((0, 0), (a, b)));
-        }
-
-        while !Q.is_empty() {
-            let ((x0, y0), (c, d)) = Q.pop_front().unwrap();
-
-            if is_area(x0 + c, y0 + d, N, N) && ans[(x0 + c) as usize][(y0 + d) as usize] == -1 {
-                ans[(x0 + c) as usize][(y0 + d) as usize] = ans[x0 as usize][y0 as usize] + 1;
+        let mut G = vec![vec![]; N * N];
+        for i in 0..N {
+            for j in 0..N {
                 for &(a, b) in &dist {
-                    Q.push_back(((x0 + c, y0 + d), (a, b)));
+                    if is_area(i as isize + a as isize, j as isize + b as isize, N, N) {
+                        let index1 = i * N + j;
+                        let index2 = (i as isize + a) as usize * N + (j as isize + b) as usize;
+                        G[index1].push(index2);
+                    }
                 }
             }
         }
+
+        let mut Q = VecDeque::new();
+        let mut ans = vec![vec![-1; N]; N];
+        ans[0][0] = 0;
+        Q.push_back((0, 0));
+
+        while !Q.is_empty() {
+            let (pos, cost) = Q.pop_front().unwrap();
+            for &next in &G[pos] {
+                if ans[next / N][next % N] == -1 {
+                    ans[next / N][next % N] = cost + 1;
+                    Q.push_back((next, cost + 1));
+                }
+            }
+        }
+
         for row in &ans {
             println!("{}", row.iter().join(" "));
         }
