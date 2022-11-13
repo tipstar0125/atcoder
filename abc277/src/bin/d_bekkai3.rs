@@ -79,28 +79,6 @@ impl UnionFind {
     fn get_size(&self) -> usize {
         self.size
     }
-    fn members(&mut self, x: usize) -> Vec<usize> {
-        let root = self.find(x);
-        (0..self.parent.len())
-            .filter(|i| self.find(*i) == root)
-            .collect::<Vec<usize>>()
-    }
-    fn roots(&mut self) -> Vec<usize> {
-        (0..self.parent.len())
-            .filter(|i| self.parent[*i] < 0)
-            .collect::<Vec<usize>>()
-    }
-    fn all_group_members(&mut self) -> BTreeMap<usize, Vec<usize>> {
-        let mut groups_map = BTreeMap::new();
-        for x in 0..self.parent.len() {
-            let r = self.find(x);
-            groups_map
-                .entry(r)
-                .or_insert_with(|| Vec::with_capacity(self.get_union_size(r)))
-                .push(x);
-        }
-        groups_map
-    }
 }
 #[derive(Default)]
 struct Solver {}
@@ -113,31 +91,30 @@ impl Solver {
             mut A: [usize; N]
         }
         let all_sum = A.iter().sum::<usize>();
-        let mut map: BTreeMap<usize, usize> = BTreeMap::new();
-
-        for &a in &A {
-            *map.entry(a).or_default() += 1;
-        }
-
         A.sort();
-        A.dedup();
 
-        let mut uf = UnionFind::new(A.len() - 1);
-        for i in 0..A.len() {
-            if (A[i] + 1) % M == A[(i + 1) % A.len()] {
-                uf.unite(i, (i + 1) % A.len());
+        let mut start = 0;
+        for i in 1..N {
+            if A[i] - A[i - 1] > 1 {
+                start = i;
+                break;
             }
         }
 
+        let mut sum = 0;
         let mut sum_list = vec![];
-        for (_, members) in uf.all_group_members() {
-            let mut sum = 0;
-            for m in members {
-                sum += map[&A[m]] * A[m];
+
+        for i in 0..N {
+            let pos0 = (start + i) % N;
+            let pos1 = (start + i + 1) % N;
+            sum += A[pos0];
+            if (M + A[pos0] + 1 - A[pos1]) % M > 1 {
+                sum_list.push(sum);
+                sum = 0;
             }
-            sum_list.push(sum);
         }
 
+        sum_list.push(sum);
         println!("{}", all_sum - sum_list.iter().max().unwrap());
     }
 }
