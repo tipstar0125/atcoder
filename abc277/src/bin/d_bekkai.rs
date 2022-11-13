@@ -47,24 +47,22 @@ impl UnionFind {
         self.parent[x] = root as isize;
         root
     }
-    fn unite(&mut self, x: usize, y: usize) -> Option<(usize, usize)> {
+    fn unite(&mut self, x: usize, y: usize) {
         let root_x = self.find(x);
         let root_y = self.find(y);
         if root_x == root_y {
-            return None;
+            return;
         }
         let size_x = -self.parent[root_x];
         let size_y = -self.parent[root_y];
-        self.size -= 1;
         if size_x >= size_y {
             self.parent[root_x] -= size_y;
             self.parent[root_y] = root_x as isize;
-            Some((root_x, root_y))
         } else {
             self.parent[root_y] -= size_x;
             self.parent[root_x] = root_y as isize;
-            Some((root_y, root_x))
         }
+        self.size -= 1;
     }
     fn is_same(&mut self, x: usize, y: usize) -> bool {
         self.find(x) == self.find(y)
@@ -90,32 +88,55 @@ impl Solver {
             M: usize,
             mut A: [usize; N]
         }
-        let all_sum = A.iter().sum::<usize>();
+        let sum = A.iter().sum::<usize>();
+        let mut map = BTreeMap::new();
+
+        for &a in &A {
+            *map.entry(a).or_insert(0) += 1;
+        }
+
         A.sort();
+        A.dedup();
 
-        let mut start = 0;
-        for i in 1..N {
-            if A[i] - A[i - 1] > 1 {
-                start = i;
-                break;
+        let mut group = vec![];
+        let mut vec = vec![];
+        for i in 0..A.len() {
+            if i == A.len() - 1 {
+                if vec.is_empty() {
+                    vec.push(A[i]);
+                }
+                vec.sort();
+                vec.dedup();
+                group.push(vec.clone());
+            } else if A[i + 1] - A[i] == 1 {
+                vec.push(A[i]);
+                vec.push(A[i + 1]);
+            } else {
+                if vec.is_empty() {
+                    vec.push(A[i]);
+                }
+                vec.sort();
+                vec.dedup();
+                group.push(vec.clone());
+                vec = vec![];
             }
         }
 
-        let mut sum = 0;
-        let mut sum_list = vec![];
-
-        for i in 0..N {
-            let pos0 = (start + i) % N;
-            let pos1 = (start + i + 1) % N;
-            sum += A[pos0];
-            if (M + A[pos0] + 1 - A[pos1]) % M > 1 {
-                sum_list.push(sum);
-                sum = 0;
-            }
+        if group.len() >= 2 && group[0].contains(&0) && group[group.len() - 1].contains(&(M - 1)) {
+            let mut b = group[group.len() - 1].clone();
+            group[0].append(&mut b);
+            group.pop();
         }
 
-        sum_list.push(sum);
-        println!("{}", all_sum - sum_list.iter().max().unwrap());
+        let mut ans = 1_usize << 60;
+        for g in group {
+            let mut c = sum;
+            for &gi in &g {
+                c -= gi * map[&gi];
+            }
+            ans = min!(ans, c);
+        }
+        println!("{}", ans);
     }
 }
 fn main() {

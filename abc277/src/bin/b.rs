@@ -85,38 +85,18 @@ impl Solver {
     fn solve(&mut self) {
         input! {
             N: usize,
+            mut S: [Chars; N]
         }
 
-        let mut set = HashSet::new();
-        let mut is_ok = true;
-        for _ in 0..N {
-            input! {
-                s: Chars
-            }
+        S.sort();
+        S.dedup();
 
-            if !(s[0] == 'H' || s[0] == 'D' || s[0] == 'C' || s[0] == 'S') {
+        let mut is_ok = S.len() == N;
+
+        for s in S {
+            if !("HDCS".contains(s[0]) && "A23456789TJQK".contains(s[1])) {
                 is_ok = false;
             }
-            if !(s[1] == 'A'
-                || s[1] == '2'
-                || s[1] == '3'
-                || s[1] == '4'
-                || s[1] == '5'
-                || s[1] == '6'
-                || s[1] == '7'
-                || s[1] == '8'
-                || s[1] == '9'
-                || s[1] == 'T'
-                || s[1] == 'J'
-                || s[1] == 'Q'
-                || s[1] == 'K')
-            {
-                is_ok = false;
-            }
-            set.insert(s);
-        }
-        if set.len() < N {
-            is_ok = false;
         }
 
         if is_ok {

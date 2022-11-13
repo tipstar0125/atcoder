@@ -91,31 +91,30 @@ impl Solver {
             mut A: [usize; N]
         }
         let all_sum = A.iter().sum::<usize>();
+        let mut map = BTreeMap::new();
+
+        for &a in &A {
+            *map.entry(a).or_insert(0) += 1;
+        }
+
         A.sort();
+        A.dedup();
 
-        let mut start = 0;
-        for i in 1..N {
-            if A[i] - A[i - 1] > 1 {
-                start = i;
-                break;
+        let mut sum = vec![0; A.len()];
+        for i in 0..A.len() {
+            sum[i] = map[&A[i]] * A[i];
+        }
+
+        let mut uf = UnionFind::new(A.len());
+        for i in 0..A.len() {
+            if (A[i] + 1) % M == A[(i + 1) % A.len()] {
+                if let Some((parent, child)) = uf.unite(i, (i + 1) % A.len()) {
+                    sum[parent] += sum[child];
+                }
             }
         }
 
-        let mut sum = 0;
-        let mut sum_list = vec![];
-
-        for i in 0..N {
-            let pos0 = (start + i) % N;
-            let pos1 = (start + i + 1) % N;
-            sum += A[pos0];
-            if (M + A[pos0] + 1 - A[pos1]) % M > 1 {
-                sum_list.push(sum);
-                sum = 0;
-            }
-        }
-
-        sum_list.push(sum);
-        println!("{}", all_sum - sum_list.iter().max().unwrap());
+        println!("{}", all_sum - sum.iter().max().unwrap());
     }
 }
 fn main() {
