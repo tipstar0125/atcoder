@@ -92,31 +92,31 @@ impl Solver {
             N: usize
         }
 
-        let (mut u, mut d) = (1, N + 1);
-        while u + 1 != d {
+        let (mut u, mut d) = (1, N);
+        while u != d {
             let m = (u + d) / 2;
-            println!("? {} {} {} {}", u, m - 1, 1, N);
+            println!("? {} {} {} {}", u, m, 1, N);
             input! {
                 T: usize
             }
 
-            if T == m - u {
-                u = m;
+            if T == m + 1 - u {
+                u = m + 1;
             } else {
                 d = m;
             }
         }
 
-        let (mut l, mut r) = (1, N + 1);
-        while l + 1 != r {
+        let (mut l, mut r) = (1, N);
+        while l != r {
             let m = (l + r) / 2;
-            println!("? {} {} {} {}", 1, N, l, m - 1);
+            println!("? {} {} {} {}", 1, N, l, m);
             input! {
                 T: usize
             }
 
-            if T == m - l {
-                l = m;
+            if T == m + 1 - l {
+                l = m + 1;
             } else {
                 r = m;
             }

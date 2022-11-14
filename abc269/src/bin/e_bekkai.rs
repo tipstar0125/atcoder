@@ -92,37 +92,58 @@ impl Solver {
             N: usize
         }
 
-        let (mut u, mut d) = (1, N + 1);
-        while u + 1 != d {
-            let m = (u + d) / 2;
-            println!("? {} {} {} {}", u, m - 1, 1, N);
+        // A, B: row
+        // C, D: col
+
+        let (mut a, mut b, c, d) = (0, (N - 1) / 2, 0, N - 1);
+        loop {
+            println!("? {} {} {} {}", a + 1, b + 1, c + 1, d + 1);
             input! {
-                T: usize
+                T: isize
             }
-
-            if T == m - u {
-                u = m;
-            } else {
-                d = m;
+            let num = b - a;
+            if T == 0 {
+                break;
             }
+            if T == 1 && b - a == 0 {
+                a += 1;
+                break;
+            }
+            if T == -1 {
+                return;
+            }
+            if T as usize == b + 1 - a {
+                a = b + 1;
+            }
+            b = a + num / 2;
         }
+        let ans1 = a + 1;
 
-        let (mut l, mut r) = (1, N + 1);
-        while l + 1 != r {
-            let m = (l + r) / 2;
-            println!("? {} {} {} {}", 1, N, l, m - 1);
+        let (a, b, mut c, mut d) = (0, N - 1, 0, (N - 1) / 2);
+        loop {
+            println!("? {} {} {} {}", a + 1, b + 1, c + 1, d + 1);
             input! {
-                T: usize
+                T: isize
             }
-
-            if T == m - l {
-                l = m;
-            } else {
-                r = m;
+            let num = d - c;
+            if T == 0 {
+                break;
             }
+            if T == 1 && d - c == 0 {
+                c += 1;
+                break;
+            }
+            if T == -1 {
+                return;
+            }
+            if T as usize == d + 1 - c {
+                c = d + 1;
+            }
+            d = c + num / 2;
         }
+        let ans2 = c + 1;
 
-        println!("! {} {}", u, l);
+        println!("! {} {}", ans1, ans2);
     }
 }
 fn main() {
