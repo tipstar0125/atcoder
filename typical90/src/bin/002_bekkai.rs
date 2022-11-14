@@ -89,7 +89,18 @@ impl Solver {
             return;
         }
 
-        for b in 0..1 << N {
+        let comb = (0..N).combinations(N / 2);
+        let mut bit_list = vec![];
+        for vec in comb {
+            let mut x = 0;
+            for v in vec {
+                x |= 1 << v;
+            }
+            bit_list.push(x);
+        }
+
+        bit_list.sort();
+        for &b in &bit_list {
             let mut check = 0_isize;
             let mut is_ok = true;
             for i in (0..N).rev() {
@@ -101,9 +112,6 @@ impl Solver {
                 if check < 0 {
                     is_ok = false;
                 }
-            }
-            if check != 0 {
-                is_ok = false;
             }
 
             if is_ok {
