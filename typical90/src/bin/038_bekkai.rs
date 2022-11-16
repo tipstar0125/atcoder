@@ -91,14 +91,16 @@ impl Solver {
 
         let g = gcd(A, B);
         let MAX = 10_isize.pow(18);
-        // A * B = GCD * LCM
-        // LCM = A * B / GCD
-        // LCM > MAX <=> A * B / GCD > MAX <=> B > MAX * GCD / A
-        // <=> B > MAX / (A / GCD)
-        if B > MAX as usize / (A / g) {
+        let mut ans = (0, false);
+        if A > B {
+            ans = (A / g).overflowing_mul(B);
+        } else {
+            ans = (B / g).overflowing_mul(A);
+        }
+        if ans.0 > MAX as usize || ans.1 {
             println!("Large");
         } else {
-            println!("{}", A / g * B);
+            println!("{}", ans.0);
         }
     }
 }
