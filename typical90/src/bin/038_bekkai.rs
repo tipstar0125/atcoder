@@ -82,6 +82,7 @@ impl UnionFind {
 #[derive(Default)]
 struct Solver {}
 impl Solver {
+    #[allow(unused_assignments)]
     #[fastout]
     fn solve(&mut self) {
         input! {
