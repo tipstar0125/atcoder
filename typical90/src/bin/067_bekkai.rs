@@ -86,27 +86,34 @@ impl Solver {
     #[fastout]
     fn solve(&mut self) {
         input! {
-            mut N: u128,
+            mut N: String,
             K: usize
         }
 
         for _ in 0..K {
             let mut num = 0;
             let mut p = 1;
-            while N > 0 {
-                num += N % 10 * p;
+            for c in N.chars().rev() {
+                num += (c as usize - '0' as usize) * p;
                 p *= 8;
-                N /= 10;
             }
 
-            let mut p = 1;
+            N = "".to_string();
             while num > 0 {
-                N += if num % 9 == 8 { 5 } else { num % 9 } * p;
-                p *= 10;
+                let mut x = num % 9;
+                if x == 8 {
+                    x = 5;
+                }
+                N = x.to_string() + N.as_str();
                 num /= 9;
             }
         }
-        print!("{}", N);
+
+        if N.is_empty() {
+            println!("0");
+        } else {
+            println!("{}", N);
+        }
     }
 }
 fn main() {
