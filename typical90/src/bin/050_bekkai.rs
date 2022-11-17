@@ -6,8 +6,6 @@
 #![allow(clippy::nonminimal_bool)]
 #![allow(clippy::neg_multiply)]
 #![allow(dead_code)]
-use std::collections::vec_deque;
-
 use proconio::{
     fastout, input,
     marker::{Chars, Usize1},
@@ -90,21 +88,32 @@ impl Solver {
             L: usize
         }
 
+        // i + j * L = N
         let MOD = 1_000_000_007_usize;
-        let mut dp = vec![vec![0; N + 1]; N + 1];
-        dp[0][0] = 1;
         let mut ans = 0;
+        for i in 0..=N {
+            if (N - i) % L == 0 {
+                let j = (N - i) / L;
+                let mut a = 1;
+                let mut b = 1;
 
-        for i in 1..=N {
-            for j in 1..=N {
-                if dp[i - 1][j - 1] > 0 {
-                    dp[i][j] = (dp[i][j] + dp[i - 1][j - 1]) % MOD;
+                for k in 1..=i + j {
+                    a = a * k % MOD;
                 }
-                if j >= L && dp[i - 1][j - L] > 0 {
-                    dp[i][j] = (dp[i][j] + dp[i - 1][j - L]) % MOD;
+                if i >= 2 {
+                    for k in 1..=i {
+                        b = b * k % MOD;
+                    }
                 }
+                if j >= 2 {
+                    for k in 1..=j {
+                        b = b * k % MOD;
+                    }
+                }
+
+                ans += a * mod_power(b, MOD - 2, MOD) % MOD;
+                ans %= MOD;
             }
-            ans = (ans + dp[i][N]) % MOD;
         }
         println!("{}", ans);
     }
@@ -116,4 +125,17 @@ fn main() {
         .unwrap()
         .join()
         .unwrap();
+}
+
+fn mod_power(a: usize, b: usize, m: usize) -> usize {
+    let mut p = a;
+    let mut ans = 1;
+
+    for i in 0..64 {
+        if b >> i & 1 == 1 {
+            ans = ans * p % m;
+        }
+        p = p * p % m;
+    }
+    ans
 }
