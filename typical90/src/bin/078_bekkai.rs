@@ -98,13 +98,10 @@ impl Solver {
 
         let mut ans = 0;
         for (i, g) in G.iter().enumerate() {
-            let mut cnt = 0;
-            for &j in g {
-                if i > j {
-                    cnt += 1;
-                }
-            }
-            if cnt == 1 {
+            let mut list = g.clone();
+            list.sort();
+            let index = list.lower_bound(&i);
+            if index == 1 {
                 ans += 1;
             }
         }
