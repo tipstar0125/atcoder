@@ -94,11 +94,10 @@ impl Solver {
         let mut dp = vec![0; N + 1];
         dp[0] = 1;
 
-        for i in 1..=N {
-            if i < L {
-                dp[i] = dp[i - 1] % MOD;
-            } else {
-                dp[i] = (dp[i - 1] + dp[i - L]) % MOD;
+        for i in 0..N {
+            dp[i + 1] = (dp[i + 1] + dp[i]) % MOD;
+            if i + L <= N {
+                dp[i + L] = (dp[i + L] + dp[i]) % MOD;
             }
         }
         println!("{}", dp[N]);
