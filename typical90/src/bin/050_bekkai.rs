@@ -130,12 +130,14 @@ fn main() {
 fn mod_power(a: usize, b: usize, m: usize) -> usize {
     let mut p = a;
     let mut ans = 1;
+    let mut n = b;
 
-    for i in 0..64 {
-        if b >> i & 1 == 1 {
+    while n > 0 {
+        if n & 1 == 1 {
             ans = ans * p % m;
         }
         p = p * p % m;
+        n >>= 1;
     }
     ans
 }
