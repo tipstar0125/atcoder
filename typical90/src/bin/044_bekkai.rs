@@ -86,24 +86,29 @@ impl Solver {
         input! {
             N: usize,
             Q: usize,
-            mut A: [usize; N],
+            A: [usize; N],
             Txy: [(usize, usize, usize); Q]
         }
 
         let mut shift_cnt = 0;
+        let mut assignment = vec![];
+        for i in 0..N {
+            assignment.push(i);
+        }
+
         for &txy in &Txy {
             match txy {
                 (1, x, y) => {
-                    let x1 = (x - 1 + shift_cnt) % N;
-                    let y1 = (y - 1 + shift_cnt) % N;
-                    A.swap(x1, y1);
+                    let x1 = (N + x - 1 - shift_cnt) % N;
+                    let y1 = (N + y - 1 - shift_cnt) % N;
+                    assignment.swap(x1, y1);
                 }
                 (2, _, _) => {
-                    shift_cnt = (N + shift_cnt - 1) % N;
+                    shift_cnt = (shift_cnt + 1) % N;
                 }
                 (3, x, _) => {
-                    let x1 = (x - 1 + shift_cnt) % N;
-                    println!("{}", A[x1]);
+                    let x1 = (N + x - 1 - shift_cnt) % N;
+                    println!("{}", A[assignment[x1]]);
                 }
                 (_, _, _) => unreachable!(),
             }
