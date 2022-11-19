@@ -1,0 +1,36 @@
+---
+type: Batch
+timelimit: 4s
+match: Lines
+
+cases:
+  - name: sample1
+    in: |
+      abcdefghijklmn
+      3
+      abcd
+      ijk
+      ghi
+    out: |
+      2
+  - name: sample2
+    in: |
+      atcoderbeginnercontest
+      1
+      abc
+    out: |
+      0
+  - name: sample3
+    in: |
+      aaaaaaaaa
+      2
+      aa
+      xyz
+    out: |
+      4
+
+extend:
+  - type: Text
+    path: "./ex"
+    in: /in/*.txt
+    out: /out/*.txt
