@@ -6,7 +6,7 @@
 #![allow(clippy::nonminimal_bool)]
 #![allow(clippy::neg_multiply)]
 #![allow(dead_code)]
-use std::{cmp::Reverse, collections::BinaryHeap};
+use std::collections::VecDeque;
 
 use itertools::Itertools;
 use proconio::{
@@ -100,27 +100,20 @@ impl Solver {
 
         let INF = 1_usize << 60;
         let mut dist = vec![INF; N + 1];
-        let mut fixed = vec![false; N + 1];
         dist[1] = 0;
-        let mut Q = BinaryHeap::new();
-        Q.push(Reverse((dist[1], 1)));
+        let mut Q = VecDeque::new();
+        Q.push_back(1);
 
         while !Q.is_empty() {
-            let Reverse((_, pos)) = Q.pop().unwrap();
-            if fixed[pos] {
-                continue;
-            }
-            fixed[pos] = true;
-
+            let pos = Q.pop_front().unwrap();
             for &next in &G[pos] {
-                let (n, w) = next;
-                if dist[pos] + w < dist[n] {
-                    dist[n] = dist[pos] + w;
-                    Q.push(Reverse((dist[n], n)));
+                if dist[pos] + next.1 < dist[next.0] {
+                    dist[next.0] = dist[pos] + next.1;
+                    Q.push_back(next.0);
                 }
             }
         }
-
+        
         for &d in &dist[1..] {
             if d == INF {
                 println!("-1");

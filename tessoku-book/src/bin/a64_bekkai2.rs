@@ -98,36 +98,26 @@ impl Solver {
             G[b].push((a, c));
         }
 
-        let INF = 1_usize << 60;
-        let mut dist = vec![INF; N + 1];
-        let mut fixed = vec![false; N + 1];
-        dist[1] = 0;
+        let mut dist = vec![-1_isize; N + 1];
         let mut Q = BinaryHeap::new();
-        Q.push(Reverse((dist[1], 1)));
+        Q.push(Reverse((0, 1)));
 
         while !Q.is_empty() {
-            let Reverse((_, pos)) = Q.pop().unwrap();
-            if fixed[pos] {
+            let Reverse((d, pos)) = Q.pop().unwrap();
+            if dist[pos] != -1 {
                 continue;
             }
-            fixed[pos] = true;
+            dist[pos] = d;
 
             for &next in &G[pos] {
                 let (n, w) = next;
-                if dist[pos] + w < dist[n] {
-                    dist[n] = dist[pos] + w;
-                    Q.push(Reverse((dist[n], n)));
+                if dist[n] != -1 {
+                    continue;
                 }
+                Q.push(Reverse((d + w as isize, n)));
             }
         }
-
-        for &d in &dist[1..] {
-            if d == INF {
-                println!("-1");
-            } else {
-                println!("{}", d);
-            }
-        }
+        println!("{}", dist[1..].iter().join("\n"));
     }
 }
 fn main() {
