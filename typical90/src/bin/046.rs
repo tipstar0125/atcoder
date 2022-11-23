@@ -6,6 +6,8 @@
 #![allow(clippy::nonminimal_bool)]
 #![allow(clippy::neg_multiply)]
 #![allow(dead_code)]
+use std::collections::BTreeMap;
+
 use proconio::{
     fastout, input,
     marker::{Chars, Usize1},
@@ -88,20 +90,26 @@ impl Solver {
             A: [[usize; N]; 3]
         }
 
-        let mut dp = vec![vec![0; 46]; 4];
-        dp[0][0] = 1;
+        let mut num_list: Vec<Vec<usize>> = vec![vec![0; 46]; 3];
 
-        for i in 1..=3 {
+        for i in 0..3 {
+            for j in 0..N {
+                let key = A[i][j] % 46;
+                num_list[i][key] += 1;
+            }
+        }
+
+        let mut ans = 0;
+        for i in 0..46 {
             for j in 0..46 {
-                if dp[i - 1][j] > 0 {
-                    for k in 0..N {
-                        dp[i][(j + A[i - 1][k]) % 46] += dp[i - 1][j];
+                for k in 0..46 {
+                    if (i + j + k) % 46 == 0 {
+                        ans += num_list[0][i] * num_list[1][j] * num_list[2][k];
                     }
                 }
             }
         }
-
-        println!("{}", dp[3][0]);
+        println!("{}", ans);
     }
 }
 fn main() {

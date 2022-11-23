@@ -84,43 +84,24 @@ impl Solver {
     #[fastout]
     fn solve(&mut self) {
         input! {
-            L: usize,
-            R: usize
+            N: usize,
+            A: [[usize; N]; 3]
         }
 
-        let MOD = 1_000_000_007;
-        let L_order = L.to_string().len();
-        let R_order = R.to_string().len();
+        let mut dp = vec![vec![0; 46]; 4];
+        dp[0][0] = 1;
 
-        let mut ans = 0;
-        for i in L_order..=R_order {
-            let l = mod_power(10, i - 1, MOD);
-            let r = mod_power(10, i, MOD) - 1;
-            let mut sum = 1;
-            sum = sum * (MOD + r - l + 1) % MOD;
-            sum = ((sum % MOD) * (l + r) % MOD) % MOD;
-            sum = sum * mod_power(2, MOD - 2, MOD) % MOD;
-            sum = (sum * i) % MOD;
-            ans = (ans + sum) % MOD;
+        for i in 1..=3 {
+            for j in 0..46 {
+                if dp[i - 1][j] > 0 {
+                    for k in 0..N {
+                        dp[i][(j + A[i - 1][k]) % 46] += dp[i - 1][j];
+                    }
+                }
+            }
         }
 
-        let l = mod_power(10, L_order - 1, MOD);
-        let mut sum = 1;
-        sum = sum * (MOD + L % MOD - l) % MOD;
-        sum = ((sum % MOD) * (MOD + l + L % MOD - 1) % MOD) % MOD;
-        sum = sum * mod_power(2, MOD - 2, MOD) % MOD;
-        sum = (sum * L_order) % MOD;
-        ans = (MOD + ans - sum) % MOD;
-
-        let r = mod_power(10, R_order, MOD) - 1;
-        let mut sum = 1;
-        sum = sum * (MOD + r - R % MOD) % MOD;
-        sum = ((sum % MOD) * (R % MOD + r + 1) % MOD) % MOD;
-        sum = (sum * R_order) % MOD;
-        sum = sum * mod_power(2, MOD - 2, MOD) % MOD;
-        ans = (MOD + ans - sum) % MOD;
-
-        println!("{}", ans);
+        println!("{}", dp[3][0]);
     }
 }
 fn main() {
@@ -130,19 +111,4 @@ fn main() {
         .unwrap()
         .join()
         .unwrap();
-}
-
-fn mod_power(a: usize, b: usize, m: usize) -> usize {
-    let mut p = a;
-    let mut ans = 1;
-    let mut n = b;
-
-    while n > 0 {
-        if n & 1 == 1 {
-            ans = ans * p % m;
-        }
-        p = p * p % m;
-        n >>= 1;
-    }
-    ans
 }
