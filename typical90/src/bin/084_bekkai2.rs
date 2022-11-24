@@ -84,25 +84,39 @@ impl Solver {
     #[fastout]
     fn solve(&mut self) {
         input! {
-            _: usize,
+            N: usize,
             S: Chars
         }
 
         let mut ans = 0;
-        let mut num = 0;
-        for (i, &s) in S.iter().enumerate() {
-            if s == 'o' {
-                num = i + 1;
+        let mut left = 0;
+        let mut right = 0;
+        while left < N - 1 && right < N {
+            if S[left] != 'o' {
+                left += 1;
             } else {
-                ans += num;
+                right = max!(right, left + 1);
+                if S[right] != 'x' {
+                    right += 1;
+                } else {
+                    ans += N - right;
+                    left += 1;
+                }
             }
         }
-        let mut num = 0;
-        for (i, &s) in S.iter().enumerate() {
-            if s == 'x' {
-                num = i + 1;
+        left = 0;
+        right = 0;
+        while left < N - 1 && right < N {
+            if S[left] != 'x' {
+                left += 1;
             } else {
-                ans += num;
+                right = max!(right, left + 1);
+                if S[right] != 'o' {
+                    right += 1;
+                } else {
+                    ans += N - right;
+                    left += 1;
+                }
             }
         }
         println!("{}", ans);
