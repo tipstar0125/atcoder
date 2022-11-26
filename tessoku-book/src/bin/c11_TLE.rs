@@ -6,6 +6,7 @@
 #![allow(clippy::nonminimal_bool)]
 #![allow(clippy::neg_multiply)]
 #![allow(dead_code)]
+use ordered_float::NotNan;
 use std::{cmp::Reverse, collections::BinaryHeap};
 
 use itertools::Itertools;
@@ -89,19 +90,22 @@ impl Solver {
         input! {
             N: usize,
             K: usize,
-            A: [usize; N]
+            A: [f64; N]
         }
 
         let mut heap = BinaryHeap::new();
-        let mut cnt_list = vec![0; N];
+        let mut cnt_list = vec![0_usize; N];
         for (i, &a) in A.iter().enumerate() {
-            heap.push((a, i));
+            heap.push((NotNan::new(a).unwrap(), i));
         }
 
         for _ in 0..K {
             let (_, index) = heap.pop().unwrap();
             cnt_list[index] += 1;
-            heap.push((A[index] / (cnt_list[index] + 1), index));
+            heap.push((
+                NotNan::new(A[index] / (cnt_list[index] as f64 + 1.0)).unwrap(),
+                index,
+            ));
         }
         println!("{}", cnt_list.iter().join(" "));
     }
