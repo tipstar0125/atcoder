@@ -84,27 +84,29 @@ impl Solver {
     #[fastout]
     fn solve(&mut self) {
         input! {
-            N: usize,
-            K: usize,
-            mut AB: [(usize, usize); N]
+            A: usize,
+            B: usize
         }
 
-        AB.sort_by(|(a, _), (b, _)| b.cmp(a));
-        let mut i = 0;
-        let mut ans = 0;
-        while K - i > 2 && i < N {
-            ans += AB[i].0;
-            i += 2;
+        let mut l = 0_usize;
+        let mut r = 1_000_000_000_000_000_usize;
+        while r - l > 1 {
+            let m = (l + r) / 2;
+            let t0 = B as f64 * m as f64 + A as f64 / (1_f64 + m as f64).sqrt();
+            let t1 = B as f64 * (m + 1) as f64 + A as f64 / (1_f64 + (m + 1) as f64).sqrt();
+            if t0 < t1 {
+                r = m;
+            } else {
+                l = m;
+            }
         }
-        let mut CD = vec![(0, 0); AB.len() - i];
-        CD.clone_from_slice(&AB[i..]);
-        let mut max = CD[0].0;
-        println!("{} {}", ans, max);
-        CD.sort_by(|(_, a), (_, b)| b.cmp(a));
-        max = max!(max, CD[0].1 + CD[1].1);
-        println!("{} {}", ans, max);
-        ans += max;
-        println!("{}", ans);
+        let t0 = B as f64 * l as f64 + A as f64 / (1_f64 + l as f64).sqrt();
+        let t1 = B as f64 * r as f64 + A as f64 / (1_f64 + r as f64).sqrt();
+        if t0 < t1 {
+            println!("{:.10}", t0);
+        } else {
+            println!("{:.10}", t1);
+        }
     }
 }
 fn main() {

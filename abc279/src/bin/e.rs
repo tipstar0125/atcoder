@@ -6,6 +6,9 @@
 #![allow(clippy::nonminimal_bool)]
 #![allow(clippy::neg_multiply)]
 #![allow(dead_code)]
+use std::collections::VecDeque;
+
+use itertools::Itertools;
 use proconio::{
     fastout, input,
     marker::{Chars, Usize1},
@@ -84,27 +87,35 @@ impl Solver {
     #[fastout]
     fn solve(&mut self) {
         input! {
-            N: usize,
-            K: usize,
-            mut AB: [(usize, usize); N]
+            _: usize,
+            M: usize,
+            A: [usize; M]
         }
 
-        AB.sort_by(|(a, _), (b, _)| b.cmp(a));
-        let mut i = 0;
-        let mut ans = 0;
-        while K - i > 2 && i < N {
-            ans += AB[i].0;
-            i += 2;
+        let mut pos = 1;
+
+        for &a in &A {
+            if a == pos {
+                pos = a + 1;
+            } else if a + 1 == pos {
+                pos = a;
+            }
         }
-        let mut CD = vec![(0, 0); AB.len() - i];
-        CD.clone_from_slice(&AB[i..]);
-        let mut max = CD[0].0;
-        println!("{} {}", ans, max);
-        CD.sort_by(|(_, a), (_, b)| b.cmp(a));
-        max = max!(max, CD[0].1 + CD[1].1);
-        println!("{} {}", ans, max);
-        ans += max;
-        println!("{}", ans);
+
+        let mut ans = VecDeque::new();
+        for &a in A.iter().rev() {
+            println!("{} {} {}", pos, a, a + 1);
+            if a == pos {
+                pos = a + 1;
+                ans.push_front(pos);
+            } else if a + 1 == pos {
+                pos = a;
+                ans.push_front(pos);
+            } else {
+                ans.push_front(pos);
+            }
+        }
+        println!("{}", ans.iter().join("\n"));
     }
 }
 fn main() {

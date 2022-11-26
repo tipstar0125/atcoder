@@ -84,27 +84,30 @@ impl Solver {
     #[fastout]
     fn solve(&mut self) {
         input! {
-            N: usize,
-            K: usize,
-            mut AB: [(usize, usize); N]
+            S: Chars,
+            T: Chars
         }
 
-        AB.sort_by(|(a, _), (b, _)| b.cmp(a));
-        let mut i = 0;
-        let mut ans = 0;
-        while K - i > 2 && i < N {
-            ans += AB[i].0;
-            i += 2;
+        if S.len() < T.len() {
+            println!("No");
+            return;
         }
-        let mut CD = vec![(0, 0); AB.len() - i];
-        CD.clone_from_slice(&AB[i..]);
-        let mut max = CD[0].0;
-        println!("{} {}", ans, max);
-        CD.sort_by(|(_, a), (_, b)| b.cmp(a));
-        max = max!(max, CD[0].1 + CD[1].1);
-        println!("{} {}", ans, max);
-        ans += max;
-        println!("{}", ans);
+
+        let mut ans = false;
+        for i in 0..(S.len() - T.len() + 1) {
+            let mut is_ok = true;
+            for j in 0..T.len() {
+                if S[i + j] != T[j] {
+                    is_ok = false;
+                }
+            }
+            ans |= is_ok;
+        }
+        if ans {
+            println!("Yes");
+        } else {
+            println!("No");
+        }
     }
 }
 fn main() {

@@ -6,6 +6,8 @@
 #![allow(clippy::nonminimal_bool)]
 #![allow(clippy::neg_multiply)]
 #![allow(dead_code)]
+use std::collections::HashMap;
+
 use proconio::{
     fastout, input,
     marker::{Chars, Usize1},
@@ -84,27 +86,39 @@ impl Solver {
     #[fastout]
     fn solve(&mut self) {
         input! {
-            N: usize,
-            K: usize,
-            mut AB: [(usize, usize); N]
+            H: usize,
+            W: usize,
+            S: [Chars; H],
+            T: [Chars; H]
         }
 
-        AB.sort_by(|(a, _), (b, _)| b.cmp(a));
-        let mut i = 0;
-        let mut ans = 0;
-        while K - i > 2 && i < N {
-            ans += AB[i].0;
-            i += 2;
+        let mut map_s: HashMap<String, usize> = HashMap::new();
+        let mut map_t: HashMap<String, usize> = HashMap::new();
+
+        for j in 0..W {
+            let mut str_s = "".to_string();
+            let mut str_t = "".to_string();
+            for i in 0..H {
+                str_s += S[i][j].to_string().as_str();
+                str_t += T[i][j].to_string().as_str();
+            }
+            *map_s.entry(str_s).or_default() += 1;
+            *map_t.entry(str_t).or_default() += 1;
         }
-        let mut CD = vec![(0, 0); AB.len() - i];
-        CD.clone_from_slice(&AB[i..]);
-        let mut max = CD[0].0;
-        println!("{} {}", ans, max);
-        CD.sort_by(|(_, a), (_, b)| b.cmp(a));
-        max = max!(max, CD[0].1 + CD[1].1);
-        println!("{} {}", ans, max);
-        ans += max;
-        println!("{}", ans);
+        let mut ok = true;
+        let keys: Vec<String> = map_s.keys().cloned().collect();
+
+        for k in keys {
+            if *map_s.entry(k.clone()).or_default() != *map_t.entry(k.clone()).or_default() {
+                ok = false;
+            }
+        }
+
+        if ok {
+            println!("Yes");
+        } else {
+            println!("No");
+        }
     }
 }
 fn main() {
