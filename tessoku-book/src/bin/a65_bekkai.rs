@@ -89,18 +89,15 @@ impl Solver {
             A: [usize; N-1]
         }
 
-        let mut G = vec![vec![]; N];
-        for (i, &a) in A.iter().enumerate() {
-            G[a - 1].push(i + 1);
+        let mut cnt_list = vec![0; N];
+        for &a in &A {
+            cnt_list[a - 1] += 1
         }
-        
-        let mut dp = vec![0; N];
-        for i in (0..N).rev() {
-            for &c in &G[i] {
-                dp[i] += dp[c] + 1;
-            }
+
+        for (i, &a) in A.iter().enumerate().rev() {
+            cnt_list[a - 1] += cnt_list[i + 1];
         }
-        println!("{}", dp.iter().join(" "));
+        println!("{}", cnt_list.iter().join(" "));
     }
 }
 fn main() {
