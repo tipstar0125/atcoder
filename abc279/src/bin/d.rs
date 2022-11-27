@@ -88,25 +88,24 @@ impl Solver {
             B: usize
         }
 
+        let f = |t: usize| -> f64 { B as f64 * t as f64 + A as f64 / (t as f64 + 1.0).sqrt() };
+
         let mut l = 0_usize;
-        let mut r = 1_000_000_000_000_000_usize;
+        let mut r = A / B;
         while r - l > 1 {
             let m = (l + r) / 2;
-            let t0 = B as f64 * m as f64 + A as f64 / (1_f64 + m as f64).sqrt();
-            let t1 = B as f64 * (m + 1) as f64 + A as f64 / (1_f64 + (m + 1) as f64).sqrt();
-            if t0 < t1 {
+            if f(m) <= f(m + 1) {
                 r = m;
             } else {
                 l = m;
             }
         }
-        let t0 = B as f64 * l as f64 + A as f64 / (1_f64 + l as f64).sqrt();
-        let t1 = B as f64 * r as f64 + A as f64 / (1_f64 + r as f64).sqrt();
-        if t0 < t1 {
-            println!("{:.10}", t0);
-        } else {
-            println!("{:.10}", t1);
+
+        let mut ans = std::f64::MAX;
+        for i in l..=r {
+            ans = ans.min(f(i));
         }
+        println!("{:.10}", ans);
     }
 }
 fn main() {

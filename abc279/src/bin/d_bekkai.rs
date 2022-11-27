@@ -84,18 +84,29 @@ impl Solver {
     #[fastout]
     fn solve(&mut self) {
         input! {
-            S: Chars,
-            T: Chars
+            A: usize,
+            B: usize
         }
 
-        let mut ok = false;
-
-        if S.len() >= T.len() {
-            for w in S.windows(T.len()) {
-                ok |= w == T.as_slice();
+        let mut l = 0_usize;
+        let mut r = 1_000_000_000_000_000_usize;
+        while r - l > 1 {
+            let m = (l + r) / 2;
+            let t0 = B as f64 * m as f64 + A as f64 / (1_f64 + m as f64).sqrt();
+            let t1 = B as f64 * (m + 1) as f64 + A as f64 / (1_f64 + (m + 1) as f64).sqrt();
+            if t0 < t1 {
+                r = m;
+            } else {
+                l = m;
             }
         }
-        println!("{}", if ok { "Yes" } else { "No" });
+        let t0 = B as f64 * l as f64 + A as f64 / (1_f64 + l as f64).sqrt();
+        let t1 = B as f64 * r as f64 + A as f64 / (1_f64 + r as f64).sqrt();
+        if t0 < t1 {
+            println!("{:.10}", t0);
+        } else {
+            println!("{:.10}", t1);
+        }
     }
 }
 fn main() {

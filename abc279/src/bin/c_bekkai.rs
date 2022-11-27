@@ -6,6 +6,8 @@
 #![allow(clippy::nonminimal_bool)]
 #![allow(clippy::neg_multiply)]
 #![allow(dead_code)]
+use std::collections::HashMap;
+
 use proconio::{
     fastout, input,
     marker::{Chars, Usize1},
@@ -84,18 +86,31 @@ impl Solver {
     #[fastout]
     fn solve(&mut self) {
         input! {
-            S: Chars,
-            T: Chars
+            H: usize,
+            W: usize,
+            S: [Chars; H],
+            T: [Chars; H]
         }
 
-        let mut ok = false;
+        let mut map_s: HashMap<String, usize> = HashMap::new();
+        let mut map_t: HashMap<String, usize> = HashMap::new();
 
-        if S.len() >= T.len() {
-            for w in S.windows(T.len()) {
-                ok |= w == T.as_slice();
+        for j in 0..W {
+            let mut str_s = "".to_string();
+            let mut str_t = "".to_string();
+            for i in 0..H {
+                str_s += S[i][j].to_string().as_str();
+                str_t += T[i][j].to_string().as_str();
             }
+            *map_s.entry(str_s).or_default() += 1;
+            *map_t.entry(str_t).or_default() += 1;
         }
-        println!("{}", if ok { "Yes" } else { "No" });
+
+        if map_s == map_t {
+            println!("Yes");
+        } else {
+            println!("No");
+        }
     }
 }
 fn main() {

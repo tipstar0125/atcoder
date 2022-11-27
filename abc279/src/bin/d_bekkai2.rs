@@ -84,18 +84,29 @@ impl Solver {
     #[fastout]
     fn solve(&mut self) {
         input! {
-            S: Chars,
-            T: Chars
+            A: usize,
+            B: usize
         }
 
-        let mut ok = false;
+        let f = |t: usize| -> f64 { B as f64 * t as f64 + A as f64 / (t as f64 + 1.0).sqrt() };
 
-        if S.len() >= T.len() {
-            for w in S.windows(T.len()) {
-                ok |= w == T.as_slice();
+        let mut l = 0;
+        let mut r = A / B;
+        while r - l > 10 {
+            let ll = (2 * l + r) / 3;
+            let rr = (l + 2 * r) / 3;
+            if f(ll) > f(rr) {
+                l = ll;
+            } else {
+                r = rr;
             }
         }
-        println!("{}", if ok { "Yes" } else { "No" });
+
+        let mut ans = std::f64::MAX;
+        for i in l..=r {
+            ans = ans.min(f(i));
+        }
+        println!("{:.10}", ans);
     }
 }
 fn main() {

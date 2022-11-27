@@ -92,33 +92,11 @@ impl Solver {
             T: [Chars; H]
         }
 
-        let mut map_s: HashMap<String, usize> = HashMap::new();
-        let mut map_t: HashMap<String, usize> = HashMap::new();
-
-        for j in 0..W {
-            let mut str_s = "".to_string();
-            let mut str_t = "".to_string();
-            for i in 0..H {
-                str_s += S[i][j].to_string().as_str();
-                str_t += T[i][j].to_string().as_str();
-            }
-            *map_s.entry(str_s).or_default() += 1;
-            *map_t.entry(str_t).or_default() += 1;
-        }
-        let mut ok = true;
-        let keys: Vec<String> = map_s.keys().cloned().collect();
-
-        for k in keys {
-            if *map_s.entry(k.clone()).or_default() != *map_t.entry(k.clone()).or_default() {
-                ok = false;
-            }
-        }
-
-        if ok {
-            println!("Yes");
-        } else {
-            println!("No");
-        }
+        let mut S: Vec<Vec<_>> = (0..W).map(|j| (0..H).map(|i| S[i][j]).collect()).collect();
+        let mut T: Vec<Vec<_>> = (0..W).map(|j| (0..H).map(|i| T[i][j]).collect()).collect();
+        S.sort();
+        T.sort();
+        println!("{}", if S == T { "Yes" } else { "No" });
     }
 }
 fn main() {

@@ -88,14 +88,26 @@ impl Solver {
             T: Chars
         }
 
-        let mut ok = false;
-
-        if S.len() >= T.len() {
-            for w in S.windows(T.len()) {
-                ok |= w == T.as_slice();
-            }
+        if S.len() < T.len() {
+            println!("No");
+            return;
         }
-        println!("{}", if ok { "Yes" } else { "No" });
+
+        let mut ans = false;
+        for i in 0..(S.len() - T.len() + 1) {
+            let mut is_ok = true;
+            for j in 0..T.len() {
+                if S[i + j] != T[j] {
+                    is_ok = false;
+                }
+            }
+            ans |= is_ok;
+        }
+        if ans {
+            println!("Yes");
+        } else {
+            println!("No");
+        }
     }
 }
 fn main() {
