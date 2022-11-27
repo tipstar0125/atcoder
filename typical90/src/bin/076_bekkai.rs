@@ -10,7 +10,6 @@ use proconio::{
     fastout, input,
     marker::{Chars, Usize1},
 };
-use superslice::Ext;
 
 #[macro_export]
 macro_rules! max {
@@ -95,17 +94,60 @@ impl Solver {
         }
 
         let cut_size = A.iter().sum::<usize>() / 10;
-        let mut B = vec![0; 2 * N + 1];
-        for i in 1..2 * N + 1 {
-            B[i] = B[i - 1] + A[(i - 1) % N];
+        let mut doubleA = A.clone();
+        doubleA.extend(&A);
+        let mut check_list = vec![];
+
+        if A.iter().all(|&x| x <= cut_size) {
+            check_list.push(doubleA);
+        } else {
+            let mut start = 0;
+            while A[start] <= cut_size {
+                start += 1;
+            }
+            start += 1;
+
+            let mut vec = vec![];
+            for i in 0..N {
+                let pos = (i + start) % N;
+                if A[pos] <= cut_size {
+                    vec.push(A[pos]);
+                } else {
+                    check_list.push(vec);
+                    vec = vec![];
+                }
+            }
+            check_list.push(vec);
         }
 
         let mut ans = false;
-        for i in 0..=N {
-            let pos = B.lower_bound(&(B[i] + cut_size));
-            if pos < 2 * N + 1 && B[i] + cut_size == B[pos] {
-                ans = true;
+        for list in check_list {
+            if list.is_empty() {
+                continue;
             }
+            let mut l = 0;
+            let mut r = 0;
+            let mut sum = list[0];
+            let mut ok = false;
+            loop {
+                if sum == cut_size {
+                    ok = true;
+                    break;
+                } else if sum < cut_size {
+                    r += 1;
+                    if r >= list.len() {
+                        break;
+                    }
+                    sum += list[r];
+                } else {
+                    if l >= list.len() {
+                        break;
+                    }
+                    sum -= list[l];
+                    l += 1;
+                }
+            }
+            ans |= ok;
         }
         println!("{}", if ans { "Yes" } else { "No" });
     }
