@@ -98,11 +98,44 @@ impl Solver {
             G[b].push(a);
         }
 
-        let mut rank = vec![0; N + 1];
-        let mut visited = vec![false; N + 1];
-        visited[T] = true;
-        dfs(T, &G, &mut visited, &mut rank);
-        println!("{}", rank[1..].iter().join(" "));
+        let mut Q = VecDeque::new();
+        let mut dist = vec![-1_isize; N + 1];
+        Q.push_back(T);
+        dist[T] = 0;
+        while !Q.is_empty() {
+            let pos = Q.pop_front().unwrap();
+            for &next in &G[pos] {
+                if dist[next] == -1 {
+                    dist[next] = dist[pos] + 1;
+                    Q.push_back(next);
+                }
+            }
+        }
+
+        let mut G = vec![vec![]; N + 1];
+        for &(a, b) in &AB {
+            if dist[a] < dist[b] {
+                G[a].push(b);
+            } else {
+                G[b].push(a);
+            }
+        }
+
+        let mut heap = BinaryHeap::new();
+        for (i, &d) in dist[1..].iter().enumerate() {
+            heap.push((d, i + 1))
+        }
+
+        let mut dp = vec![0; N + 1];
+        for _ in 0..N {
+            let (_, pos) = heap.pop().unwrap();
+            let mut max = 0;
+            for &next in &G[pos] {
+                max = max!(max, dp[next] + 1);
+            }
+            dp[pos] = max;
+        }
+        println!("{}", dp[1..].iter().join(" "));
     }
 }
 fn main() {
@@ -112,15 +145,4 @@ fn main() {
         .unwrap()
         .join()
         .unwrap();
-}
-
-fn dfs(pos: usize, G: &Vec<Vec<usize>>, visited: &mut Vec<bool>, rank: &mut Vec<usize>) -> usize {
-    for &next in &G[pos] {
-        if !visited[next] {
-            visited[pos] = true;
-            let ret = dfs(next, G, visited, rank);
-            rank[pos] = max!(rank[pos], ret + 1);
-        }
-    }
-    rank[pos]
 }
