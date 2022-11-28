@@ -101,11 +101,11 @@ impl Solver {
         }
 
         let INF = 1_usize << 60;
-        let mut dist1 = vec![INF; N + 1];
+        let mut dist = vec![INF; N + 1];
         let mut fixed = vec![false; N + 1];
         let mut Q = BinaryHeap::new();
-        dist1[1] = 0;
-        Q.push(Reverse((dist1[1], 1)));
+        dist[1] = 0;
+        Q.push(Reverse((dist[1], 1)));
 
         while !Q.is_empty() {
             let Reverse((_, pos)) = Q.pop().unwrap();
@@ -116,42 +116,34 @@ impl Solver {
 
             for &next in &G[pos] {
                 let (n, w) = next;
-                if dist1[pos] + w < dist1[n] {
-                    dist1[n] = dist1[pos] + w;
-                    Q.push(Reverse((dist1[n], n)));
+                if dist[pos] + w < dist[n] {
+                    dist[n] = dist[pos] + w;
+                    Q.push(Reverse((dist[n], n)));
                 }
             }
         }
 
-        let mut distN = vec![INF; N + 1];
-        let mut fixed = vec![false; N + 1];
-        let mut Q = BinaryHeap::new();
-        distN[N] = 0;
-        Q.push(Reverse((distN[N], N)));
-
+        let mut Q = VecDeque::new();
+        let mut visited = vec![false; N + 1];
+        Q.push_back(N);
+        visited[N] = true;
         while !Q.is_empty() {
-            let Reverse((_, pos)) = Q.pop().unwrap();
-            if fixed[pos] {
-                continue;
-            }
-            fixed[pos] = true;
-
+            let pos = Q.pop_front().unwrap();
             for &next in &G[pos] {
                 let (n, w) = next;
-                if distN[pos] + w < distN[n] {
-                    distN[n] = distN[pos] + w;
-                    Q.push(Reverse((distN[n], n)));
+                if (dist[pos] == dist[n] + w) && !visited[n] {
+                    visited[n] = true;
+                    Q.push_back(n);
                 }
             }
         }
 
         let mut ans = 0;
-        for i in 1..=N {
-            if dist1[i] + distN[i] == dist1[N] {
+        for &v in &visited {
+            if v {
                 ans += 1;
             }
         }
-
         println!("{}", ans);
     }
 }
