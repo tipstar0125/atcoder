@@ -8,6 +8,7 @@
 #![allow(dead_code)]
 use std::collections::BTreeMap;
 
+use num_integer::gcd;
 use proconio::{
     fastout, input,
     marker::{Chars, Usize1},
@@ -86,27 +87,17 @@ impl Solver {
     #[fastout]
     fn solve(&mut self) {
         input! {
-            K: usize
+            mut K: usize
         }
 
-        let mut i = 2_usize;
-        let mut k = K;
-        while i * i <= 1_000_000_000_000 {
-            if k % i == 0 {
-                k /= i;
-            } else if i % k == 0 {
-                k = 1;
+        for i in 1..2_000_000 {
+            K /= gcd(K, i);
+            if K == 1 {
+                println!("{}", i);
+                return;
             }
-            if k == 1 {
-                break;
-            }
-            i += 1;
         }
-        if k > 1 {
-            println!("{}", k)
-        } else {
-            println!("{}", i);
-        }
+        println!("{}", K);
     }
 }
 fn main() {

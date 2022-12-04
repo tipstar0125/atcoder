@@ -6,7 +6,8 @@
 #![allow(clippy::nonminimal_bool)]
 #![allow(clippy::neg_multiply)]
 #![allow(dead_code)]
-use itertools::Itertools;
+use std::collections::BTreeMap;
+
 use proconio::{
     fastout, input,
     marker::{Chars, Usize1},
@@ -85,29 +86,48 @@ impl Solver {
     #[fastout]
     fn solve(&mut self) {
         input! {
-            H1: usize,
-            W1: usize,
-            A: [[usize; W1]; H1],
-            H2: usize,
-            W2: usize,
-            B: [[usize; W2]; H2]
+            K: usize
         }
 
-        let mut ans = false;
-        for row_comb in (0..H1).combinations(H2) {
-            for col_comb in (0..W1).combinations(W2) {
-                let mut ok = true;
-                for (bi, &ai) in row_comb.iter().enumerate() {
-                    for (bj, &aj) in col_comb.iter().enumerate() {
-                        if A[ai][aj] != B[bi][bj] {
-                            ok = false;
-                        }
-                    }
+        let mut k = K;
+        let mut p_fact: BTreeMap<usize, usize> = BTreeMap::new();
+        let mut i = 2_usize;
+        while i * i <= K {
+            while k % i == 0 {
+                k /= i;
+                *p_fact.entry(i).or_default() += 1;
+            }
+            i += 1;
+        }
+        if k != 1 {
+            *p_fact.entry(k).or_default() += 1;
+        }
+
+        let eval = |n: usize| -> bool {
+            let mut ret = true;
+            for (p, num) in &p_fact {
+                let mut cnt = 0;
+                let mut x = n;
+                while x / p >= 1 {
+                    x /= p;
+                    cnt += x;
                 }
-                ans |= ok;
+                ret &= cnt >= *num;
+            }
+            ret
+        };
+
+        let mut left = 1;
+        let mut right = K;
+        while right - left > 1 {
+            let mid = (left + right) / 2;
+            if eval(mid) {
+                right = mid;
+            } else {
+                left = mid;
             }
         }
-        println!("{}", if ans {"Yes"} else {"No"});
+        println!("{}", right);
     }
 }
 fn main() {
