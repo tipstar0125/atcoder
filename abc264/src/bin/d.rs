@@ -93,11 +93,10 @@ impl Solver {
         for (pos0, t) in T.enumerate() {
             for (pos1, &s) in S.clone().iter().enumerate() {
                 if s == t {
-                    ans += pos1 - pos0;
                     for i in 0..pos1 - pos0 {
+                        ans += 1;
                         S.swap(pos1 - i - 1, pos1 - i);
                     }
-                    break;
                 }
             }
         }
