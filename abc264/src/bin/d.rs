@@ -88,9 +88,9 @@ impl Solver {
             mut S: Chars
         }
 
-        let T = ['a', 't', 'c', 'o', 'd', 'e'];
+        let T = "atcoder".chars();
         let mut ans = 0_usize;
-        for (pos0, &t) in T.iter().enumerate() {
+        for (pos0, t) in T.enumerate() {
             for (pos1, &s) in S.clone().iter().enumerate() {
                 if s == t {
                     ans += pos1 - pos0;
