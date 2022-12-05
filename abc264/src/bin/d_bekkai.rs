@@ -6,8 +6,6 @@
 #![allow(clippy::nonminimal_bool)]
 #![allow(clippy::neg_multiply)]
 #![allow(dead_code)]
-use std::collections::{BTreeMap, VecDeque};
-
 use itertools::Itertools;
 use proconio::{
     fastout, input,
@@ -87,34 +85,22 @@ impl Solver {
     #[fastout]
     fn solve(&mut self) {
         input! {
-            S: Chars
+            mut S: Chars
         }
 
-        let mut Q = VecDeque::new();
-        let mut map: BTreeMap<String, usize> = BTreeMap::new();
-
-        let atcoder = "atcoder".to_string();
-        Q.push_back(S.clone());
-        map.entry(S.iter().collect::<String>()).or_default();
-
-        loop {
-            let current = Q.pop_front().unwrap();
-            let current_string = current.iter().collect::<String>();
-            if current_string == atcoder {
-                break;
-            }
-
-            for i in 1..7 {
-                let mut next = current.clone();
-                next.swap(i - 1, i);
-                let next_string = next.iter().collect::<String>();
-                if !map.contains_key(&next_string) {
-                    Q.push_back(next.clone());
-                    *map.entry(next_string).or_default() += map[&current_string] + 1;
+        let T = "atcoder".chars();
+        let mut ans = 0_usize;
+        for (pos0, t) in T.enumerate() {
+            for (pos1, &s) in S.clone().iter().enumerate() {
+                if s == t {
+                    for i in 0..pos1 - pos0 {
+                        ans += 1;
+                        S.swap(pos1 - i - 1, pos1 - i);
+                    }
                 }
             }
         }
-        println!("{}", map[&atcoder]);
+        println!("{}", ans);
     }
 }
 fn main() {
