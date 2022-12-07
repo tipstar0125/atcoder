@@ -99,21 +99,22 @@ impl Solver {
             A[t] = a;
         }
 
-        let INF = 1_isize << 60;
-        let mut dp = vec![vec![-INF; 5]; TMAX + 1];
+        let mut dp = vec![vec![-1; 5]; TMAX + 1];
         dp[0][0] = 0;
 
         for i in 1..=TMAX {
             for j in 0..5 {
-                if j > 0 {
-                    dp[i][j] = dp[i - 1][j - 1];
+                let a = if X[i] == j { A[i] } else { 0 };
+                if j > 0 && dp[i - 1][j - 1] != -1 {
+                    dp[i][j] = dp[i - 1][j - 1] + a;
                 }
-                if j < 4 {
-                    dp[i][j] = max!(dp[i][j], dp[i - 1][j + 1]);
+                if j < 4 && dp[i - 1][j + 1] != -1 {
+                    dp[i][j] = max!(dp[i][j], dp[i - 1][j + 1] + a);
                 }
-                dp[i][j] = max!(dp[i][j], dp[i - 1][j]);
+                if dp[i - 1][j] != -1 {
+                    dp[i][j] = max!(dp[i][j], dp[i - 1][j] + a);
+                }
             }
-            dp[i][X[i]] += A[i];
         }
         println!("{}", dp[dp.len() - 1].iter().max().unwrap());
     }
