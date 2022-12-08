@@ -91,21 +91,44 @@ impl Solver {
             A: [isize; N]
         }
 
-        let mut f = vec![0; N + 1];
+        let sum = A.iter().sum::<isize>();
+        let mut left = 0;
+        let mut min = sum;
+        let mut S1 = vec![0; N + 1];
         for i in 1..=N {
-            f[i] = min!(A[i - 1] + f[i - 1], L * i as isize);
+            S1[i] = S1[i - 1] + A[i - 1];
+        }
+        for i in 1..=N {
+            let sum1 = sum - S1[i] + L * i as isize;
+            if min >= sum1 {
+                left = i;
+                min = sum1;
+            }
         }
 
-        let mut g = vec![0; N + 1];
-        for i in 1..=N {
-            g[i] = min!(A[N - i] + g[i - 1], R * i as isize);
+        let mut B = A.clone();
+        for i in 0..left {
+            B[i] = L;
         }
 
-        let mut ans = A.iter().sum::<isize>();
-        for i in 0..=N {
-            ans = min!(ans, f[i] + g[N - i]);
+        let mut S2 = vec![0; N + 1];
+        for i in 1..=N {
+            S2[N - i] = S2[N - i + 1] + B[N - i];
         }
-        println!("{}", ans);
+
+        let sum = B.iter().sum::<isize>();
+        let mut min = sum;
+        for i in 1..=N {
+            min = min!(
+                min,
+                sum - S2[N - i] + min!(A[N - i] + R * (i as isize - 1), R * i as isize)
+            );
+        }
+        println!("{}", A.iter().join(" "));
+        println!("{}", S1.iter().join(" "));
+        println!("{}", B.iter().join(" "));
+        println!("{}", S2.iter().join(" "));
+        println!("{}", min);
     }
 }
 fn main() {
