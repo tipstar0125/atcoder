@@ -6,7 +6,6 @@
 #![allow(clippy::nonminimal_bool)]
 #![allow(clippy::neg_multiply)]
 #![allow(dead_code)]
-use itertools::Itertools;
 use proconio::{
     fastout, input,
     marker::{Chars, Usize1},
@@ -85,30 +84,31 @@ impl Solver {
     #[fastout]
     fn solve(&mut self) {
         input! {
-            N: usize,
-            M: usize,
-            X: [isize; N],
-            CY: [(usize, isize); M]
+            S: Chars,
+            T: Chars
         }
 
-        let mut bonus = vec![0; N];
-        for (c, y) in CY {
-            bonus[c - 1] = y;
-        }
+        let mut i = 0;
+        let mut j = 0;
 
-        let INF = 1_isize << 60;
-        let mut dp = vec![vec![-INF; N + 1]; N + 1];
-        dp[0][0] = 0;
-
-        for i in 1..=N {
-            for j in 0..=N {
-                dp[i][0] = max!(dp[i][0], dp[i - 1][j]);
-                if j < N {
-                    dp[i][j + 1] = dp[i - 1][j] + X[i - 1] + bonus[j];
+        while j < T.len() {
+            if i < 2 && S[i] != T[j] {
+                println!("No");
+                return;
+            }
+            if S[i] == T[j] {
+                if i < S.len() - 1 {
+                    i += 1;
                 }
+                j += 1;
+            } else if S[i - 2] == S[i - 1] && S[i - 1] == T[j] {
+                j += 1;
+            } else {
+                println!("No");
+                return;
             }
         }
-        println!("{}", dp[N].iter().max().unwrap());
+        println!("Yes");
     }
 }
 fn main() {

@@ -85,30 +85,50 @@ impl Solver {
     #[fastout]
     fn solve(&mut self) {
         input! {
-            N: usize,
-            M: usize,
-            X: [isize; N],
-            CY: [(usize, isize); M]
+            S: Chars,
+            T: Chars
         }
 
-        let mut bonus = vec![0; N];
-        for (c, y) in CY {
-            bonus[c - 1] = y;
-        }
-
-        let INF = 1_isize << 60;
-        let mut dp = vec![vec![-INF; N + 1]; N + 1];
-        dp[0][0] = 0;
-
-        for i in 1..=N {
-            for j in 0..=N {
-                dp[i][0] = max!(dp[i][0], dp[i - 1][j]);
-                if j < N {
-                    dp[i][j + 1] = dp[i - 1][j] + X[i - 1] + bonus[j];
-                }
+        let mut rle_S = vec![];
+        let mut cnt = 1_usize;
+        for i in 1..S.len() {
+            if S[i - 1] != S[i] {
+                rle_S.push((S[i - 1], cnt));
+                cnt = 1;
+            } else {
+                cnt += 1;
             }
         }
-        println!("{}", dp[N].iter().max().unwrap());
+        rle_S.push((S[S.len() - 1], cnt));
+
+        let mut rle_T = vec![];
+        let mut cnt = 1_usize;
+        for i in 1..T.len() {
+            if T[i - 1] != T[i] {
+                rle_T.push((T[i - 1], cnt));
+                cnt = 1;
+            } else {
+                cnt += 1;
+            }
+        }
+        rle_T.push((T[T.len() - 1], cnt));
+
+        if rle_S.len() == rle_T.len() {
+            let mut ok = true;
+            for i in 0..rle_S.len() {
+                let (s_str, s_num) = rle_S[i];
+                let (t_str, t_num) = rle_T[i];
+                if s_str != t_str {
+                    ok = false;
+                }
+                if s_num != t_num && (s_num < 2 || s_num > t_num) {
+                    ok = false;
+                }
+            }
+            println!("{}", if ok { "Yes" } else { "No" });
+        } else {
+            println!("No");
+        }
     }
 }
 fn main() {
