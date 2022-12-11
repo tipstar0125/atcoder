@@ -84,28 +84,41 @@ impl Solver {
     #[fastout]
     fn solve(&mut self) {
         input! {
-            h1: isize,
-            h2: isize,
-            h3: isize,
-            w1: isize,
-            w2: isize,
-            w3: isize
+            h1: usize,
+            h2: usize,
+            h3: usize,
+            w1: usize,
+            w2: usize,
+            w3: usize
         }
 
-        let mut ans = 0_usize;
-        for i in 1_isize..=30 {
-            for j in 1_isize..=30 {
-                for k in 1_isize..=30 {
-                    for l in 1_isize..=30 {
-                        let a = h1 - i - j;
-                        let b = h2 - k - l;
-                        let c = w1 - i - k;
-                        let d = w2 - j - l;
-                        let e1 = h3 - c - d;
-                        let e2 = w3 - a - b;
-                        if a > 0 && b > 0 && c > 0 && d > 0 && e1 > 0 && e2 > 0 && e1 == e2 {
-                            ans += 1;
+        let make_list = |x: usize| -> Vec<(usize, usize, usize)> {
+            let mut list = vec![];
+            for i in 1..=30 {
+                for j in 1..=30 {
+                    for k in 1..=30 {
+                        if i + j + k == x {
+                            list.push((i, j, k));
                         }
+                    }
+                }
+            }
+            list
+        };
+
+        let h1_list = make_list(h1);
+        let h2_list = make_list(h2);
+        let h3_list = make_list(h3);
+
+        let mut ans = 0_usize;
+        for &r1 in &h1_list {
+            for &r2 in &h2_list {
+                for &r3 in &h3_list {
+                    let (x11, x12, x13) = r1;
+                    let (x21, x22, x23) = r2;
+                    let (x31, x32, x33) = r3;
+                    if x11 + x21 + x31 == w1 && x12 + x22 + x32 == w2 && x13 + x23 + x33 == w3 {
+                        ans += 1;
                     }
                 }
             }

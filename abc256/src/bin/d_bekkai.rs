@@ -84,33 +84,28 @@ impl Solver {
     #[fastout]
     fn solve(&mut self) {
         input! {
-            h1: isize,
-            h2: isize,
-            h3: isize,
-            w1: isize,
-            w2: isize,
-            w3: isize
+            N: usize,
+            mut LR: [(usize, usize); N]
         }
 
-        let mut ans = 0_usize;
-        for i in 1_isize..=30 {
-            for j in 1_isize..=30 {
-                for k in 1_isize..=30 {
-                    for l in 1_isize..=30 {
-                        let a = h1 - i - j;
-                        let b = h2 - k - l;
-                        let c = w1 - i - k;
-                        let d = w2 - j - l;
-                        let e1 = h3 - c - d;
-                        let e2 = w3 - a - b;
-                        if a > 0 && b > 0 && c > 0 && d > 0 && e1 > 0 && e2 > 0 && e1 == e2 {
-                            ans += 1;
-                        }
-                    }
-                }
+        LR.sort_by(|(a, _), (b, _)| a.cmp(b));
+        let mut ans = vec![];
+        let (mut l, mut r) = LR[0];
+        for i in 1..N {
+            let (l1, r1) = LR[i];
+            if l1 <= r {
+                r = max!(r, r1);
+            } else {
+                ans.push((l, r));
+                l = l1;
+                r = r1;
             }
         }
-        println!("{}", ans);
+        ans.push((l, r));
+
+        for row in ans {
+            println!("{} {}", row.0, row.1);
+        }
     }
 }
 fn main() {
