@@ -91,23 +91,19 @@ impl Solver {
         }
 
         let INF = 1_isize << 60;
-        let mut dp = vec![vec![vec![-INF; D]; K + 1]; N + 1];
-        dp[0][0][0] = 0;
-
-        for i in 1..=N {
-            for j in 0..=K {
-                for k in 0..D {
-                    dp[i][j][k] = max!(dp[i][j][k], dp[i - 1][j][k]);
-                    if j > 0 {
-                        dp[i][j][(k + A[i - 1]) % D] = max!(
-                            dp[i][j][(k + A[i - 1]) % D],
-                            dp[i - 1][j - 1][k] + A[i - 1] as isize
-                        );
-                    }
+        let mut dp = vec![vec![-INF; D]; K + 1];
+        dp[0][0] = 0;
+        for &a in &A {
+            let mut ndp = dp.clone();
+            for i in 0..K {
+                for j in 0..D {
+                    ndp[i + 1][(j + a) % D] = max!(ndp[i + 1][(j + a) % D], dp[i][j] + a as isize)
                 }
             }
+            dp = ndp;
         }
-        println!("{}", if dp[N][K][0] < 0 { -1 } else { dp[N][K][0] });
+
+        println!("{}", if dp[K][0] < 0 { -1 } else { dp[K][0] });
     }
 }
 fn main() {
