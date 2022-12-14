@@ -85,33 +85,35 @@ impl Solver {
     fn solve(&mut self) {
         input! {
             X: isize,
-            mut A: isize,
-            mut D: isize,
+            A: isize,
+            D: isize,
             N: isize
         }
 
-        if D < 0 {
-            A += (N - 1) * D;
-            D = -D;
-        }
-
         let f = |n: isize| -> isize { A + (n - 1) * D };
+        let f_inv = |x: isize| -> isize { (x - A) / D + 1 };
 
-        let mut l = 0;
-        let mut r = N;
-        while (r - l) > 1 {
-            let m = (l + r) / 2;
-            if f(m) >= X {
-                r = m;
-            } else {
-                l = m;
-            }
+        if X <= A && D >= 0 {
+            println!("{}", (A - X).abs());
+            return;
+        }
+        if X >= A && D <= 0 {
+            println!("{}", (A - X).abs());
+            return;
+        }
+        if X >= f(N) && D >= 0 {
+            println!("{}", (X - f(N)).abs());
+            return;
+        }
+        if X <= f(N) && D <= 0 {
+            println!("{}", (X - f(N)).abs());
+            return;
         }
 
-        if r == 1 {
-            println!("{}", (f(r) - X).abs());
+        if D >= 0 {
+            println!("{}", min!(X - f(f_inv(X)), f(f_inv(X) + 1) - X));
         } else {
-            println!("{}", min!((f(r) - X).abs(), (f(l) - X).abs()));
+            println!("{}", min!(f(f_inv(X)) - X, X - f(f_inv(X) + 1)));
         }
     }
 }

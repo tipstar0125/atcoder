@@ -96,23 +96,17 @@ impl Solver {
         }
 
         let f = |n: isize| -> isize { A + (n - 1) * D };
-
-        let mut l = 0;
-        let mut r = N;
-        while (r - l) > 1 {
-            let m = (l + r) / 2;
-            if f(m) >= X {
-                r = m;
-            } else {
-                l = m;
-            }
+        let f_inv = |x: isize| -> isize { (x - A) / D + 1 };
+        if X <= A {
+            println!("{}", (A - X).abs());
+            return;
+        }
+        if X >= f(N) {
+            println!("{}", (X - f(N)).abs());
+            return;
         }
 
-        if r == 1 {
-            println!("{}", (f(r) - X).abs());
-        } else {
-            println!("{}", min!((f(r) - X).abs(), (f(l) - X).abs()));
-        }
+        println!("{}", min!(X - f(f_inv(X)), f(f_inv(X) + 1) - X));
     }
 }
 fn main() {
