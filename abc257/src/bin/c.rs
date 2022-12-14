@@ -100,8 +100,11 @@ impl Solver {
             S_adult[i] = S_adult[i - 1] + if WS[i - 1].1 == '1' { 1 } else { 0 };
             S_child[i] = S_child[i - 1] + if WS[i - 1].1 == '0' { 1 } else { 0 };
         }
-        let mut ans = 0;
+        let mut ans = 0_usize;
         for i in 0..=N {
+            if i > 0 && i < N && WS[i - 1].0 == WS[i].0 {
+                continue;
+            }
             ans = max!(ans, S_child[i] + S_adult[N] - S_adult[i]);
         }
         println!("{}", ans);
