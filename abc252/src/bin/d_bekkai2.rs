@@ -95,18 +95,17 @@ impl Solver {
         for &a in &A {
             cnt_list[a] += 1;
         }
-        let mut dp = vec![vec![0_usize; 4]; MAX + 1];
-        dp[0][0] = 1;
-
+        let mut S = vec![0; MAX + 1];
         for i in 1..MAX + 1 {
-            for j in 0..=3 {
-                dp[i][j] = dp[i - 1][j];
-                if j > 0 {
-                    dp[i][j] += dp[i - 1][j - 1] * cnt_list[i];
-                }
-            }
+            S[i] = S[i - 1] + cnt_list[i];
         }
-        println!("{}", dp[MAX][3]);
+
+        let mut ans = 0_usize;
+        for j in 0..N {
+            let aj = A[j];
+            ans += S[aj - 1] * (S[MAX] - S[aj]);
+        }
+        println!("{}", ans);
     }
 }
 fn main() {

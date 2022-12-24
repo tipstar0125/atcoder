@@ -90,23 +90,17 @@ impl Solver {
             A: [usize; N]
         }
 
-        let MAX = 200_000;
-        let mut cnt_list = vec![0; MAX + 1];
+        let mut ans = N * (N - 1) * (N - 2) / 6;
+        let mut map: HashMap<usize, usize> = HashMap::new();
         for &a in &A {
-            cnt_list[a] += 1;
+            *map.entry(a).or_default() += 1;
         }
-        let mut dp = vec![vec![0_usize; 4]; MAX + 1];
-        dp[0][0] = 1;
-
-        for i in 1..MAX + 1 {
-            for j in 0..=3 {
-                dp[i][j] = dp[i - 1][j];
-                if j > 0 {
-                    dp[i][j] += dp[i - 1][j - 1] * cnt_list[i];
-                }
+        for (_, v) in map {
+            if v > 1 {
+                ans -= v * (v - 1) / 2 * (N - v) + v * (v - 1) * (v - 2) / 6;
             }
         }
-        println!("{}", dp[MAX][3]);
+        println!("{}", ans);
     }
 }
 fn main() {
