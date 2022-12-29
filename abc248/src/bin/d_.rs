@@ -93,13 +93,13 @@ impl Solver {
             query: [(usize, usize, usize); Q]
         }
 
-        let mut index_list = vec![vec![]; N + 1];
+        let mut map: BTreeMap<usize, Vec<usize>> = BTreeMap::new();
         for (i, &a) in A.iter().enumerate() {
-            index_list[a].push(i + 1);
+            map.entry(a).or_default().push(i + 1);
         }
 
         for (l, r, num) in query {
-            let indexes = &index_list[num];
+            let indexes = map.entry(num).or_default();
             let ans = indexes.upper_bound(&r) - indexes.lower_bound(&l);
             println!("{}", ans);
         }
