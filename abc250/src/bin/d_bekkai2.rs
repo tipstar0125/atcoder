@@ -8,7 +8,6 @@
 #![allow(dead_code)]
 use std::collections::BTreeMap;
 
-use num_traits::Pow;
 use proconio::{
     fastout, input,
     marker::{Chars, Usize1},
@@ -118,19 +117,10 @@ impl Solver {
         let mut ans = 0_usize;
         let mut l = 0;
         let mut r = prime_list.len() - 1;
-        let f = |p: usize, q: usize| -> usize {
-            let v = p as f64 + (q as f64).powf(3.0);
-            if v < 4e18 {
-                p * q.pow(3)
-            } else {
-                4e18 as usize
-            }
-        };
-
         while l < prime_list.len() - 1 {
             let p = prime_list[l];
             let q = prime_list[r];
-            if r > 0 && f(p, q) > N {
+            if r > 0 && p > N / q.pow(3) {
                 r -= 1;
             } else {
                 if r > l {
