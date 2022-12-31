@@ -87,39 +87,38 @@ impl Solver {
     fn solve(&mut self) {
         input! {
             _N: usize,
-            mut X: usize,
+            X: usize,
             S: Chars
         }
 
-        let mut stack = vec![];
-        for s in S {
-            if s == 'U' {
-                if stack.is_empty() {
-                    stack.push(s);
-                } else {
-                    let last = stack[stack.len() - 1];
-                    if last == 'U' {
-                        stack.push(s);
-                    } else {
-                        stack.pop();
-                    }
-                }
+        let radix = 2;
+        let mut pp = 1;
+        let mut T = VecDeque::new();
+        for _ in 0..60 {
+            if X / pp % radix == 1 {
+                T.push_back(1)
             } else {
-                stack.push(s);
+                T.push_back(0)
             }
+            pp *= radix;
         }
 
-        for s in stack {
+        for s in S {
             if s == 'U' {
-                X /= 2;
+                T.pop_front();
             } else if s == 'L' {
-                X *= 2;
+                T.push_front(0);
             } else {
-                X *= 2;
-                X += 1;
+                T.push_front(1);
             }
         }
-        println!("{}", X);
+        let mut ans = 0_usize;
+        let mut pp = 1;
+        for i in 0..min!(T.len(), 60) {
+            ans += T[i] * pp;
+            pp *= radix;
+        }
+        println!("{}", ans);
     }
 }
 fn main() {
