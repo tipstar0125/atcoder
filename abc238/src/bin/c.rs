@@ -117,6 +117,24 @@ fn eratosthenes(n: usize) -> Vec<bool> {
     is_prime_list
 }
 
+fn mod_pow(a: usize, b: usize, m: usize) -> usize {
+    let mut p = a;
+    let mut ret = 1;
+    let mut n = b;
+    while n > 0 {
+        if n & 1 == 1 {
+            ret = ret * p % m;
+        }
+        p = p * p % m;
+        n >>= 1;
+    }
+    ret
+}
+
+fn mod_div(a: usize, b: usize, m: usize) -> usize {
+    (a * mod_pow(b, m - 2, m)) % m
+}
+
 fn f(n: usize) -> usize {
     let MOD = 998244353;
     let num_str = n.to_string();
@@ -127,19 +145,5 @@ fn f(n: usize) -> usize {
     let mut v = (n + 1 - a) % MOD;
     v *= (n + 2 - a) % MOD;
     v %= MOD;
-    v *= power(2, MOD - 2, MOD);
-    v %= MOD;
-    (v + f(a - 1)) % MOD
-}
-
-fn power(a: usize, b: usize, m: usize) -> usize {
-    let mut p = a;
-    let mut ans = 1;
-    for i in 0..64 {
-        if (b >> i) % 2 == 1 {
-            ans = (ans * p) % m;
-        }
-        p = (p * p) % m;
-    }
-    ans
+    (mod_div(v, 2, MOD) + f(a - 1)) % MOD
 }
