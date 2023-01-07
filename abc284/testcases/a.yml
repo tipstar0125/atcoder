@@ -1,0 +1,34 @@
+---
+type: Batch
+timelimit: 2s
+match: Lines
+
+cases:
+  - name: sample1
+    in: |
+      3
+      Takahashi
+      Aoki
+      Snuke
+    out: |
+      Snuke
+      Aoki
+      Takahashi
+  - name: sample2
+    in: |
+      4
+      2023
+      Year
+      New
+      Happy
+    out: |
+      Happy
+      New
+      Year
+      2023
+
+extend:
+  - type: Text
+    path: "./a"
+    in: /in/*.txt
+    out: /out/*.txt
