@@ -98,32 +98,24 @@ impl Solver {
             G[a].push((b, c, d));
             G[b].push((a, c, d));
         }
-        let INF = 1_isize << 60;
-        let mut dist = vec![INF; N + 1];
+        let mut dist = vec![-1_isize; N + 1];
         let mut tree = vec![0_usize; N + 1];
         let mut Q = BinaryHeap::new();
-        Q.push(Reverse((0, 0, 1)));
+        Q.push(Reverse((0, Reverse(0), 1)));
 
         while !Q.is_empty() {
-            let Reverse((d, t, pos)) = Q.pop().unwrap();
-            if dist[pos] < d {
-                continue;
-            }
-            if dist[pos] == d && tree[pos] >= t {
+            let Reverse((d, Reverse(t), pos)) = Q.pop().unwrap();
+            if dist[pos] != -1 {
                 continue;
             }
             dist[pos] = d;
             tree[pos] = t;
-            // tree[pos] = max!(tree[pos], t);
 
             for &next in &G[pos] {
                 let (n, w, dt) = next;
-                let nd = d + w as isize;
-                let nt = t + dt;
-                if dist[n] < nd {
-                    continue;
+                if dist[n] == -1 {
+                    Q.push(Reverse((d + w as isize, Reverse(t + dt), n)));
                 }
-                Q.push(Reverse((nd, nt, n)));
             }
         }
         println!("{} {}", dist[N], tree[N]);
