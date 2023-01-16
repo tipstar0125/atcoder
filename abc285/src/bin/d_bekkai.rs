@@ -6,7 +6,7 @@
 #![allow(clippy::nonminimal_bool)]
 #![allow(clippy::neg_multiply)]
 #![allow(dead_code)]
-use std::collections::{BTreeMap, HashMap, VecDeque};
+use std::collections::BTreeMap;
 
 use proconio::{
     fastout, input,
@@ -89,46 +89,32 @@ impl Solver {
             N: usize,
             ST: [(String, String); N]
         }
-        let mut x = vec![];
-        for (s, t) in &ST {
-            x.push(s.as_str());
-            x.push(t.as_str());
+
+        let mut G: BTreeMap<String, String> = BTreeMap::new();
+        let mut visited: BTreeMap<String, bool> = BTreeMap::new();
+        for (s, t) in ST.clone() {
+            *G.entry(s.clone()).or_default() = t;
+            *visited.entry(s).or_default() = false;
         }
 
-        let map: BTreeMap<_, _> = x.iter().enumerate().map(|(i, &s)| (s, i)).collect();
-        let mut indegs = vec![0; x.len()];
-        let mut G = vec![vec![]; x.len()];
-        for (s, t) in &ST {
-            indegs[map[t.as_str()]] += 1;
-            G[map[s.as_str()]].push(map[t.as_str()]);
-        }
-
-        let mut Q = VecDeque::new();
-        for (i, &indeg) in indegs.iter().enumerate() {
-            if indeg == 0 {
-                Q.push_back(i);
-            }
-        }
-
-        let mut topo_sorted_list = vec![];
-        while !Q.is_empty() {
-            let pos = Q.pop_front().unwrap();
-            topo_sorted_list.push(pos);
-            for &next in &G[pos] {
-                indegs[next] -= 1;
-                if indegs[next] == 0 {
-                    Q.push_back(next);
+        for (s, _) in ST {
+            if !visited[&s] {
+                *visited.entry(s.clone()).or_default() = true;
+                let mut next = G[&s].clone();
+                loop {
+                    *visited.entry(next.clone()).or_default() = true;
+                    if !G.contains_key(&next) {
+                        break;
+                    }
+                    if next == s {
+                        println!("No");
+                        return;
+                    }
+                    next = G[&next].clone();
                 }
             }
         }
-        println!(
-            "{}",
-            if topo_sorted_list.len() == x.len() {
-                "Yes"
-            } else {
-                "No"
-            }
-        );
+        println!("Yes");
     }
 }
 fn main() {

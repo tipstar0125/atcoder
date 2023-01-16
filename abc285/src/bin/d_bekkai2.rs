@@ -6,7 +6,7 @@
 #![allow(clippy::nonminimal_bool)]
 #![allow(clippy::neg_multiply)]
 #![allow(dead_code)]
-use std::collections::{BTreeMap, HashMap, VecDeque};
+use std::collections::{BTreeMap, HashMap};
 
 use proconio::{
     fastout, input,
@@ -89,46 +89,29 @@ impl Solver {
             N: usize,
             ST: [(String, String); N]
         }
-        let mut x = vec![];
+
+        let mut map: HashMap<&str, usize> = HashMap::new();
+        let mut num = 1_usize;
+        let mut uf = UnionFind::new(2e5 as usize + 1);
+        let mut has_loop = false;
         for (s, t) in &ST {
-            x.push(s.as_str());
-            x.push(t.as_str());
-        }
-
-        let map: BTreeMap<_, _> = x.iter().enumerate().map(|(i, &s)| (s, i)).collect();
-        let mut indegs = vec![0; x.len()];
-        let mut G = vec![vec![]; x.len()];
-        for (s, t) in &ST {
-            indegs[map[t.as_str()]] += 1;
-            G[map[s.as_str()]].push(map[t.as_str()]);
-        }
-
-        let mut Q = VecDeque::new();
-        for (i, &indeg) in indegs.iter().enumerate() {
-            if indeg == 0 {
-                Q.push_back(i);
+            let s_str = s.as_str();
+            let t_str = t.as_str();
+            if !map.contains_key(s_str) {
+                *map.entry(s_str).or_default() = num;
+                num += 1;
             }
-        }
-
-        let mut topo_sorted_list = vec![];
-        while !Q.is_empty() {
-            let pos = Q.pop_front().unwrap();
-            topo_sorted_list.push(pos);
-            for &next in &G[pos] {
-                indegs[next] -= 1;
-                if indegs[next] == 0 {
-                    Q.push_back(next);
-                }
+            if !map.contains_key(t_str) {
+                *map.entry(t_str).or_default() = num;
+                num += 1;
             }
-        }
-        println!(
-            "{}",
-            if topo_sorted_list.len() == x.len() {
-                "Yes"
-            } else {
-                "No"
+            if uf.is_same(map[s_str], map[t_str]) {
+                has_loop = true;
+                break;
             }
-        );
+            uf.unite(map[s_str], map[t_str]);
+        }
+        println!("{}", if !has_loop { "Yes" } else { "No" });
     }
 }
 fn main() {
