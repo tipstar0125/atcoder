@@ -86,52 +86,34 @@ impl Solver {
         input! {
             H: usize,
             W: usize,
-            mut A: [[usize; W]; H],
-            mut B: [[usize; W]; H]
+            mut A: [[isize; W]; H],
+            mut B: [[isize; W]; H]
         }
 
-        let mut sum_a = 0;
-        let mut sum_b = 0;
-        for i in 0..H {
-            for j in 0..W {
-                sum_a += A[i][j];
-                sum_b += B[i][j];
-            }
-        }
+        let mut cnt = 0_isize;
 
         for i in 0..H - 1 {
             for j in 0..W - 1 {
-                let min = min!(A[i][j], A[i + 1][j], A[i][j + 1], A[i + 1][j + 1]);
-                A[i][j] -= min;
-                A[i + 1][j] -= min;
-                A[i][j + 1] -= min;
-                A[i + 1][j + 1] -= min;
+                let delta = B[i][j] - A[i][j];
+                cnt += delta.abs();
+                A[i][j] += delta;
+                A[i + 1][j] += delta;
+                A[i][j + 1] += delta;
+                A[i + 1][j + 1] += delta;
             }
         }
-
-        for i in 0..H - 1 {
-            for j in 0..W - 1 {
-                let min = min!(B[i][j], B[i + 1][j], B[i][j + 1], B[i + 1][j + 1]);
-                B[i][j] -= min;
-                B[i + 1][j] -= min;
-                B[i][j + 1] -= min;
-                B[i + 1][j + 1] -= min;
-            }
-        }
-        let mut ans = true;
-
+        let mut ok = true;
         for i in 0..H {
             for j in 0..W {
                 if A[i][j] != B[i][j] {
-                    ans = false;
+                    ok = false;
                 }
             }
         }
 
-        if ans {
+        if ok {
             println!("Yes");
-            // let cnt = (sum_a as isize - sum_b as isize).abs() / 4;
-            println!("{} {}", sum_a, sum_b);
+            println!("{}", cnt);
         } else {
             println!("No");
         }
