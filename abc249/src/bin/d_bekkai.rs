@@ -6,7 +6,7 @@
 #![allow(clippy::nonminimal_bool)]
 #![allow(clippy::neg_multiply)]
 #![allow(dead_code)]
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 
 use proconio::{
     fastout, input,
@@ -90,16 +90,27 @@ impl Solver {
             A: [usize; N]
         }
 
-        let mut counts = vec![0; 2e5 as usize + 1];
-        let m = *A.iter().max().unwrap();
+        let mut map: BTreeMap<usize, usize> = BTreeMap::new();
         for &a in &A {
-            counts[a] += 1;
+            *map.entry(a).or_default() += 1;
         }
 
         let mut cnt = 0_usize;
-        for q in 1..=m {
-            for r in 1..=m / q {
-                cnt += counts[q * r] * counts[q] * counts[r];
+        for &k in map.clone().keys() {
+            let mut pattern = BTreeSet::new();
+            let mut i = 1_usize;
+            while i * i <= k {
+                if k % i == 0 {
+                    pattern.insert((k, i, k / i));
+                    pattern.insert((k, k / i, i));
+                }
+                i += 1;
+            }
+            for (ai, aj, ak) in pattern {
+                let num_ai = *map.entry(ai).or_default();
+                let num_aj = *map.entry(aj).or_default();
+                let num_ak = *map.entry(ak).or_default();
+                cnt += num_ai * num_aj * num_ak;
             }
         }
         println!("{}", cnt);
@@ -165,19 +176,4 @@ fn prime_factorize(n: usize) -> BTreeMap<usize, usize> {
         *pf.entry(nn).or_default() += 1;
     }
     pf
-}
-
-fn enum_dividers(n: usize) -> Vec<usize> {
-    let mut i = 1_usize;
-    let mut ret = vec![];
-    while i * i <= n {
-        if n % i == 0 {
-            ret.push(i);
-            if i != n / i {
-                ret.push(n / i);
-            }
-        }
-        i += 1;
-    }
-    ret
 }

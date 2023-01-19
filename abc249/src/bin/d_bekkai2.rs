@@ -91,15 +91,17 @@ impl Solver {
         }
 
         let mut counts = vec![0; 2e5 as usize + 1];
-        let m = *A.iter().max().unwrap();
         for &a in &A {
             counts[a] += 1;
         }
 
         let mut cnt = 0_usize;
-        for q in 1..=m {
-            for r in 1..=m / q {
-                cnt += counts[q * r] * counts[q] * counts[r];
+        for &ai in &A {
+            let dividers = enum_dividers(ai);
+            for &aj in &dividers {
+                let num_aj = counts[aj];
+                let num_ak = counts[ai / aj];
+                cnt += num_aj * num_ak;
             }
         }
         println!("{}", cnt);
