@@ -90,31 +90,25 @@ impl Solver {
             LRV: [(usize, usize, isize); Q]
         }
 
-        let mut ans = 0;
+        let mut ans = 0_isize;
+        let mut delta_list = vec![0_isize; N - 1];
         for i in 1..N {
             ans += (A[i] - A[i - 1]).abs();
+            delta_list[i - 1] = A[i] - A[i - 1];
         }
-        let mut edges = vec![0; N];
 
         for &(l, r, v) in &LRV {
-            edges[l - 1] += v;
-            edges[r - 1] += v;
-            let lv = edges[l - 1];
-            let rv = edges[r - 1];
-
-            if l >= 2 {
-                if A[l - 2] > A[l - 1] {
-                    ans -= lv;
-                } else {
-                    ans += lv;
-                }
+            if l > 1 {
+                let before = delta_list[l - 2].abs();
+                delta_list[l - 2] += v;
+                let after = delta_list[l - 2].abs();
+                ans += after - before;
             }
             if r < N {
-                if A[r - 1] < A[r] {
-                    ans -= rv;
-                } else {
-                    ans += rv;
-                }
+                let before = delta_list[r - 1].abs();
+                delta_list[r - 1] -= v;
+                let after = delta_list[r - 1].abs();
+                ans += after - before;
             }
             println!("{}", ans);
         }
