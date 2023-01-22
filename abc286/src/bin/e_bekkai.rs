@@ -90,45 +90,46 @@ impl Solver {
     fn solve(&mut self) {
         input! {
             N: usize,
-            A: [isize; N],
+            A: [usize; N],
             S: [Chars; N],
             Q: usize,
             UV: [(Usize1, Usize1); Q]
         }
 
         let mut G = vec![vec![]; N];
-        let d = 1e12 as isize;
         for i in 0..N {
             for j in 0..N {
                 if S[i][j] == 'Y' {
-                    G[i].push((j, d - A[j]));
+                    G[i].push(j);
                 }
             }
         }
-        let INF = 1_isize << 60;
+        let INF = 1_usize << 60;
+
+        let mut point = vec![vec![0_usize; N]; N];
         let mut dist = vec![vec![INF; N]; N];
         for i in 0..N {
+            let mut Q = VecDeque::new();
+            point[i][i] = A[i];
             dist[i][i] = 0;
-            for &(j, dd) in &G[i] {
-                dist[i][j] = dd;
-            }
-        }
-
-        for k in 0..N {
-            for i in 0..N {
-                for j in 0..N {
-                    dist[i][j] = min!(dist[i][j], dist[i][k] + dist[k][j]);
+            Q.push_back(i);
+            while !Q.is_empty() {
+                let pos = Q.pop_front().unwrap();
+                for &next in &G[pos] {
+                    if dist[i][next] >= dist[i][pos] + 1 && point[i][next] < point[i][pos] + A[next]
+                    {
+                        point[i][next] = point[i][pos] + A[next];
+                        dist[i][next] = dist[i][pos] + 1;
+                        Q.push_back(next);
+                    }
                 }
             }
         }
-
         for &(start, stop) in &UV {
             if dist[start][stop] == INF {
                 println!("Impossible");
             } else {
-                let ans_dist = (dist[start][stop] + d - 1) / d;
-                let ans_point = ans_dist * d - dist[start][stop] + A[start];
-                println!("{} {}", ans_dist, ans_point);
+                println!("{} {}", dist[start][stop], point[start][stop]);
             }
         }
     }

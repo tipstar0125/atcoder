@@ -107,17 +107,23 @@ impl Solver {
         }
         let INF = 1_isize << 60;
         let mut dist = vec![vec![INF; N]; N];
-        for i in 0..N {
-            dist[i][i] = 0;
-            for &(j, dd) in &G[i] {
-                dist[i][j] = dd;
-            }
-        }
 
-        for k in 0..N {
-            for i in 0..N {
-                for j in 0..N {
-                    dist[i][j] = min!(dist[i][j], dist[i][k] + dist[k][j]);
+        for i in 0..N {
+            let mut Q = BinaryHeap::new();
+            let mut fixed = vec![false; N];
+            dist[i][i] = -A[i];
+            Q.push((Reverse(dist[i][i]), i));
+            while !Q.is_empty() {
+                let (_, pos) = Q.pop().unwrap();
+                if fixed[pos] {
+                    continue;
+                }
+                fixed[pos] = true;
+                for &(next, cost) in &G[pos] {
+                    if dist[i][next] > dist[i][pos] + cost {
+                        dist[i][next] = dist[i][pos] + cost;
+                        Q.push((Reverse(dist[i][next]), next));
+                    }
                 }
             }
         }
@@ -127,7 +133,7 @@ impl Solver {
                 println!("Impossible");
             } else {
                 let ans_dist = (dist[start][stop] + d - 1) / d;
-                let ans_point = ans_dist * d - dist[start][stop] + A[start];
+                let ans_point = ans_dist * d - dist[start][stop];
                 println!("{} {}", ans_dist, ans_point);
             }
         }
