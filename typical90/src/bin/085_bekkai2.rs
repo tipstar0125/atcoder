@@ -90,9 +90,17 @@ impl Solver {
         }
         let dividers = enum_dividers(K);
         let mut ans = 0_usize;
-        for &i in &dividers {
-            for &j in &dividers {
-                if i <= j && K / i >= j && K % (i * j) == 0 && j <= K / i / j {
+        let f = |a: usize, b: usize| -> bool {
+            let c = a as f64;
+            let d = b as f64;
+            if c * d > 1e12 {
+                return false;
+            }
+            K % (a * b) == 0
+        };
+        for i in &dividers {
+            for j in &dividers {
+                if i <= j && f(*i, *j) && *j <= K / i / j {
                     ans += 1;
                 }
             }
