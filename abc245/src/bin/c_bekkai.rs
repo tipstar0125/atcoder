@@ -92,31 +92,26 @@ impl Solver {
             B: [isize; N]
         }
 
-        let mut dp = vec![vec![false; 2]; N];
-        dp[0][0] = true;
-        dp[0][1] = true;
+        let mut element = BTreeSet::new();
+        element.insert(A[0]);
+        element.insert(B[0]);
         for i in 1..N {
-            if dp[i - 1][0] && (A[i] - A[i - 1]).abs() <= K {
-                dp[i][0] = true;
+            let mut next = BTreeSet::new();
+            for &e in &element {
+                if (A[i] - e).abs() <= K {
+                    next.insert(A[i]);
+                }
+                if (B[i] - e).abs() <= K {
+                    next.insert(B[i]);
+                }
             }
-            if dp[i - 1][0] && (B[i] - A[i - 1]).abs() <= K {
-                dp[i][1] = true;
-            }
-            if dp[i - 1][1] && (A[i] - B[i - 1]).abs() <= K {
-                dp[i][0] = true;
-            }
-            if dp[i - 1][1] && (B[i] - B[i - 1]).abs() <= K {
-                dp[i][1] = true;
+            element = next;
+            if element.len() == 0 {
+                println!("No");
+                return;
             }
         }
-        println!(
-            "{}",
-            if dp[N - 1][0] || dp[N - 1][1] {
-                "Yes"
-            } else {
-                "No"
-            }
-        );
+        println!("Yes");
     }
 }
 fn main() {
