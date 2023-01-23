@@ -91,20 +91,20 @@ impl Solver {
             S: Chars
         }
 
-        let mut map: BTreeMap<usize, BTreeMap<char, Vec<usize>>> = BTreeMap::new();
+        let mut map: BTreeMap<usize, BTreeMap<char, BTreeSet<usize>>> = BTreeMap::new();
         for i in 0..N {
             let (x, y) = XY[i];
             let s = S[i];
-            map.entry(y).or_default().entry(s).or_default().push(x);
+            map.entry(y).or_default().entry(s).or_default().insert(x);
         }
 
         for (_, v) in map {
             if v.len() == 2 {
-                let left_max = v[&'L'].iter().max().unwrap();
-                let right_min = v[&'R'].iter().min().unwrap();
-                if right_min < left_max {
-                    println!("Yes");
-                    return;
+                for r in &v[&'R'] {
+                    if v[&'L'].range(r..).next().is_some() {
+                        println!("Yes");
+                        return;
+                    }
                 }
             }
         }
