@@ -91,22 +91,28 @@ impl Solver {
             AB: [(isize, isize); N]
         }
 
-        let mut x = vec![];
+        let mut imos: BTreeMap<isize, isize> = BTreeMap::new();
 
         for &(a, b) in &AB {
-            x.push((a, 1));
-            x.push((a + b, -1));
+            *imos.entry(a).or_default() += 1;
+            *imos.entry(a + b).or_default() -= 1;
         }
-
-        x.sort();
-
+        let mut S: BTreeMap<isize, isize> = BTreeMap::new();
         let mut cnt = 0_isize;
-        let mut ans = vec![0; N + 1];
-        for i in 0..x.len() - 1 {
-            cnt += x[i].1;
-            ans[cnt as usize] += x[i + 1].0 - x[i].0;
+        for (k, v) in imos {
+            cnt += v;
+            *S.entry(k).or_default() += cnt;
         }
-        println!("{}", ans[1..].iter().join(" "));
+
+        let mut ans = vec![0_isize; N + 1];
+        let mut before_k = *S.clone().keys().collect::<Vec<&isize>>()[0];
+        let mut before_v = 0;
+        for (k, v) in S {
+            ans[before_v as usize] += k - before_k;
+            before_k = k;
+            before_v = v;
+        }
+        println!("{}", &ans[1..].iter().join(" "));
     }
 }
 fn main() {
