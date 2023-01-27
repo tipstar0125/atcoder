@@ -1,0 +1,36 @@
+---
+type: Batch
+timelimit: 2s
+match: Lines
+
+cases:
+  - name: sample1
+    in: |
+      mari
+      to
+      zzo
+      1321
+    out: |
+      marizzotomari
+  - name: sample2
+    in: |
+      abra
+      cad
+      abra
+      123
+    out: |
+      abracadabra
+  - name: sample3
+    in: |
+      a
+      b
+      c
+      1
+    out: |
+      a
+
+extend:
+  - type: Text
+    path: "./b"
+    in: /in/*.txt
+    out: /out/*.txt

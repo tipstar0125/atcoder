@@ -1,0 +1,32 @@
+---
+type: Batch
+timelimit: 2s
+match: Lines
+
+cases:
+  - name: sample1
+    in: |
+      abc
+    out: |
+      4
+  - name: sample2
+    in: |
+      aa
+    out: |
+      1
+  - name: sample3
+    in: |
+      acba
+    out: |
+      6
+  - name: sample4
+    in: |
+      chokudai
+    out: |
+      54
+
+extend:
+  - type: Text
+    path: "./f"
+    in: /in/*.txt
+    out: /out/*.txt
