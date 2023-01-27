@@ -6,10 +6,7 @@
 #![allow(clippy::nonminimal_bool)]
 #![allow(clippy::neg_multiply)]
 #![allow(dead_code)]
-use std::{
-    collections::{BTreeMap, BTreeSet},
-    iter::FromIterator,
-};
+use std::collections::{BTreeMap, BTreeSet};
 
 use itertools::Itertools;
 use proconio::{
@@ -94,18 +91,26 @@ impl Solver {
             XY: [(usize, usize); N]
         }
 
-        let set = BTreeSet::from_iter(XY.iter().cloned());
-        let mut ans = 0_usize;
-        for i in 0..N {
-            for j in i + 1..N {
-                let (x0, y0) = XY[i];
-                let (x1, y1) = XY[j];
-                if x0 != x1 && y0 != y1 && set.contains(&(x0, y1)) && set.contains(&(x1, y0)) {
-                    ans += 1;
+        let mut mp: BTreeMap<usize, BTreeSet<usize>> = BTreeMap::new();
+        for &(x, y) in &XY {
+            mp.entry(x).or_default().insert(y);
+        }
+        let x_list = mp.keys().clone().collect::<Vec<&usize>>();
+        if x_list.len() >= 2 {
+            let mut ans = 0_usize;
+            for comb in x_list.iter().combinations(2) {
+                let x0 = comb[0];
+                let x1 = comb[1];
+                let set = &mp[x0] & &mp[x1];
+                let n = set.len();
+                if n >= 2 {
+                    ans += n * (n - 1) / 2;
                 }
             }
+            println!("{}", ans);
+        } else {
+            println!("0");
         }
-        println!("{}", ans / 2);
     }
 }
 fn main() {
