@@ -88,34 +88,37 @@ impl Solver {
         input! {
             N: usize,
             S: [Chars; N],
-            T: [Chars; N]
+            mut T: [Chars; N]
         }
 
-        let mut s_position = vec![];
-        let mut t_position = vec![];
+        let mut s_pattern = vec![];
         for i in 0..N {
             for j in 0..N {
                 if S[i][j] == '#' {
-                    s_position.push((i as isize, j as isize));
-                }
-                if T[i][j] == '#' {
-                    t_position.push((i as isize, j as isize));
+                    s_pattern.push((i, j));
                 }
             }
         }
-        t_position.sort();
-        s_position.sort();
 
         for _ in 0..4 {
-            if s_position.len() == t_position.len() {
+            let mut t_pattern = vec![];
+            for i in 0..N {
+                for j in 0..N {
+                    if T[i][j] == '#' {
+                        t_pattern.push((i, j));
+                    }
+                }
+            }
+
+            if s_pattern.len() == t_pattern.len() {
                 let mut ok = true;
-                let diff_row = s_position[0].0 - t_position[0].0;
-                let diff_col = s_position[0].1 - t_position[0].1;
-                for (&(sr, sc), &(tr, tc)) in s_position.iter().zip(t_position.iter()) {
-                    if diff_row != sr - tr {
+                let row_diff = s_pattern[0].0 as isize - t_pattern[0].0 as isize;
+                let col_diff = s_pattern[0].1 as isize - t_pattern[0].1 as isize;
+                for k in 1..s_pattern.len() {
+                    if row_diff != (s_pattern[k].0 as isize - t_pattern[k].0 as isize) {
                         ok = false;
                     }
-                    if diff_col != sc - tc {
+                    if col_diff != (s_pattern[k].1 as isize - t_pattern[k].1 as isize) {
                         ok = false;
                     }
                 }
@@ -124,11 +127,16 @@ impl Solver {
                     return;
                 }
             }
-            for i in 0..t_position.len() {
-                let (row, col) = t_position[i];
-                t_position[i] = (col, -row);
+
+            let mut t_tmp = vec![vec!['.'; N]; N];
+            for i in 0..N {
+                for j in 0..N {
+                    if T[j][N - i - 1] == '#' {
+                        t_tmp[i][j] = '#';
+                    }
+                }
             }
-            t_position.sort();
+            T = t_tmp;
         }
         println!("No");
     }
