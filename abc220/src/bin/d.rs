@@ -91,19 +91,18 @@ impl Solver {
             A: [usize; N]
         }
 
-        let mut dp = vec![vec![0_usize; 10]; N - 1];
+        let mut dp = vec![vec![0_usize; 10]; N];
         let MOD = 998244353_usize;
-        dp[0][(A[0] + A[1]) % 10] += 1;
-        dp[0][(A[0] * A[1]) % 10] += 1;
-        for i in 1..N - 1 {
+        dp[0][A[0]] = 1;
+        for i in 1..N {
             for j in 0..=9 {
-                dp[i][(j + A[i + 1]) % 10] += dp[i - 1][j];
-                dp[i][(j + A[i + 1]) % 10] %= MOD;
-                dp[i][(j * A[i + 1]) % 10] += dp[i - 1][j];
-                dp[i][(j * A[i + 1]) % 10] %= MOD;
+                dp[i][(j + A[i]) % 10] += dp[i - 1][j];
+                dp[i][(j + A[i]) % 10] %= MOD;
+                dp[i][(j * A[i]) % 10] += dp[i - 1][j];
+                dp[i][(j * A[i]) % 10] %= MOD;
             }
         }
-        println!("{}", dp[N - 2].iter().join("\n"));
+        println!("{}", dp[N - 1].iter().join("\n"));
     }
 }
 fn main() {
