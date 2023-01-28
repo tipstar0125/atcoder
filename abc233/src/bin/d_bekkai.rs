@@ -93,17 +93,22 @@ impl Solver {
         }
 
         let mut S = vec![0; N + 1];
-        let mut mp: BTreeMap<isize, usize> = BTreeMap::new();
+        let mut mp: BTreeMap<isize, Vec<usize>> = BTreeMap::new();
 
         for i in 0..N {
             S[i + 1] = S[i] + A[i];
+            mp.entry(S[i + 1]).or_default().push(i + 1);
         }
 
         let mut ans = 0_usize;
         for i in 1..=N {
-            *mp.entry(S[i - 1]).or_default() += 1;
-            if mp.contains_key(&(S[i] - K)) {
-                ans += mp[&(S[i] - K)];
+            if S[i] == K {
+                ans += 1;
+            }
+            if mp.contains_key(&(S[i] + K)) {
+                let len = mp[&(S[i] + K)].len();
+                let idx = mp[&(S[i] + K)].lower_bound(&(i + 1));
+                ans += len - idx;
             }
         }
         println!("{}", ans);
