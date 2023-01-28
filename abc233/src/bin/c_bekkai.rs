@@ -90,16 +90,29 @@ impl Solver {
             X: usize
         }
 
-        let mut ans = 0_usize;
-        let mut G = vec![];
+        let mut x = vec![1];
         for _ in 0..N {
             input! {
                 L: usize,
                 A: [usize; L]
             }
-            G.push(A);
+
+            let mut x_tmp = vec![];
+            for &xi in &x {
+                for &a in &A {
+                    if xi <= X / a {
+                        x_tmp.push(xi * a);
+                    }
+                }
+            }
+            x = x_tmp;
         }
-        dfs(0, 1, &G, &mut ans, X);
+        let mut ans = 0_usize;
+        for &xi in &x {
+            if xi == X {
+                ans += 1;
+            }
+        }
         println!("{}", ans);
     }
 }
@@ -110,21 +123,6 @@ fn main() {
         .unwrap()
         .join()
         .unwrap();
-}
-
-fn dfs(pos: usize, p: usize, G: &Vec<Vec<usize>>, ans: &mut usize, X: usize) {
-    if pos == G.len() {
-        if p == X {
-            *ans += 1;
-        }
-        return;
-    }
-
-    for next in &G[pos] {
-        if p <= X / next {
-            dfs(pos + 1, p * next, G, ans, X);
-        }
-    }
 }
 
 fn eratosthenes(n: usize) -> Vec<bool> {
