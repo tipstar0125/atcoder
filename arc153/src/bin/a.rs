@@ -6,7 +6,7 @@
 #![allow(clippy::nonminimal_bool)]
 #![allow(clippy::neg_multiply)]
 #![allow(dead_code)]
-use std::collections::{BTreeMap, BTreeSet};
+use std::collections::BTreeMap;
 
 use itertools::Itertools;
 use proconio::{
@@ -87,53 +87,32 @@ impl Solver {
     #[fastout]
     fn solve(&mut self) {
         input! {
-            N: usize,
-            M: usize,
-            A: [usize; N]
+            N: usize
         }
 
-        let mut set = BTreeSet::new();
-        for &a in &A {
-            let mut aa = a;
-            let mut i = 2;
-            while i * i <= a {
-                while aa % i == 0 {
-                    set.insert(i);
-                    aa /= i;
-                }
-                i += 1;
-            }
-            if aa != 1 {
-                set.insert(aa);
-            }
-        }
-        let mut prime_set_list = vec![];
-        for m in 1..=M {
-            let mut mm = m;
-            let mut i = 2;
-            let mut set = BTreeSet::new();
-            while i * i <= m {
-                while mm % i == 0 {
-                    set.insert(i);
-                    mm /= i;
-                }
-                i += 1;
-            }
-            if mm != 1 {
-                set.insert(mm);
-            }
-            prime_set_list.push(set);
-        }
-
-        let mut ans = vec![];
-        for (i, s) in prime_set_list.iter().enumerate() {
-            let ss = s.intersection(&set);
-            if ss.count() == 0 {
-                ans.push(i + 1);
+        let mut n = N - 1;
+        let mut ans = vec!["".to_string(); 9];
+        for i in 0..6 {
+            let x = n % 10;
+            n /= 10;
+            if i == 0 {
+                ans[7] = x.to_string();
+            } else if i == 1 {
+                ans[6] = x.to_string();
+                ans[8] = x.to_string();
+            } else if i == 2 {
+                ans[4] = x.to_string();
+                ans[5] = x.to_string();
+            } else if i == 3 {
+                ans[3] = x.to_string();
+            } else if i == 4 {
+                ans[2] = x.to_string();
+            } else {
+                ans[0] = (x + 1).to_string();
+                ans[1] = (x + 1).to_string();
             }
         }
-        println!("{}", ans.len());
-        println!("{}", ans.iter().join("\n"));
+        println!("{}", ans.iter().join(""));
     }
 }
 fn main() {
