@@ -1,0 +1,35 @@
+---
+type: Batch
+timelimit: 2s
+match: Lines
+
+cases:
+  - name: sample1
+    in: |
+      2
+      6 2
+      abbaab
+      5 3
+      abcbb
+    out: |
+      Yes
+      No
+  - name: sample2
+    in: |
+      3
+      12 400378271514996652
+      njvhhvjnnjvh
+      10 884633988115575508
+      rrhiyvrrur
+      36 71630165869626180
+      vsxmxajrrduhhudrrjaxmxsvvsxmxajrrduh
+    out: |
+      Yes
+      No
+      Yes
+
+extend:
+  - type: Text
+    path: "./a"
+    in: /in/*.txt
+    out: /out/*.txt

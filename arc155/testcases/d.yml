@@ -1,0 +1,55 @@
+---
+type: Batch
+timelimit: 2s
+match: Lines
+
+cases:
+  - name: sample1
+    in: |
+      4
+      2 3 4 6
+    out: |
+      Takahashi
+      Aoki
+      Takahashi
+      Aoki
+  - name: sample2
+    in: |
+      4
+      2 155 155 155
+    out: |
+      Takahashi
+      Takahashi
+      Takahashi
+      Takahashi
+  - name: sample3
+    in: |
+      20
+      2579 25823 32197 55685 73127 73393 74033 95252 104289 114619 139903 144912 147663 149390 155806 169494 175264 181477 189686 196663
+    out: |
+      Takahashi
+      Aoki
+      Takahashi
+      Aoki
+      Takahashi
+      Takahashi
+      Takahashi
+      Takahashi
+      Aoki
+      Takahashi
+      Takahashi
+      Aoki
+      Aoki
+      Aoki
+      Aoki
+      Aoki
+      Takahashi
+      Takahashi
+      Aoki
+      Takahashi
+
+extend:
+  - type: Text
+    path: "./d"
+    in: /in/*.txt
+    out: /out/*.txt
