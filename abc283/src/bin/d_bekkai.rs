@@ -6,7 +6,7 @@
 #![allow(clippy::nonminimal_bool)]
 #![allow(clippy::neg_multiply)]
 #![allow(dead_code)]
-use std::collections::{BTreeSet, HashSet};
+use std::collections::HashSet;
 
 use proconio::{
     fastout, input,
@@ -89,27 +89,32 @@ impl Solver {
             S: Chars
         }
 
-        let mut X: BTreeSet<char> = BTreeSet::new();
-        let mut Y: Vec<BTreeSet<char>> = vec![];
-        Y.push(BTreeSet::new());
+        let mut set = HashSet::new();
+        let mut stack = vec![];
+        let mut good_num = 0_usize;
+        let mut good_list = vec![HashSet::new(); 300_000];
 
-        for s in S {
-            if s == '(' {
-                Y.push(BTreeSet::new());
-            } else if s == ')' {
-                let Y_last = Y.pop().unwrap();
-                for y in Y_last {
-                    X.remove(&y);
+        for (i, s) in S.iter().enumerate() {
+            if *s == '(' {
+                stack.push(i);
+                good_num = i;
+            } else if *s == ')' {
+                stack.pop();
+                let goods = good_list[good_num].clone();
+                for g in goods {
+                    set.remove(g);
+                }
+                if !stack.is_empty() {
+                    good_num = *stack.last().unwrap();
                 }
             } else {
-                if X.contains(&s) {
+                good_list[good_num].insert(s);
+                if set.contains(s) {
                     println!("No");
                     return;
+                } else {
+                    set.insert(s);
                 }
-                X.insert(s);
-                let mut Y_last = Y.pop().unwrap();
-                Y_last.insert(s);
-                Y.push(Y_last);
             }
         }
         println!("Yes");
