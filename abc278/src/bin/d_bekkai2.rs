@@ -6,7 +6,7 @@
 #![allow(clippy::nonminimal_bool)]
 #![allow(clippy::neg_multiply)]
 #![allow(dead_code)]
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 
 use proconio::{
     fastout, input,
@@ -87,43 +87,42 @@ impl Solver {
     fn solve(&mut self) {
         input! {
             N: usize,
-            mut A: [usize; N],
-            Q: usize
+            A: [usize; N],
+            Q: usize,
         }
 
-        let mut added_index = vec![];
-        let mut base = 0_usize;
-        for i in 0..N {
-            added_index.push(i);
+        let mut M: BTreeMap<usize, usize> = BTreeMap::new();
+        let mut base = 0;
+        for (i, &a) in A.iter().enumerate() {
+            *M.entry(i).or_default() += a;
         }
 
         for _ in 0..Q {
             input! {
                 t: usize
             }
-
-            if t == 1 {
-                input! {
-                    x: usize
+            match t {
+                1 => {
+                    input! {
+                        x: usize
+                    }
+                    base = x;
+                    M.clear();
                 }
-
-                while !added_index.is_empty() {
-                    let idx = added_index.pop().unwrap();
-                    A[idx] = 0;
+                2 => {
+                    input! {
+                        i: usize,
+                        x: usize
+                    }
+                    *M.entry(i - 1).or_default() += x;
                 }
-                base = x;
-            } else if t == 2 {
-                input! {
-                    i: Usize1,
-                    x: usize
+                3 => {
+                    input! {
+                        i: usize
+                    }
+                    println!("{}", base + *M.entry(i - 1).or_default());
                 }
-                A[i] += x;
-                added_index.push(i);
-            } else {
-                input! {
-                    i: Usize1
-                }
-                println!("{}", A[i] + base);
+                _ => unreachable!(),
             }
         }
     }
@@ -135,73 +134,4 @@ fn main() {
         .unwrap()
         .join()
         .unwrap();
-}
-
-fn eratosthenes(n: usize) -> Vec<bool> {
-    let mut is_prime_list = vec![true; n + 1];
-    is_prime_list[0] = false;
-    is_prime_list[1] = false;
-    let mut i = 2;
-    while i * i <= n {
-        if is_prime_list[i] {
-            let mut j = i * i;
-            while j <= n {
-                is_prime_list[j] = false;
-                j += i;
-            }
-        }
-        i += 1
-    }
-    is_prime_list
-}
-
-fn mod_pow(a: usize, b: usize, m: usize) -> usize {
-    let mut p = a;
-    let mut ret = 1;
-    let mut n = b;
-    while n > 0 {
-        if n & 1 == 1 {
-            ret = ret * p % m;
-        }
-        p = p * p % m;
-        n >>= 1;
-    }
-    ret
-}
-
-fn mod_div(a: usize, b: usize, m: usize) -> usize {
-    (a * mod_pow(b, m - 2, m)) % m
-}
-
-fn prime_factorize(n: usize) -> BTreeMap<usize, usize> {
-    let mut nn = n;
-    let mut i = 2;
-    let mut pf: BTreeMap<usize, usize> = BTreeMap::new();
-    while i * i <= n {
-        while nn % i == 0 {
-            *pf.entry(i).or_default() += 1;
-            nn /= i;
-        }
-        i += 1;
-    }
-    if nn != 1 {
-        *pf.entry(nn).or_default() += 1;
-    }
-    pf
-}
-
-fn enum_dividers(n: usize) -> Vec<usize> {
-    let mut i = 1_usize;
-    let mut ret = vec![];
-    while i * i <= n {
-        if n % i == 0 {
-            ret.push(i);
-            if i != n / i {
-                ret.push(n / i);
-            }
-        }
-        i += 1;
-    }
-    ret.sort();
-    ret
 }
