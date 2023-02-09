@@ -91,26 +91,26 @@ impl Solver {
         input! {
             N: usize,
             D: usize,
-            XY: [(usize, usize); N]
+            mut XY: [(usize, usize); N]
         }
 
-        let mut used = vec![false; N];
+        XY.sort_by(|(a, _), (b, _)| a.cmp(b));
+        let mut heap = BinaryHeap::new();
         let mut ans = 0_usize;
+
+        let mut i = 0_usize;
         for d in 1..=D {
-            let mut id = -1;
-            let mut max = 0;
-            for (i, &(x, y)) in XY.iter().enumerate() {
-                if used[i] {
-                    continue;
-                }
-                if x <= d && y > max {
-                    max = y;
-                    id = i as isize;
+            while i < N {
+                let (x, y) = XY[i];
+                if x <= d {
+                    heap.push(y);
+                    i += 1;
+                } else {
+                    break;
                 }
             }
-            if id != -1 {
-                used[id as usize] = true;
-                ans += max;
+            if !heap.is_empty() {
+                ans += heap.pop().unwrap();
             }
         }
         println!("{}", ans);
