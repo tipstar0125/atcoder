@@ -6,13 +6,12 @@
 #![allow(clippy::nonminimal_bool)]
 #![allow(clippy::neg_multiply)]
 #![allow(dead_code)]
-use std::collections::{BTreeMap, VecDeque};
+use std::collections::BTreeMap;
 
 use proconio::{
     fastout, input,
     marker::{Chars, Usize1},
 };
-use superslice::Ext;
 
 #[macro_export]
 macro_rules! max {
@@ -93,33 +92,27 @@ impl Solver {
             R: isize,
             mut X: [isize; N]
         }
-        let mut X: VecDeque<_> = X.iter().cloned().collect();
-        X.push_front(0);
-        X.push_back(W);
-        let X: Vec<_> = X.iter().cloned().collect();
+        X.push(W);
 
         let MOD = 1e9 as usize + 7;
-        let mut dp = vec![0; N + 2];
-        let mut S = vec![0; N + 2];
-        dp[0] = 1;
-        S[0] = 1;
+        let INF = 1_isize << 60;
+        let mut S: BTreeMap<isize, usize> = BTreeMap::new();
+        let mut sum = 1_usize;
+        let mut ans = 0;
+        S.entry(-INF).or_default();
+        *S.entry(0).or_default() = 1;
 
         for i in 1..N + 2 {
-            let x = X[i];
-            let l = X.upper_bound(&(x - R - 1)) as isize - 1;
-            let r = X.upper_bound(&(x - L)) as isize - 1;
-            if r == -1 {
-                dp[i] = 0;
-            } else {
-                dp[i] = S[r as usize];
-            }
-            if l != -1 {
-                dp[i] -= S[l as usize];
-            }
-            dp[i] = (dp[i] + MOD) % MOD;
-            S[i] = (S[i - 1] + dp[i]) % MOD;
+            let x = X[i - 1];
+            let (_, l) = S.range(..=x - R - 1).next_back().unwrap();
+            let (_, r) = S.range(..=x - L).next_back().unwrap();
+            let num = (r - l + MOD) % MOD;
+            sum += num;
+            sum %= MOD;
+            *S.entry(x).or_default() = sum;
+            ans = num;
         }
-        println!("{}", dp[N + 1]);
+        println!("{}", ans);
     }
 }
 fn main() {
