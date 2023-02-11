@@ -94,26 +94,32 @@ impl Solver {
             mut X: [isize; N]
         }
         let mut X: VecDeque<_> = X.iter().cloned().collect();
-        let INF = 1 << 60;
         X.push_front(0);
-        X.push_front(-INF);
         X.push_back(W);
         let X: Vec<_> = X.iter().cloned().collect();
 
         let MOD = 1e9 as usize + 7;
-        let mut dp = vec![0; N + 3];
-        let mut S = vec![0; N + 3];
-        dp[1] = 1;
-        S[1] = 1;
+        let mut dp = vec![0; N + 2];
+        let mut S = vec![0; N + 2];
+        dp[0] = 1;
+        S[0] = 1;
 
-        for i in 2..N + 3 {
+        for i in 1..N + 2 {
             let x = X[i];
-            let l = X.upper_bound(&(x - R - 1)) - 1;
-            let r = X.upper_bound(&(x - L)) - 1;
-            dp[i] = (S[r] - S[l] + MOD) % MOD;
+            let l = X.upper_bound(&(x - R - 1)) as isize - 1;
+            let r = X.upper_bound(&(x - L)) as isize - 1;
+            if r == -1 {
+                dp[i] = 0;
+            } else {
+                dp[i] = S[r as usize];
+            }
+            if l != -1 {
+                dp[i] -= S[l as usize];
+            }
+            dp[i] = (dp[i] + MOD) % MOD;
             S[i] = (S[i - 1] + dp[i]) % MOD;
         }
-        println!("{}", dp[N + 2]);
+        println!("{}", dp[N + 1]);
     }
 }
 fn main() {
