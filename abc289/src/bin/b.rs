@@ -91,17 +91,12 @@ impl Solver {
             M: usize
         }
 
-        if M == 0 {
-            let mut ans = vec![];
-            for i in 1..=N {
-                ans.push(i);
+        let mut A = vec![];
+        for _ in 0..M {
+            input! {
+                a: usize
             }
-            println!("{}", ans.iter().join(" "));
-            return;
-        }
-
-        input! {
-            A: [usize; M]
+            A.push(a);
         }
 
         let mut G = vec![vec![]; N + 1];

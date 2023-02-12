@@ -13,7 +13,6 @@ use proconio::{
     fastout, input,
     marker::{Chars, Usize1},
 };
-use superslice::Ext;
 
 #[macro_export]
 macro_rules! max {
@@ -98,18 +97,19 @@ impl Solver {
                 C: usize,
                 a: [usize; C]
             }
-            let a: BTreeSet<_> = a.iter().cloned().collect();
             A.push(a);
         }
 
         let mut ans = 0_usize;
         for num in 1..=M {
             for p in (0..M).combinations(num) {
-                let mut set: BTreeSet<usize> = BTreeSet::new();
+                let mut vec = vec![];
                 for &pi in &p {
-                    set = &set | &A[pi];
+                    vec.extend(A[pi].clone());
                 }
-                if set.len() == N {
+                vec.sort();
+                vec.dedup();
+                if vec.len() == N {
                     ans += 1;
                 }
             }

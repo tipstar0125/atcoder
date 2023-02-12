@@ -102,19 +102,7 @@ impl Solver {
             A.push(a);
         }
 
-        let mut ans = 0_usize;
-        for num in 1..=M {
-            for p in (0..M).combinations(num) {
-                let mut set: BTreeSet<usize> = BTreeSet::new();
-                for &pi in &p {
-                    set = &set | &A[pi];
-                }
-                if set.len() == N {
-                    ans += 1;
-                }
-            }
-        }
-        println!("{}", ans);
+        println!("{}", dfs(0, &BTreeSet::new(), &A, M, N));
     }
 }
 fn main() {
@@ -124,6 +112,18 @@ fn main() {
         .unwrap()
         .join()
         .unwrap();
+}
+
+fn dfs(pos: usize, set: &BTreeSet<usize>, A: &Vec<BTreeSet<usize>>, M: usize, N: usize) -> usize {
+    if pos == M {
+        if set.len() == N {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+    let set_added = set | &A[pos].clone();
+    dfs(pos + 1, set, A, M, N) + dfs(pos + 1, &set_added, A, M, N)
 }
 
 fn eratosthenes(n: usize) -> Vec<bool> {
