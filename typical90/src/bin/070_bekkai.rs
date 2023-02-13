@@ -97,13 +97,46 @@ impl Solver {
             Y.push(y);
         }
 
-        X.sort();
-        Y.sort();
-        let mut ans = 0;
-        for i in 0..N {
-            ans += (X[i] - X[N / 2]).abs() + (Y[i] - Y[N / 2]).abs();
+        let INF = 1_isize << 60;
+        let f = |x: isize, vec: &Vec<isize>| -> isize {
+            let mut res = 0;
+            for v in vec {
+                res += (v - x).abs();
+            }
+            res
+        };
+        let mut ans_x = INF;
+        let mut l = -1e9 as isize;
+        let mut r = 1e9 as isize;
+        while r - l > 10 {
+            let m1 = (l * 2 + r) / 3;
+            let m2 = (l + r * 2) / 3;
+            if f(m1, &X) > f(m2, &X) {
+                l = m1;
+            } else {
+                r = m2;
+            }
         }
-        println!("{}", ans);
+        for v in l..=r {
+            ans_x = min!(ans_x, f(v, &X));
+        }
+
+        let mut ans_y = INF;
+        let mut l = -1e9 as isize;
+        let mut r = 1e9 as isize;
+        while r - l > 10 {
+            let m1 = (l * 2 + r) / 3;
+            let m2 = (l + r * 2) / 3;
+            if f(m1, &Y) > f(m2, &Y) {
+                l = m1;
+            } else {
+                r = m2;
+            }
+        }
+        for v in l..=r {
+            ans_y = min!(ans_y, f(v, &Y));
+        }
+        println!("{}", ans_x + ans_y);
     }
 }
 fn main() {
