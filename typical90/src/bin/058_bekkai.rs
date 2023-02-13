@@ -91,7 +91,6 @@ impl Solver {
         }
 
         let mut n = N;
-        let mut k = K;
         let MOD = 1e5 as usize;
         let mut time_stamp = [-1; 1e5 as usize];
         let mut cnt = 0_isize;
@@ -110,13 +109,19 @@ impl Solver {
         let offset = time_stamp[n as usize] as usize;
         let period = cnt as usize - offset;
 
-        if K >= offset {
-            k = (K - offset) % period + offset;
-        }
-        for (i, &v) in time_stamp.iter().enumerate() {
-            if k == v as usize {
-                println!("{}", i);
-                return;
+        if K < offset {
+            for (i, &v) in time_stamp.iter().enumerate() {
+                if K == v as usize {
+                    println!("{}", i);
+                    return;
+                }
+            }
+        } else {
+            for (i, &v) in time_stamp.iter().enumerate() {
+                if (K - offset) % period + offset == v as usize {
+                    println!("{}", i);
+                    return;
+                }
             }
         }
     }
