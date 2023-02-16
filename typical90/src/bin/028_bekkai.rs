@@ -92,29 +92,30 @@ impl Solver {
         }
 
         let MAX = 1005;
-        let mut cnt = vec![vec![0_isize; MAX]; MAX];
+        let mut imos = vec![vec![0_isize; MAX]; MAX];
         for &(lx, ly, rx, ry) in &P {
-            cnt[lx][ly] += 1;
-            cnt[lx][ry] -= 1;
-            cnt[rx][ly] -= 1;
-            cnt[rx][ry] += 1;
+            imos[lx][ly] += 1;
+            imos[lx][ry] -= 1;
+            imos[rx][ly] -= 1;
+            imos[rx][ry] += 1;
         }
 
+        let mut S = vec![vec![0_isize; MAX]; MAX];
         for i in 0..MAX {
             for j in 1..MAX {
-                cnt[i][j] += cnt[i][j - 1];
+                S[i][j] = S[i][j - 1] + imos[i][j - 1];
             }
         }
         for j in 0..MAX {
             for i in 1..MAX {
-                cnt[i][j] += cnt[i - 1][j]
+                S[i][j] += S[i - 1][j]
             }
         }
 
         let mut ans = vec![0; N + 1];
         for i in 0..MAX {
             for j in 0..MAX {
-                ans[cnt[i][j] as usize] += 1;
+                ans[S[i][j] as usize] += 1;
             }
         }
         println!("{}", ans[1..].iter().join("\n"));
