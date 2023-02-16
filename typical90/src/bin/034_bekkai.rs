@@ -93,26 +93,31 @@ impl Solver {
 
         let mut l = 0_usize;
         let mut r = 0_usize;
-        let mut cnt = 0_usize;
+        let mut cnt_kind = 0_usize;
+        let mut cnt_length = 0_usize;
         let mut ans = 0_usize;
         let mut map: BTreeMap<usize, usize> = BTreeMap::new();
 
         while l < N {
-            if r < N && cnt <= K {
+            if r < N && cnt_kind <= K {
                 *map.entry(a[r]).or_default() += 1;
-                if map[&a[r]] == 1 {
-                    cnt += 1;
+                cnt_kind = map.len();
+                cnt_length += 1;
+                if cnt_kind <= K {
+                    ans = max!(ans, cnt_length);
                 }
                 r += 1;
             } else {
-                *map.entry(a[l]).or_default() -= 1;
-                if map[&a[l]] == 0 {
-                    cnt -= 1;
+                if !map.is_empty() {
+                    if map[&a[l]] == 1 {
+                        map.remove(&a[l]);
+                    } else {
+                        *map.entry(a[l]).or_default() -= 1;
+                    }
+                    cnt_kind = map.len();
+                    cnt_length -= 1;
                 }
                 l += 1;
-            }
-            if cnt <= K {
-                ans = max!(ans, r - l);
             }
         }
         println!("{}", ans);

@@ -100,14 +100,16 @@ impl Solver {
         while l < N {
             if r < N && cnt <= K {
                 *map.entry(a[r]).or_default() += 1;
-                if map[&a[r]] == 1 {
-                    cnt += 1;
-                }
+                cnt = map.len();
                 r += 1;
             } else {
-                *map.entry(a[l]).or_default() -= 1;
-                if map[&a[l]] == 0 {
-                    cnt -= 1;
+                if !map.is_empty() {
+                    if map[&a[l]] == 1 {
+                        map.remove(&a[l]);
+                    } else {
+                        *map.entry(a[l]).or_default() -= 1;
+                    }
+                    cnt = map.len();
                 }
                 l += 1;
             }
