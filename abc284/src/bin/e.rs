@@ -89,34 +89,20 @@ impl Solver {
             N: usize,
             M: usize
         }
-        let mut G = vec![vec![]; N + 1];
+        let mut G = vec![vec![]; N];
         for _ in 0..M {
             input! {
-                u: usize,
-                v: usize
+                u: Usize1,
+                v: Usize1
             }
             G[u].push(v);
             G[v].push(u);
         }
-        let mut Q = VecDeque::new();
-        Q.push_back((1, HashSet::new()));
-        let mut ans = 0_usize;
-        while !Q.is_empty() {
-            let (pos, visited) = Q.pop_front().unwrap();
-            ans += 1;
-            if ans > 1e6 as usize {
-                println!("{}", 1_000_000);
-                return;
-            }
-            for nex in &G[pos] {
-                if !visited.contains(nex) {
-                    let mut v = visited.clone();
-                    v.insert(pos);
-                    Q.push_back((*nex, v));
-                }
-            }
-        }
-        println!("{}", ans);
+
+        let mut visited = vec![false; N];
+        visited[0] = true;
+        let ans = dfs(0, &G, &mut visited);
+        println!("{}", min!(ans, 1e6 as usize));
     }
 }
 fn main() {
@@ -126,6 +112,21 @@ fn main() {
         .unwrap()
         .join()
         .unwrap();
+}
+
+fn dfs(pos: usize, G: &Vec<Vec<usize>>, visited: &mut Vec<bool>) -> usize {
+    let mut cnt = 1;
+    for &next in &G[pos] {
+        if !visited[next] {
+            visited[next] = true;
+            cnt += dfs(next, G, visited);
+            visited[next] = false;
+        }
+        if cnt > 1e6 as usize {
+            break;
+        }
+    }
+    cnt
 }
 
 fn eratosthenes(n: usize) -> Vec<bool> {
