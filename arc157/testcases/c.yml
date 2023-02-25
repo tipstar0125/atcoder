@@ -1,0 +1,41 @@
+---
+type: Batch
+timelimit: 3s
+match: Lines
+
+cases:
+  - name: sample1
+    in: |
+      2 2
+      YY
+      XY
+    out: |
+      4
+  - name: sample2
+    in: |
+      2 2
+      XY
+      YY
+    out: |
+      2
+  - name: sample3
+    in: |
+      10 20
+      YYYYYYYYYYYYYYYYYYYY
+      YYYYYYYYYYYYYYYYYYYY
+      YYYYYYYYYYYYYYYYYYYY
+      YYYYYYYYYYYYYYYYYYYY
+      YYYYYYYYYYYYYYYYYYYY
+      YYYYYYYYYYYYYYYYYYYY
+      YYYYYYYYYYYYYYYYYYYY
+      YYYYYYYYYYYYYYYYYYYY
+      YYYYYYYYYYYYYYYYYYYY
+      YYYYYYYYYYYYYYYYYYYY
+    out: |
+      423787835
+
+extend:
+  - type: Text
+    path: "./c"
+    in: /in/*.txt
+    out: /out/*.txt

@@ -1,0 +1,33 @@
+---
+type: Batch
+timelimit: 3s
+match: Lines
+
+cases:
+  - name: sample1
+    in: |
+      2 3
+      XYY
+      YXY
+    out: |
+      2
+  - name: sample2
+    in: |
+      2 3
+      XYX
+      YYY
+    out: |
+      0
+  - name: sample3
+    in: |
+      2 58
+      YXXYXXYXXYXXYXXYXXYXXYXXYXXYXXYXXYXXYXXYXXYXXYXXYXXYXXYXXY
+      YXXYXXYXXYXXYXXYXXYXXYXXYXXYXXYXXYXXYXXYXXYXXYXXYXXYXXYXXY
+    out: |
+      164036797
+
+extend:
+  - type: Text
+    path: "./d"
+    in: /in/*.txt
+    out: /out/*.txt
