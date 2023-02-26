@@ -91,18 +91,24 @@ impl Solver {
             mut B: Chars
         }
 
+        for i in 1..N {
+            let a = (A[i - 1] as u8 - b'0') as usize * 10 + (A[i] as u8 - b'0') as usize;
+            let aa = (A[i - 1] as u8 - b'0') as usize * 10 + (B[i] as u8 - b'0') as usize;
+            let b = (B[i - 1] as u8 - b'0') as usize * 10 + (B[i] as u8 - b'0') as usize;
+            let bb = (B[i - 1] as u8 - b'0') as usize * 10 + (A[i] as u8 - b'0') as usize;
+            if a * b > aa * bb {
+                swap(&mut A[i], &mut B[i]);
+            }
+        }
         A.reverse();
         B.reverse();
         let mut AA = 0_usize;
         let mut BB = 0_usize;
         let mut p = 1_usize;
         let MOD = 998244353_usize;
-        for i in 0..min!(N, 11) {
-            let mut a = (A[i] as u8 - b'0') as usize * p;
-            let mut b = (B[i] as u8 - b'0') as usize * p;
-            if a > b {
-                swap(&mut a, &mut b);
-            }
+        for i in 0..min!(N, 18) {
+            let a = (A[i] as u8 - b'0') as usize * p;
+            let b = (B[i] as u8 - b'0') as usize * p;
             AA += a;
             BB += b;
             p *= 10;
