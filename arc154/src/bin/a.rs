@@ -6,7 +6,7 @@
 #![allow(clippy::nonminimal_bool)]
 #![allow(clippy::neg_multiply)]
 #![allow(dead_code)]
-use std::collections::{BTreeMap, VecDeque};
+use std::{collections::BTreeMap, mem::swap};
 
 use proconio::{
     fastout, input,
@@ -87,63 +87,30 @@ impl Solver {
     fn solve(&mut self) {
         input! {
             N: usize,
-            M: usize,
-            K: usize,
-            uva: [(Usize1, Usize1, usize); M],
-            s: [Usize1; K]
+            mut A: Chars,
+            mut B: Chars
         }
 
-        let mut switch = vec![false; N];
-        for &si in &s {
-            switch[si] = true;
-        }
-        let mut G0 = vec![vec![]; N];
-        let mut G1 = vec![vec![]; N];
-        for &(u, v, a) in &uva {
-            if a == 0 {
-                G0[u].push(v);
-                G0[v].push(u);
-            } else {
-                G1[u].push(v);
-                G1[v].push(u);
+        A.reverse();
+        B.reverse();
+        let mut AA = 0_usize;
+        let mut BB = 0_usize;
+        let mut p = 1_usize;
+        let MOD = 998244353_usize;
+        for i in 0..min!(N, 11) {
+            let mut a = (A[i] as u8 - b'0') as usize * p;
+            let mut b = (B[i] as u8 - b'0') as usize * p;
+            if a > b {
+                swap(&mut a, &mut b);
             }
+            AA += a;
+            BB += b;
+            p *= 10;
         }
-
-        let INF = 1_usize << 60;
-        let mut dist = vec![vec![INF; N]; 2];
-        let mut Q = VecDeque::new();
-        Q.push_back((0, 1));
-        dist[1][0] = 0;
-        if switch[0] {
-            Q.push_back((0, 0));
-            dist[0][0] = 0;
-        }
-        while !Q.is_empty() {
-            let (pos, status) = Q.pop_front().unwrap();
-
-            if status == 0 || switch[pos] {
-                for &next in &G0[pos] {
-                    if dist[0][next] > dist[status][pos] + 1 {
-                        dist[0][next] = dist[status][pos] + 1;
-                        Q.push_back((next, 0));
-                    }
-                }
-            }
-            if status == 1 || switch[pos] {
-                for &next in &G1[pos] {
-                    if dist[1][next] > dist[status][pos] + 1 {
-                        dist[1][next] = dist[status][pos] + 1;
-                        Q.push_back((next, 1));
-                    }
-                }
-            }
-        }
-        let ans = min!(dist[0][N - 1], dist[1][N - 1]);
-        if ans >= INF {
-            println!("-1");
-        } else {
-            println!("{}", ans);
-        }
+        AA %= MOD;
+        BB %= MOD;
+        let ans = (AA * BB) % MOD;
+        println!("{}", ans);
     }
 }
 fn main() {
