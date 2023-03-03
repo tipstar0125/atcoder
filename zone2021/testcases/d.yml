@@ -1,0 +1,21 @@
+---
+type: Batch
+timelimit: 2s
+match: Lines
+
+cases:
+  - name: sample1
+    in: |
+      ozRnonnoe
+    out: |
+      zone
+  - name: sample2
+    in: |
+      hellospaceRhellospace
+    out: >
+
+extend:
+  - type: Text
+    path: "./d"
+    in: /in/*.txt
+    out: /out/*.txt
