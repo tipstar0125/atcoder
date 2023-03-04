@@ -90,7 +90,7 @@ impl Solver {
         }
 
         let mut ans = 0_usize;
-        for i in 1..N / 2 + 1 {
+        for i in 1..=N / 2 {
             let mut cnt = 1_usize;
             if i != 1 {
                 cnt = enum_dividers(i).len();
