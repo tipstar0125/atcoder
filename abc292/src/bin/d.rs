@@ -79,6 +79,25 @@ impl UnionFind {
     fn get_size(&self) -> usize {
         self.size
     }
+    fn roots(&self) -> Vec<usize> {
+        (0..self.parent.len())
+            .filter(|i| self.parent[*i] < 0)
+            .collect::<Vec<usize>>()
+    }
+    fn members(&mut self, x: usize) -> Vec<usize> {
+        let root = self.find(x);
+        (0..self.parent.len())
+            .filter(|i| self.find(*i) == root)
+            .collect::<Vec<usize>>()
+    }
+    fn all_group_members(&mut self) -> BTreeMap<usize, Vec<usize>> {
+        let mut groups_map: BTreeMap<usize, Vec<usize>> = BTreeMap::new();
+        for x in 0..self.parent.len() {
+            let r = self.find(x);
+            groups_map.entry(r).or_default().push(x);
+        }
+        groups_map
+    }
 }
 #[derive(Default)]
 struct Solver {}
@@ -99,27 +118,13 @@ impl Solver {
             G[v].push(u);
         }
 
-        let mut children: BTreeMap<usize, Vec<usize>> = BTreeMap::new();
-        for (i, &p) in uf.clone().parent.iter().enumerate() {
-            if p < 0 {
-                children.entry(i).or_default();
-            } else {
-                let parent = uf.find(p as usize);
-                children.entry(parent).or_default().push(i);
-            }
-        }
         let mut ok = true;
-        for (parent, children) in children {
-            let mut nodes = children;
-            nodes.push(parent);
+        for (_, members) in uf.all_group_members() {
             let mut cnt = 0_usize;
-            for &node in &nodes {
-                cnt += G[node].len();
+            for &member in &members {
+                cnt += G[member].len();
             }
-            if cnt % 2 != 0 {
-                ok = false;
-            }
-            if cnt % 2 == 0 && cnt / 2 != nodes.len() {
+            if 2 * members.len() != cnt {
                 ok = false;
             }
         }
