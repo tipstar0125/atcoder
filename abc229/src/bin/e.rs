@@ -111,31 +111,28 @@ impl Solver {
         input! {
             N: usize,
             M: usize,
-            mut AB: [(Usize1, Usize1); M]
+            AB: [(Usize1, Usize1); M]
         }
 
-        AB.sort();
+        let mut G = vec![vec![]; N];
+        for &(a, b) in &AB {
+            G[a].push(b);
+        }
+
         let mut uf = UnionFind::new(N);
         let mut ans = vec![];
-        let mut j = if M > 0 { M - 1 } else { 0 };
-        let mut before_uf_size = uf.get_size();
-        ans.push(0);
+        let mut a = 0;
+        ans.push(a);
 
         for i in (1..N).rev() {
-            if M > 0 {
-                while AB[j].0 == i {
-                    let (a, b) = AB[j];
-                    uf.unite(a, b);
-                    if j > 0 {
-                        j -= 1;
-                    } else {
-                        break;
-                    }
+            a += 1;
+            for &j in &G[i] {
+                if !uf.is_same(i, j) {
+                    uf.unite(i, j);
+                    a -= 1;
                 }
             }
-            let diff_size = before_uf_size - uf.get_size();
-            ans.push(ans.last().unwrap() - diff_size + 1);
-            before_uf_size = uf.get_size();
+            ans.push(a);
         }
         println!("{}", ans.iter().rev().join("\n"));
     }
