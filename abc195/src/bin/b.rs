@@ -6,9 +6,8 @@
 #![allow(clippy::nonminimal_bool)]
 #![allow(clippy::neg_multiply)]
 #![allow(dead_code)]
-use std::collections::{BTreeMap, VecDeque};
+use std::collections::BTreeMap;
 
-use itertools::Itertools;
 use proconio::{
     fastout, input,
     marker::{Chars, Usize1},
@@ -106,65 +105,22 @@ impl Solver {
     #[fastout]
     fn solve(&mut self) {
         input! {
-            H: usize,
-            W: usize,
-            rs: Usize1,
-            cs: Usize1,
-            rt: Usize1,
-            ct: Usize1,
-            S: [Chars; H]
+            A: usize,
+            B: usize,
+            W: usize
         }
 
-        let mut G = vec![vec![]; H * W];
-        for i in 0..H {
-            for j in 0..W - 1 {
-                if S[i][j] == '#' {
-                    continue;
-                }
-                for k in j + 1..W {
-                    if S[i][k] == '#' {
-                        break;
-                    }
-                    let pos0 = i * W + j;
-                    let pos1 = i * W + k;
-                    G[pos0].push(pos1);
-                    G[pos1].push(pos0);
-                }
+        let mut ok = vec![];
+        for i in 1..=1e6 as usize {
+            if A * i <= W * 1000 && W * 1000 <= B * i {
+                ok.push(i);
             }
         }
-        for j in 0..W {
-            for i in 0..H - 1 {
-                if S[i][j] == '#' {
-                    continue;
-                }
-                for k in i + 1..H {
-                    if S[k][j] == '#' {
-                        break;
-                    }
-                    let pos0 = i * W + j;
-                    let pos1 = k * W + j;
-                    G[pos0].push(pos1);
-                    G[pos1].push(pos0);
-                }
-            }
+        if ok.is_empty() {
+            println!("UNSATISFIABLE");
+        } else {
+            println!("{} {}", ok[0], ok.last().unwrap());
         }
-
-        let mut Q = VecDeque::new();
-        let mut dist = vec![-1_isize; H * W];
-        let start = rs * W + cs;
-        let goal = rt * W + ct;
-        Q.push_back(start);
-        dist[start] = 0;
-        while !Q.is_empty() {
-            let pos = Q.pop_front().unwrap();
-            for &next in &G[pos] {
-                if dist[next] == -1 {
-                    dist[next] = dist[pos] + 1;
-                    Q.push_back(next);
-                }
-            }
-        }
-        println!("{}", dist[goal] - 1);
     }
 }
 fn main() {

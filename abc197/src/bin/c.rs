@@ -6,7 +6,7 @@
 #![allow(clippy::nonminimal_bool)]
 #![allow(clippy::neg_multiply)]
 #![allow(dead_code)]
-use std::collections::{BTreeMap, VecDeque};
+use std::collections::BTreeMap;
 
 use itertools::Itertools;
 use proconio::{
@@ -106,65 +106,43 @@ impl Solver {
     #[fastout]
     fn solve(&mut self) {
         input! {
-            H: usize,
-            W: usize,
-            rs: Usize1,
-            cs: Usize1,
-            rt: Usize1,
-            ct: Usize1,
-            S: [Chars; H]
+            N: usize,
+            A: [usize; N]
         }
 
-        let mut G = vec![vec![]; H * W];
-        for i in 0..H {
-            for j in 0..W - 1 {
-                if S[i][j] == '#' {
-                    continue;
-                }
-                for k in j + 1..W {
-                    if S[i][k] == '#' {
-                        break;
-                    }
-                    let pos0 = i * W + j;
-                    let pos1 = i * W + k;
-                    G[pos0].push(pos1);
-                    G[pos1].push(pos0);
-                }
-            }
-        }
-        for j in 0..W {
-            for i in 0..H - 1 {
-                if S[i][j] == '#' {
-                    continue;
-                }
-                for k in i + 1..H {
-                    if S[k][j] == '#' {
-                        break;
-                    }
-                    let pos0 = i * W + j;
-                    let pos1 = k * W + j;
-                    G[pos0].push(pos1);
-                    G[pos1].push(pos0);
-                }
-            }
+        if N == 1 {
+            println!("{}", A[0]);
+            return;
         }
 
-        let mut Q = VecDeque::new();
-        let mut dist = vec![-1_isize; H * W];
-        let start = rs * W + cs;
-        let goal = rt * W + ct;
-        Q.push_back(start);
-        dist[start] = 0;
-        while !Q.is_empty() {
-            let pos = Q.pop_front().unwrap();
-            for &next in &G[pos] {
-                if dist[next] == -1 {
-                    dist[next] = dist[pos] + 1;
-                    Q.push_back(next);
+        let INF = 1_usize << 60;
+        let mut ans = INF;
+        for i in 1..N {
+            for comb in (1..N).combinations(i) {
+                let mut xor_position = vec![false; N];
+                for &c in &comb {
+                    xor_position[c] = true;
                 }
+                let mut v = A[0];
+                let mut xor_list = vec![];
+                for j in 0..N {
+                    if xor_position[j] {
+                        xor_list.push(v);
+                        v = A[j];
+                    } else {
+                        v |= A[j];
+                    }
+                }
+                xor_list.push(v);
+
+                let mut v = 0;
+                for k in 0..xor_list.len() {
+                    v ^= xor_list[k];
+                }
+                ans = min!(ans, v);
             }
         }
-        println!("{}", dist[goal] - 1);
+        println!("{}", ans);
     }
 }
 fn main() {
