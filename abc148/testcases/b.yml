@@ -1,0 +1,30 @@
+---
+type: Batch
+timelimit: 2s
+match: Lines
+
+cases:
+  - name: sample1
+    in: |
+      2
+      ip cc
+    out: |
+      icpc
+  - name: sample2
+    in: |
+      8
+      hmhmnknk uuuuuuuu
+    out: |
+      humuhumunukunuku
+  - name: sample3
+    in: |
+      5
+      aaaaa aaaaa
+    out: |
+      aaaaaaaaaa
+
+extend:
+  - type: Text
+    path: "./b"
+    in: /in/*.txt
+    out: /out/*.txt
