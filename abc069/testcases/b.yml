@@ -1,0 +1,27 @@
+---
+type: Batch
+timelimit: 2s
+match: Lines
+
+cases:
+  - name: sample1
+    in: |
+      internationalization
+    out: |
+      i18n
+  - name: sample2
+    in: |
+      smiles
+    out: |
+      s4s
+  - name: sample3
+    in: |
+      xyz
+    out: |
+      x1z
+
+extend:
+  - type: Text
+    path: "./b"
+    in: /in/*.txt
+    out: /out/*.txt
