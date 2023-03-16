@@ -1,0 +1,249 @@
+#![allow(non_snake_case)]
+#![allow(unused_imports)]
+#![allow(unused_macros)]
+#![allow(clippy::needless_range_loop)]
+#![allow(clippy::comparison_chain)]
+#![allow(clippy::nonminimal_bool)]
+#![allow(clippy::neg_multiply)]
+#![allow(dead_code)]
+use std::collections::{BTreeMap, VecDeque};
+
+use proconio::{
+    fastout, input,
+    marker::{Chars, Usize1},
+};
+
+#[macro_export]
+macro_rules! max {
+    ($x: expr) => ($x);
+    ($x: expr, $( $y: expr ),+) => {
+        std::cmp::max($x, max!($( $y ),+))
+    }
+}
+#[macro_export]
+macro_rules! min {
+    ($x: expr) => ($x);
+    ($x: expr, $( $y: expr ),+) => {
+        std::cmp::min($x, min!($( $y ),+))
+    }
+}
+#[derive(Debug, Clone)]
+struct UnionFind {
+    parent: Vec<isize>,
+    size: usize,
+}
+impl UnionFind {
+    fn new(n: usize) -> Self {
+        UnionFind {
+            parent: vec![-1; n],
+            size: n,
+        }
+    }
+    fn find(&mut self, x: usize) -> usize {
+        if self.parent[x] < 0 {
+            return x;
+        }
+        let root = self.find(self.parent[x] as usize);
+        self.parent[x] = root as isize;
+        root
+    }
+    fn unite(&mut self, x: usize, y: usize) -> Option<(usize, usize)> {
+        let root_x = self.find(x);
+        let root_y = self.find(y);
+        if root_x == root_y {
+            return None;
+        }
+        let size_x = -self.parent[root_x];
+        let size_y = -self.parent[root_y];
+        self.size -= 1;
+        if size_x >= size_y {
+            self.parent[root_x] -= size_y;
+            self.parent[root_y] = root_x as isize;
+            Some((root_x, root_y))
+        } else {
+            self.parent[root_y] -= size_x;
+            self.parent[root_x] = root_y as isize;
+            Some((root_y, root_x))
+        }
+    }
+    fn is_same(&mut self, x: usize, y: usize) -> bool {
+        self.find(x) == self.find(y)
+    }
+    fn is_root(&mut self, x: usize) -> bool {
+        self.find(x) == x
+    }
+    fn get_union_size(&mut self, x: usize) -> usize {
+        let root = self.find(x);
+        -self.parent[root] as usize
+    }
+    fn get_size(&self) -> usize {
+        self.size
+    }
+    fn roots(&self) -> Vec<usize> {
+        (0..self.parent.len())
+            .filter(|i| self.parent[*i] < 0)
+            .collect::<Vec<usize>>()
+    }
+    fn members(&mut self, x: usize) -> Vec<usize> {
+        let root = self.find(x);
+        (0..self.parent.len())
+            .filter(|i| self.find(*i) == root)
+            .collect::<Vec<usize>>()
+    }
+    fn all_group_members(&mut self) -> BTreeMap<usize, Vec<usize>> {
+        let mut groups_map: BTreeMap<usize, Vec<usize>> = BTreeMap::new();
+        for x in 0..self.parent.len() {
+            let r = self.find(x);
+            groups_map.entry(r).or_default().push(x);
+        }
+        groups_map
+    }
+}
+#[derive(Default)]
+struct Solver {}
+impl Solver {
+    #[fastout]
+    fn solve(&mut self) {
+        input! {
+            N: usize,
+            mut A: [usize; N]
+        }
+
+        A.sort();
+        let mut AA1: VecDeque<_> = A.iter().cloned().collect();
+        let mut B1 = VecDeque::new();
+        B1.push_back(AA1.pop_front().unwrap());
+
+        let mut AA2: VecDeque<_> = A.iter().cloned().collect();
+        let mut B2 = VecDeque::new();
+        B2.push_back(AA2.pop_back().unwrap());
+
+        let mut i = 0_usize;
+        let mut toggle = false;
+
+        while !AA1.is_empty() {
+            if i % 2 == 0 {
+                toggle = !toggle;
+            }
+            let x = if toggle {
+                AA1.pop_back().unwrap()
+            } else {
+                AA1.pop_front().unwrap()
+            };
+
+            if i % 2 == 0 {
+                B1.push_front(x);
+            } else {
+                B1.push_back(x);
+            }
+            i += 1;
+        }
+        let mut ans1 = 0_isize;
+        for i in 1..N {
+            ans1 += (B1[i] as isize - B1[i - 1] as isize).abs();
+        }
+
+        let mut i = 0_usize;
+        let mut toggle = false;
+
+        while !AA2.is_empty() {
+            if i % 2 == 0 {
+                toggle = !toggle;
+            }
+            let x = if toggle {
+                AA2.pop_front().unwrap()
+            } else {
+                AA2.pop_back().unwrap()
+            };
+
+            if i % 2 == 0 {
+                B2.push_front(x);
+            } else {
+                B2.push_back(x);
+            }
+            i += 1;
+        }
+        let mut ans2 = 0_isize;
+        for i in 1..N {
+            ans2 += (B2[i] as isize - B2[i - 1] as isize).abs();
+        }
+        println!("{}", max!(ans1, ans2));
+    }
+}
+fn main() {
+    std::thread::Builder::new()
+        .stack_size(128 * 1024 * 1024)
+        .spawn(|| Solver::default().solve())
+        .unwrap()
+        .join()
+        .unwrap();
+}
+
+fn eratosthenes(n: usize) -> Vec<bool> {
+    let mut is_prime_list = vec![true; n + 1];
+    is_prime_list[0] = false;
+    is_prime_list[1] = false;
+    let mut i = 2;
+    while i * i <= n {
+        if is_prime_list[i] {
+            let mut j = i * i;
+            while j <= n {
+                is_prime_list[j] = false;
+                j += i;
+            }
+        }
+        i += 1
+    }
+    is_prime_list
+}
+
+fn mod_pow(a: usize, b: usize, m: usize) -> usize {
+    let mut p = a;
+    let mut ret = 1;
+    let mut n = b;
+    while n > 0 {
+        if n & 1 == 1 {
+            ret = ret * p % m;
+        }
+        p = p * p % m;
+        n >>= 1;
+    }
+    ret
+}
+
+fn mod_div(a: usize, b: usize, m: usize) -> usize {
+    (a * mod_pow(b, m - 2, m)) % m
+}
+
+fn prime_factorize(n: usize) -> BTreeMap<usize, usize> {
+    let mut nn = n;
+    let mut i = 2;
+    let mut pf: BTreeMap<usize, usize> = BTreeMap::new();
+    while i * i <= n {
+        while nn % i == 0 {
+            *pf.entry(i).or_default() += 1;
+            nn /= i;
+        }
+        i += 1;
+    }
+    if nn != 1 {
+        *pf.entry(nn).or_default() += 1;
+    }
+    pf
+}
+
+fn enum_dividers(n: usize) -> Vec<usize> {
+    let mut i = 1_usize;
+    let mut ret = vec![];
+    while i * i <= n {
+        if n % i == 0 {
+            ret.push(i);
+            if i != n / i {
+                ret.push(n / i);
+            }
+        }
+        i += 1;
+    }
+    ret.sort();
+    ret
+}

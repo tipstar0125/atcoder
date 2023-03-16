@@ -1,0 +1,27 @@
+---
+type: Batch
+timelimit: 6s
+match: Lines
+
+cases:
+  - name: sample1
+    in: |
+      1 998244353
+    out: |
+      6
+  - name: sample2
+    in: |
+      2 998244353
+    out: |
+      261
+  - name: sample3
+    in: |
+      314 1000000007
+    out: |
+      182908545
+
+extend:
+  - type: Text
+    path: "./d"
+    in: /in/*.txt
+    out: /out/*.txt
