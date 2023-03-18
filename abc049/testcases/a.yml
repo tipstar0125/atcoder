@@ -1,0 +1,27 @@
+---
+type: Batch
+timelimit: 2s
+match: Lines
+
+cases:
+  - name: sample1
+    in: |
+      a
+    out: |
+      vowel
+  - name: sample2
+    in: |
+      z
+    out: |
+      consonant
+  - name: sample3
+    in: |
+      s
+    out: |
+      consonant
+
+extend:
+  - type: Text
+    path: "./a"
+    in: /in/*.txt
+    out: /out/*.txt
