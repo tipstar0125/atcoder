@@ -1,0 +1,32 @@
+---
+type: Batch
+timelimit: 1s
+match: Lines
+
+cases:
+  - name: sample1
+    in: |
+      CODEFESTIVAL
+    out: |
+      Yes
+  - name: sample2
+    in: |
+      FESTIVALCODE
+    out: |
+      No
+  - name: sample3
+    in: |
+      CF
+    out: |
+      Yes
+  - name: sample4
+    in: |
+      FCF
+    out: |
+      Yes
+
+extend:
+  - type: Text
+    path: "./a"
+    in: /in/*.txt
+    out: /out/*.txt
