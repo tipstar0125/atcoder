@@ -110,33 +110,49 @@ impl Solver {
             S: Chars,
             T: Chars
         }
-        let mut cnt = 0_usize;
-        let mut ans = vec![];
-        let mut before_index = -1;
+
+        let mut zero_cnt = 0_usize;
+        let mut one_cnt = 0_usize;
         for i in 0..N {
             if S[i] != T[i] {
-                cnt += 1;
-                if before_index >= 0 {
-                    if S[i] != S[before_index as usize] {
-                        ans.push(ans[before_index as usize])
-                    } else if ans[before_index as usize] == '0' {
-                        ans.push('1');
-                    } else {
-                        ans.push('0');
-                    }
+                if S[i] == '0' {
+                    zero_cnt += 1;
                 } else {
-                    ans.push('0');
+                    one_cnt += 1;
                 }
-                before_index = i as isize;
-            } else {
-                ans.push('0');
             }
         }
-        if cnt % 2 == 1 {
+
+        if (zero_cnt + one_cnt) % 2 == 1 {
             println!("-1");
-        } else {
-            println!("{}", ans.iter().join(""));
+            return;
         }
+
+        let mut ans = vec!['0'; N];
+        if zero_cnt > one_cnt {
+            let mut cnt = (zero_cnt - one_cnt) / 2;
+            let mut i = N - 1;
+            while cnt > 0 {
+                while S[i] == T[i] || S[i] != '0' {
+                    i -= 1;
+                }
+                ans[i] = '1';
+                i -= 1;
+                cnt -= 1;
+            }
+        } else {
+            let mut cnt = (one_cnt - zero_cnt) / 2;
+            let mut i = N - 1;
+            while cnt > 0 {
+                while S[i] == T[i] || S[i] != '1' {
+                    i -= 1;
+                }
+                ans[i] = '1';
+                i -= 1;
+                cnt -= 1;
+            }
+        }
+        println!("{}", ans.iter().join(""));
     }
 }
 fn main() {
