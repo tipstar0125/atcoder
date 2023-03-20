@@ -116,11 +116,7 @@ impl Solver {
         AA.sort();
         let mut ans = 0;
         for v in AA.iter().permutations(3) {
-            let mut s = "".to_string();
-            for vi in v {
-                s += vi.to_string().as_str();
-            }
-            let num: usize = s.parse().unwrap();
+            let num: usize = v.iter().join("").parse().unwrap();
             ans = max!(ans, num);
         }
         println!("{}", ans);
