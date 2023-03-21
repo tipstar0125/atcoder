@@ -27,10 +27,7 @@ fn main() {
     }
 
     // let b = power(b, m - 2, m);
-    let mut b = ext_gcd(b, m).0;
-    if b < 0 {
-        b += m as isize;
-    }
+    let b = (ext_gcd(b, m).0 + m as isize) as usize % m;
     let ans = (a * b as usize) % m;
     println!("{}", ans);
 }
