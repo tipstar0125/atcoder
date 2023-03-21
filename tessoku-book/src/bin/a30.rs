@@ -26,8 +26,12 @@ fn main() {
         b = (b * i) % m;
     }
 
-    let b = power(b, m - 2, m);
-    let ans = (a * b) % m;
+    // let b = power(b, m - 2, m);
+    let mut b = ext_gcd(b, m).0;
+    if b < 0 {
+        b += m as isize;
+    }
+    let ans = (a * b as usize) % m;
     println!("{}", ans);
 }
 
@@ -41,4 +45,13 @@ fn power(a: usize, b: usize, m: usize) -> usize {
         p = p * p % m;
     }
     ans
+}
+
+// ax+by=gcd(a, b)
+fn ext_gcd(a: usize, b: usize) -> (isize, isize, usize) {
+    if a == 0 {
+        return (0, 1, b);
+    }
+    let (x, y, g) = ext_gcd(b % a, a);
+    (y - b as isize / a as isize * x, x, g)
 }
