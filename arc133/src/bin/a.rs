@@ -6,8 +6,9 @@
 #![allow(clippy::nonminimal_bool)]
 #![allow(clippy::neg_multiply)]
 #![allow(dead_code)]
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 
+use itertools::Itertools;
 use proconio::{
     fastout, input,
     marker::{Chars, Usize1},
@@ -138,43 +139,50 @@ impl Solver {
     fn solve(&mut self) {
         input! {
             N: usize,
-            Q: usize,
-            S: Chars,
-            ABCD: [(usize, usize, usize, usize); Q]
+            A: [usize; N]
         }
 
-        let B = 100;
-        let mut p = 1_usize;
-        let mut power100 = vec![p];
-        for _ in 0..N {
-            p *= B;
-            p %= MOD;
-            power100.push(p);
+        let mut cnt = vec![0_usize; N + 1];
+        for &a in &A {
+            cnt[a] += 1;
         }
-
-        let mut h = 0_usize;
-        let mut H = vec![h];
-        for i in 0..N {
-            let num = (S[i] as u8 - b'a' + 1) as usize;
-            h *= B;
-            h += num;
-            h %= MOD;
-            H.push(h);
-        }
-
-        let hash_calc = |l: usize, r: usize| -> usize {
-            let mut ret = MOD + H[r] - H[l - 1] * power100[r - l + 1] % MOD;
-            ret %= MOD;
-            ret
-        };
-
-        for &(a, b, c, d) in &ABCD {
-            if hash_calc(a, b) == hash_calc(c, d) {
-                println!("Yes");
-            } else {
-                println!("No");
+        let max = cnt.iter().max().unwrap();
+        let mut set = BTreeSet::new();
+        for i in 1..=N {
+            if cnt[i] == *max {
+                set.insert(i);
             }
         }
+        let mut set2 = set.clone();
+        let mut c = set2.len();
+
+        let mut x = 0_usize;
+        for i in 0..N {
+            if set.contains(&A[i]) && i + 1 < N {
+                if A[i] < A[i + 1] {
+                    set.remove(&A[i]);
+                } else if A[i] > A[i + 1] {
+                    x = A[i];
+                    break;
+                }
+            }
+            if set2.contains(&A[i]) {
+                if c == 1 {
+                    x = A[i];
+                } else {
+                    set2.remove(&A[i]);
+                    c -= 1;
+                }
+            }
+        }
+
+        let mut ans = vec![];
+        for &a in &A {
+            if a != x {
+                ans.push(a);
+            }
+        }
+        println!("{}", ans.iter().join(" "));
     }
 }
 
