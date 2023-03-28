@@ -1,0 +1,27 @@
+---
+type: Batch
+timelimit: 2s
+match: Lines
+
+cases:
+  - name: sample1
+    in: |
+      happy,newyear,enjoy
+    out: |
+      happy newyear enjoy
+  - name: sample2
+    in: |
+      haiku,atcoder,tasks
+    out: |
+      haiku atcoder tasks
+  - name: sample3
+    in: |
+      abcde,fghihgf,edcba
+    out: |
+      abcde fghihgf edcba
+
+extend:
+  - type: Text
+    path: "./a"
+    in: /in/*.txt
+    out: /out/*.txt
