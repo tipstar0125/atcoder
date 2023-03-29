@@ -1,0 +1,27 @@
+---
+type: Batch
+timelimit: 2s
+match: Lines
+
+cases:
+  - name: sample1
+    in: |
+      AtCoder Beginner Contest
+    out: |
+      ABC
+  - name: sample2
+    in: |
+      AtCoder Snuke Contest
+    out: |
+      ASC
+  - name: sample3
+    in: |
+      AtCoder X Contest
+    out: |
+      AXC
+
+extend:
+  - type: Text
+    path: "./a"
+    in: /in/*.txt
+    out: /out/*.txt
