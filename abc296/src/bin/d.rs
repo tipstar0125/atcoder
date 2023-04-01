@@ -145,7 +145,7 @@ impl Solver {
         let mut i = 1_usize;
         let INF = 1_usize << 60;
         let mut ans = INF;
-        while i * i <= 2 * M {
+        while i <= (M as f64).sqrt().ceil() as usize {
             let num = (M + i - 1) / i;
             if i <= N && num <= N && i * num >= M {
                 ans = min!(ans, i * num);
