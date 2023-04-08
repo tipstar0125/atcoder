@@ -1,0 +1,27 @@
+---
+type: Batch
+timelimit: 2s
+match: Lines
+
+cases:
+  - name: sample1
+    in: |
+      accept
+    out: |
+      3
+  - name: sample2
+    in: |
+      atcoder
+    out: |
+      0
+  - name: sample3
+    in: |
+      anerroroccurred
+    out: |
+      16
+
+extend:
+  - type: Text
+    path: "./c"
+    in: /in/*.txt
+    out: /out/*.txt

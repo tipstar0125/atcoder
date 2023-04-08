@@ -1,0 +1,56 @@
+---
+type: Batch
+timelimit: 2s
+match: Lines
+
+cases:
+  - name: sample1
+    in: |
+      20
+      abbaa
+      babbb
+      aabbabaa
+      aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+      bbabaaaaabbaababaaabbabbbbbaaaaa
+      babbbaaaabaababbbabaabaaaaababaa
+      bbaababababbbaaabaabababaabbabab
+      abaabbabaabaaaaabaaaabbaabaaaaab
+      aabababbabbabbabbaaaabbabbbabaab
+      aabababbabbbbaaaabbaaaaabbaaaabb
+      abbbbaabaaabababaaaababababbaabb
+      aaaaaaaaaaaaaaaaaaaaaaabbbbbbbbb
+      aaaaaaaaaabbbbbbbbbbbbbbbbbbbbbb
+      abababaaababaaabbbbbaaaaaaabbbbb
+      aabbaaaaababaabbbbbbbbbaabaaabbb
+      babababbababbbababbbbbababbbabbb
+      bbbbababbababbbabababbabbabbbbbb
+      aaaaaaaaaaaaaaaaababababbbabbbbb
+      aabababbabbabababababababbbbabbb
+    out: |
+      bba
+      bba
+      bbba
+      aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+      bbbbbbbbbbbbbbaaaaaaaa
+      bbbbbbbbbbbbbaaaaaaa
+      bbbbbbbbbbbbbbbb
+      bbbbbbbbbb
+      bbbbbbbbbbbbbbbbab
+      bbbbbbbbbbbbbb
+      bbbbbbbbbbbbbabb
+      abbbbbbbbb
+      bbbbbbbbbbbbbbbbbbbbbb
+      bbbbbbbbbbbbbaaaaaaaaa
+      bbbbbbbbbbbbbbbaaaaa
+      bbbbbbbbbbbbbbbbbbbbbb
+      bbbbbbbbbbbbbbbbbbbbba
+      bbbbbbbbbaaaaaaaaaaaaaaa
+      bbbbbbbbbbbbbbbbba
+
+extend:
+  - type: Text
+    path: "./e"
+    in: /in/*.txt
+    out: /out/*.txt
