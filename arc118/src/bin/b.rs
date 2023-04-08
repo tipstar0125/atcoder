@@ -8,7 +8,6 @@
 #![allow(dead_code)]
 use std::collections::BTreeMap;
 
-use itertools::Itertools;
 use proconio::{
     fastout, input,
     marker::{Chars, Usize1},
@@ -139,28 +138,8 @@ impl Solver {
     #[fastout]
     fn solve(&mut self) {
         input! {
-            A: usize,
-            B: usize
+            
         }
-
-        let mut C = vec![];
-        let mut D = vec![];
-        for i in 1..=A {
-            C.push(i as isize);
-        }
-        for i in 1..=B {
-            D.push(-(i as isize));
-        }
-        if A > B {
-            let s: isize = C[B..A].iter().sum();
-            D[B - 1] -= s;
-        } else {
-            let s: isize = D[A..B].iter().sum();
-            C[A - 1] -= s;
-        }
-        let mut ans = C.clone();
-        ans.extend(D);
-        println!("{}", ans.iter().join(" "));
     }
 }
 
@@ -278,3 +257,4 @@ fn ext_gcd(a: usize, b: usize) -> (isize, isize, usize) {
 fn mod_inv2(x: usize) -> usize {
     (ext_gcd(x, MOD).0 + MOD as isize) as usize % MOD
 }
+
