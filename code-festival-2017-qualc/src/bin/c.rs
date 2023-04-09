@@ -147,33 +147,25 @@ impl Solver {
         }
 
         let mut S: VecDeque<char> = S.iter().cloned().collect();
-        let mut n = S.len();
         let mut ans = 0_usize;
         let mut head = S.pop_front().unwrap();
         let mut tail = S.pop_back().unwrap();
-        n -= 2;
         loop {
             if head == tail {
-                if n >= 2 {
+                if S.len() >= 2 {
                     head = S.pop_front().unwrap();
                     tail = S.pop_back().unwrap();
-                    n -= 2;
                 } else {
                     break;
                 }
-            } else if head == 'x' {
+            } else if head == 'x' || tail == 'x' {
                 ans += 1;
-                if n >= 1 {
-                    head = S.pop_front().unwrap();
-                    n -= 1;
-                } else {
-                    break;
-                }
-            } else if tail == 'x' {
-                ans += 1;
-                if n >= 1 {
-                    tail = S.pop_back().unwrap();
-                    n -= 1;
+                if !S.is_empty() {
+                    if head == 'x' {
+                        head = S.pop_front().unwrap();
+                    } else {
+                        tail = S.pop_back().unwrap();
+                    }
                 } else {
                     break;
                 }
