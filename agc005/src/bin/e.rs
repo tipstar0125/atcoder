@@ -138,32 +138,7 @@ impl Solver {
     #[fastout]
     fn solve(&mut self) {
         input! {
-            Q: usize,
-            LR: [(usize, usize); Q]
-        }
-
-        let MAX = 1e5 as usize;
-        let prime_list = eratosthenes(MAX);
-        let mut prime_list2 = prime_list.clone();
-        for (i, &is_prime) in prime_list.iter().enumerate().rev() {
-            if is_prime && !prime_list[(i + 1) / 2] {
-                prime_list2[i] = false;
-            }
-        }
-        let mut S = vec![0_usize; MAX + 1];
-        for (i, &is_prime) in prime_list2.iter().enumerate() {
-            if i == 0 {
-                continue;
-            }
-            if is_prime {
-                S[i] = S[i - 1] + 1;
-            } else {
-                S[i] = S[i - 1];
-            }
-        }
-        for &(l, r) in &LR {
-            let ans = S[r] - S[l - 1];
-            println!("{}", ans);
+            
         }
     }
 }
@@ -282,3 +257,4 @@ fn ext_gcd(a: usize, b: usize) -> (isize, isize, usize) {
 fn mod_inv2(x: usize) -> usize {
     (ext_gcd(x, MOD).0 + MOD as isize) as usize % MOD
 }
+
