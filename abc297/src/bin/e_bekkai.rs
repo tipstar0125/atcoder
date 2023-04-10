@@ -146,19 +146,15 @@ impl Solver {
             A: [usize; N]
         }
 
-        let mut Q = BinaryHeap::new();
-        let mut d = BTreeSet::new();
-        Q.push(Reverse(0));
+        let mut dp = BTreeSet::new();
+        let mut now = 0;
         for _ in 0..K {
-            let Reverse(pos) = Q.pop().unwrap();
             for &a in &A {
-                if !d.contains(&(pos + a)) {
-                    Q.push(Reverse(pos + a));
-                }
-                d.insert(pos + a);
+                dp.insert(a + now);
             }
+            now = *dp.range(now + 1..).next().unwrap();
         }
-        let mut iter = d.iter();
+        let mut iter = dp.iter();
         let mut ans = 0;
         for _ in 0..K {
             ans = *iter.next().unwrap();
