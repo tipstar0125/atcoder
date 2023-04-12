@@ -149,34 +149,20 @@ impl Solver {
         }
 
         P.sort();
-        P.reverse();
         Q.sort();
-        Q.reverse();
+        let mut D = P[A - X..].to_vec();
+        D.extend(Q[B - Y..].to_vec());
+        D.sort();
+        D.reverse();
         R.sort();
-        R.reverse();
+        let mut ans: usize = D.iter().sum();
 
-        let mut PQ = vec![];
-        for i in 0..X {
-            PQ.push(P[i]);
-        }
-        for i in 0..Y {
-            PQ.push(Q[i]);
-        }
-        PQ.sort();
-        PQ.reverse();
-
-        let mut S_PQ = vec![0_usize; X + Y + 1];
-        for i in 1..X + Y + 1 {
-            S_PQ[i] = S_PQ[i - 1] + PQ[i - 1];
-        }
-        let mut S_R = vec![0_usize; C + 1];
-        for i in 1..C + 1 {
-            S_R[i] = S_R[i - 1] + R[i - 1];
-        }
-
-        let mut ans = 0_usize;
-        for c in 0..min!(C, X + Y) + 1 {
-            ans = max!(ans, S_R[c] + S_PQ[X + Y - c]);
+        while !D.is_empty() && !R.is_empty() {
+            let d = D.pop().unwrap();
+            let r = R.pop().unwrap();
+            if d < r {
+                ans += r - d;
+            }
         }
         println!("{}", ans);
     }
