@@ -143,8 +143,8 @@ impl Solver {
 
         let mut i = 1_usize;
         let mut ans = 0_usize;
-        while i * i < N {
-            if N % i == 0 && N / (N / i - 1) == i {
+        while i * i <= N {
+            if N % i == 0 && N / i - 1 != 0 && N / (N / i - 1) == i {
                 ans += N / i - 1;
             }
             i += 1;
