@@ -1,0 +1,27 @@
+---
+type: Batch
+timelimit: 2s
+match: Lines
+
+cases:
+  - name: sample1
+    in: |
+      CODEFESTIVAL
+    out: |
+      CODE FESTIVAL
+  - name: sample2
+    in: |
+      POSTGRADUATE
+    out: |
+      POST GRADUATE
+  - name: sample3
+    in: |
+      ABCDEFGHIJKL
+    out: |
+      ABCD EFGHIJKL
+
+extend:
+  - type: Text
+    path: "./a"
+    in: /in/*.txt
+    out: /out/*.txt

@@ -1,0 +1,30 @@
+---
+type: Batch
+timelimit: 2s
+match: Lines
+
+cases:
+  - name: sample1
+    in: |
+      xyz
+      4
+    out: |
+      aya
+  - name: sample2
+    in: |
+      a
+      25
+    out: |
+      z
+  - name: sample3
+    in: |
+      codefestival
+      100
+    out: |
+      aaaafeaaivap
+
+extend:
+  - type: Text
+    path: "./c"
+    in: /in/*.txt
+    out: /out/*.txt
