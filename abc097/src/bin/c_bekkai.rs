@@ -143,15 +143,32 @@ impl Solver {
             K: usize
         }
 
-        let N = S.len();
+        let mut SS = S.clone();
+        SS.sort();
+        SS.dedup();
+
         let mut set = BTreeSet::new();
-        for i in 0..=N {
-            for j in i + 1..=min!(i + 5, N) {
-                set.insert(&S[i..j]);
+        for &c in &SS {
+            let mut position = vec![];
+            for (i, &s) in S.iter().enumerate() {
+                if c == s {
+                    position.push(i);
+                }
+            }
+            for i in position {
+                for j in i + 1..=min!(i + 5, S.len()) {
+                    set.insert(&S[i..j]);
+                }
+            }
+            if set.len() >= K {
+                let mut iter = set.iter();
+                for _ in 0..K - 1 {
+                    iter.next();
+                }
+                println!("{}", iter.next().unwrap().iter().join(""));
+                return;
             }
         }
-        let vec = set.iter().collect_vec();
-        println!("{}", vec[(K - 1)].iter().join(""));
     }
 }
 
