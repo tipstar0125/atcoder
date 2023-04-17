@@ -159,10 +159,9 @@ impl Solver {
             blocks[d].insert(c);
         }
 
-        let all_group_members = uf.all_group_members();
         let mut ans = vec![];
         for i in 0..N {
-            let mut candidate = all_group_members[&uf.find(i)].len() - likes[i].len() - 1;
+            let mut candidate = uf.get_union_size(i) - likes[i].len() - 1;
             for &b in &blocks[i] {
                 if uf.is_same(i, b) {
                     candidate -= 1;
