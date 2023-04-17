@@ -138,28 +138,8 @@ impl Solver {
     #[fastout]
     fn solve(&mut self) {
         input! {
-            N: usize,
-            X: usize,
-            A: [usize; N]
+            
         }
-
-        let mut B = vec![];
-        for i in 1..N {
-            B.push(A[i - 1] + A[i]);
-        }
-        let mut ans = 0_usize;
-        for i in 0..N - 1 {
-            let b = B[i];
-            if b > X {
-                ans += b - X;
-                B[i] -= b - X;
-                if i + 1 < N - 1 {
-                    let bb = B[i + 1];
-                    B[i + 1] -= min!(bb, b - X);
-                }
-            }
-        }
-        println!("{}", ans);
     }
 }
 
@@ -277,3 +257,4 @@ fn ext_gcd(a: usize, b: usize) -> (isize, isize, usize) {
 fn mod_inv2(x: usize) -> usize {
     (ext_gcd(x, MOD).0 + MOD as isize) as usize % MOD
 }
+

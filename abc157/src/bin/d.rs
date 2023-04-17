@@ -6,8 +6,9 @@
 #![allow(clippy::nonminimal_bool)]
 #![allow(clippy::neg_multiply)]
 #![allow(dead_code)]
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 
+use itertools::Itertools;
 use proconio::{
     fastout, input,
     marker::{Chars, Usize1},
@@ -139,27 +140,37 @@ impl Solver {
     fn solve(&mut self) {
         input! {
             N: usize,
-            X: usize,
-            A: [usize; N]
+            M: usize,
+            K: usize,
+            AB: [(Usize1, Usize1); M],
+            CD: [(Usize1, Usize1); K]
         }
 
-        let mut B = vec![];
-        for i in 1..N {
-            B.push(A[i - 1] + A[i]);
+        let mut uf = UnionFind::new(N);
+        let mut likes = vec![BTreeSet::new(); N];
+        let mut blocks = vec![BTreeSet::new(); N];
+        for &(a, b) in &AB {
+            uf.unite(a, b);
+            likes[a].insert(b);
+            likes[b].insert(a);
         }
-        let mut ans = 0_usize;
-        for i in 0..N - 1 {
-            let b = B[i];
-            if b > X {
-                ans += b - X;
-                B[i] -= b - X;
-                if i + 1 < N - 1 {
-                    let bb = B[i + 1];
-                    B[i + 1] -= min!(bb, b - X);
+        for &(c, d) in &CD {
+            blocks[c].insert(d);
+            blocks[d].insert(c);
+        }
+
+        let all_group_members = uf.all_group_members();
+        let mut ans = vec![];
+        for i in 0..N {
+            let mut candidate = all_group_members[&uf.find(i)].len() - likes[i].len() - 1;
+            for &b in &blocks[i] {
+                if uf.is_same(i, b) {
+                    candidate -= 1;
                 }
             }
+            ans.push(candidate);
         }
-        println!("{}", ans);
+        println!("{}", ans.iter().join(" "));
     }
 }
 
