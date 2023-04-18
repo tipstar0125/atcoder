@@ -6,7 +6,7 @@
 #![allow(clippy::nonminimal_bool)]
 #![allow(clippy::neg_multiply)]
 #![allow(dead_code)]
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 
 use proconio::{
     fastout, input,
@@ -138,7 +138,35 @@ impl Solver {
     #[fastout]
     fn solve(&mut self) {
         input! {
-            
+            N: usize,
+            XYH: [(isize, isize, isize); N]
+        }
+
+        for cx in 0..=100_isize {
+            for cy in 0..=100_isize {
+                let mut s = BTreeSet::new();
+                for &(x, y, h) in &XYH {
+                    if h != 0 {
+                        s.insert((x - cx).abs() + (y - cy).abs() + h);
+                    }
+                }
+                if s.len() == 1 {
+                    let H = *s.iter().next().unwrap();
+                    if H >= 1 {
+                        let mut ok = true;
+                        for &(x, y, h) in &XYH {
+                            let hh = max!(H - (x - cx).abs() - (y - cy).abs(), 0);
+                            if hh != h {
+                                ok = false;
+                            }
+                        }
+                        if ok {
+                            println!("{} {} {}", cx, cy, H);
+                            return;
+                        }
+                    }
+                }
+            }
         }
     }
 }
@@ -257,4 +285,3 @@ fn ext_gcd(a: usize, b: usize) -> (isize, isize, usize) {
 fn mod_inv2(x: usize) -> usize {
     (ext_gcd(x, MOD).0 + MOD as isize) as usize % MOD
 }
-
