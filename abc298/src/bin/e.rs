@@ -145,65 +145,61 @@ impl Solver {
             Q: usize
         }
 
-        let mut dp_a = vec![0_usize; N];
-        let mut dp_a_list = vec![];
-        dp_a[A] = 1;
-        loop {
-            let mut end = true;
-            let mut ndp = vec![0_usize; N];
+        let mut dp = vec![vec![0_usize; N]; 2];
+        let mut prob_a = 1;
+        let mut prob_b = 1;
+        let mut ans = 0_usize;
+        dp[0][A] = 1;
+        dp[1][B] = 1;
 
-            for i in 0..N {
-                if dp_a[i] > 0 && i < N - 1 {
-                    end = false;
+        for _ in 0..N {
+            let mut ndp = vec![vec![0_usize; N]; 2];
+            let mut prob_sum = 0_usize;
+            for i in 0..N - 1 {
+                if dp[0][i] > 0 {
+                    let mut prob = dp[0][i] * mod_inv2(prob_a);
+                    prob %= MOD;
+                    prob *= prob_b;
+                    prob %= MOD;
+                    prob *= mod_inv2(P);
+                    prob %= MOD;
                     for j in 1..=P {
-                        if i + j >= N - 1 {
-                            ndp[N - 1] += dp_a[i];
-                        } else {
-                            ndp[i + j] += dp_a[i];
-                        }
+                        ndp[0][min!(i + j, N - 1)] += prob;
+                        ndp[0][min!(i + j, N - 1)] %= MOD;
                     }
                 }
+                if i < N - 1 {
+                    prob_sum += ndp[0][i];
+                    prob_sum %= MOD;
+                }
             }
-            if end {
-                break;
-            }
-            dp_a = ndp;
-            dp_a_list.push(dp_a.clone());
-        }
+            prob_a = prob_sum;
 
-        let mut dp_b = vec![0_usize; N];
-        let mut dp_b_list = vec![];
-        dp_b[B] = 1;
-        loop {
-            let mut end = true;
-            let mut ndp = vec![0_usize; N];
-
-            for i in 0..N {
-                if dp_b[i] > 0 && i < N - 1 {
-                    end = false;
+            let mut prob_sum = 0_usize;
+            for i in 0..N - 1 {
+                if dp[1][i] > 0 {
+                    let mut prob = dp[1][i] * mod_inv2(prob_b);
+                    prob %= MOD;
+                    prob *= prob_a;
+                    prob %= MOD;
+                    prob *= mod_inv2(Q);
+                    prob %= MOD;
                     for j in 1..=Q {
-                        if i + j >= N - 1 {
-                            ndp[N - 1] += dp_b[i];
-                        } else {
-                            ndp[i + j] += dp_b[i];
-                        }
+                        ndp[1][min!(i + j, N - 1)] += prob;
+                        ndp[1][min!(i + j, N - 1)] %= MOD;
                     }
                 }
+                if i < N - 1 {
+                    prob_sum += ndp[1][i];
+                    prob_sum %= MOD;
+                }
             }
-            if end {
-                break;
-            }
-            dp_b = ndp;
-            dp_b_list.push(dp_b.clone());
+            prob_b = prob_sum;
+            ans += ndp[0][N - 1];
+            ans %= MOD;
+            dp = ndp;
         }
-        for row in dp_a_list {
-            println!("{:?}", row);
-        }
-        for row in dp_b_list {
-            println!("{:?}", row);
-        }
-        let a = mod_inv(2, 3);
-        println!("{}", a);
+        println!("{}", ans);
     }
 }
 
