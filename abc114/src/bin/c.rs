@@ -6,8 +6,9 @@
 #![allow(clippy::nonminimal_bool)]
 #![allow(clippy::neg_multiply)]
 #![allow(dead_code)]
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, VecDeque};
 
+use itertools::Itertools;
 use proconio::{
     fastout, input,
     marker::{Chars, Usize1},
@@ -138,37 +139,42 @@ impl Solver {
     #[fastout]
     fn solve(&mut self) {
         input! {
-            N: usize,
-            A: [usize; N]
+            N: usize
         }
+
+        let f = |x: usize| -> usize {
+            let mut p = 1_usize;
+            let mut num_vec = VecDeque::new();
+            let conversion_list = vec![0, 3, 5, 7];
+            for _ in (0..10).rev() {
+                num_vec.push_front(conversion_list[x / p % 4]);
+                p *= 4;
+            }
+            num_vec.iter().join("").parse::<usize>().unwrap()
+        };
+
+        let eval = |x: usize| -> bool {
+            let mut mp: BTreeMap<char, usize> = BTreeMap::new();
+            for c in x.to_string().chars() {
+                *mp.entry(c).or_default() += 1;
+            }
+            !mp.contains_key(&'0')
+                && mp.contains_key(&'3')
+                && mp.contains_key(&'5')
+                && mp.contains_key(&'7')
+        };
 
         let mut ans = 0_usize;
-        for &a in &A {
-            ans += a;
-            ans %= MOD;
-        }
-        ans *= N - 1;
-        ans %= MOD;
-
-        let mut cnt = vec![0_usize; 60];
-        for &a in &A {
-            for i in 0..60 {
-                if (a >> i) & 1 == 1 {
-                    cnt[i] += 1;
-                }
+        let mut n = 0_usize;
+        loop {
+            let nn = f(n);
+            if nn <= N && eval(nn) {
+                ans += 1;
             }
-        }
-
-        let mut p = 2_usize;
-        let mut before_cnt = 0_usize;
-        for i in 0..60 {
-            if cnt[i] > 1 {
-                let now_cnt = cnt[i] * (cnt[i] - 1) / 2 + before_cnt / p;
-                ans = MOD + ans - now_cnt * p;
-                ans %= MOD;
-                before_cnt = now_cnt;
+            if nn > N {
+                break;
             }
-            p *= 2;
+            n += 1;
         }
         println!("{}", ans);
     }

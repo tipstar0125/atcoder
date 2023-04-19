@@ -138,39 +138,8 @@ impl Solver {
     #[fastout]
     fn solve(&mut self) {
         input! {
-            N: usize,
-            A: [usize; N]
+            
         }
-
-        let mut ans = 0_usize;
-        for &a in &A {
-            ans += a;
-            ans %= MOD;
-        }
-        ans *= N - 1;
-        ans %= MOD;
-
-        let mut cnt = vec![0_usize; 60];
-        for &a in &A {
-            for i in 0..60 {
-                if (a >> i) & 1 == 1 {
-                    cnt[i] += 1;
-                }
-            }
-        }
-
-        let mut p = 2_usize;
-        let mut before_cnt = 0_usize;
-        for i in 0..60 {
-            if cnt[i] > 1 {
-                let now_cnt = cnt[i] * (cnt[i] - 1) / 2 + before_cnt / p;
-                ans = MOD + ans - now_cnt * p;
-                ans %= MOD;
-                before_cnt = now_cnt;
-            }
-            p *= 2;
-        }
-        println!("{}", ans);
     }
 }
 
@@ -288,3 +257,4 @@ fn ext_gcd(a: usize, b: usize) -> (isize, isize, usize) {
 fn mod_inv2(x: usize) -> usize {
     (ext_gcd(x, MOD).0 + MOD as isize) as usize % MOD
 }
+
