@@ -107,32 +107,6 @@ impl UnionFind {
     }
 }
 
-#[derive(Debug, Clone)]
-struct Comb {
-    facts: Vec<usize>,
-    fact_invs: Vec<usize>,
-}
-
-impl Comb {
-    fn new(n: usize) -> Self {
-        let mut facts = vec![1, 1];
-        let mut fact_invs = vec![1, 1];
-        let mut invs = vec![0, 1];
-        for i in 2..=n {
-            facts.push(facts.last().unwrap() * i % MOD);
-            invs.push((MOD - invs[MOD % i]) * (MOD / i) % MOD);
-            fact_invs.push(fact_invs.last().unwrap() * invs.last().unwrap() % MOD);
-        }
-        Comb { facts, fact_invs }
-    }
-    fn nCr(&self, n: usize, r: usize) -> usize {
-        self.facts[n] * self.fact_invs[n - r] % MOD * self.fact_invs[r] % MOD
-    }
-    fn nHr(&self, n: usize, r: usize) -> usize {
-        self.nCr(n + r - 1, r)
-    }
-}
-
 type M = ModInt;
 #[derive(Debug, Clone, Copy)]
 struct ModInt {
@@ -220,6 +194,32 @@ impl ops::MulAssign for ModInt {
 impl ops::DivAssign for ModInt {
     fn div_assign(&mut self, other: Self) {
         *self = *self / other;
+    }
+}
+
+#[derive(Debug, Clone)]
+struct Comb {
+    fact: Vec<ModInt>,
+    fact_inverse: Vec<ModInt>,
+}
+
+impl Comb {
+    fn new(n: usize) -> Self {
+        let mut fact = vec![M::one(), M::one()];
+        let mut fact_inverse = vec![M::one(), M::one()];
+        let mut inverse = vec![M::zero(), M::one()];
+        for i in 2..=n {
+            fact.push(*fact.last().unwrap() * M::new(i));
+            inverse.push((M::zero() - inverse[MOD % i]) * M::new(MOD / i));
+            fact_inverse.push(*fact_inverse.last().unwrap() * *inverse.last().unwrap());
+        }
+        Comb { fact, fact_inverse }
+    }
+    fn nCr(&self, n: usize, r: usize) -> ModInt {
+        self.fact[n] * self.fact_inverse[n - r] * self.fact_inverse[r]
+    }
+    fn nHr(&self, n: usize, r: usize) -> ModInt {
+        self.nCr(n + r - 1, r)
     }
 }
 
