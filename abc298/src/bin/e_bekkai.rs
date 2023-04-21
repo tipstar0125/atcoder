@@ -7,7 +7,6 @@
 #![allow(clippy::neg_multiply)]
 #![allow(dead_code)]
 use std::collections::BTreeMap;
-use std::ops;
 
 use proconio::{
     fastout, input,
@@ -133,96 +132,6 @@ impl Comb {
     }
 }
 
-type M = ModInt;
-#[derive(Debug, Clone, Copy)]
-struct ModInt {
-    value: usize,
-}
-
-impl ModInt {
-    fn new(n: usize) -> Self {
-        ModInt { value: n % MOD }
-    }
-    fn zero() -> Self {
-        ModInt { value: 0 }
-    }
-    fn one() -> Self {
-        ModInt { value: 1 }
-    }
-    fn value(&self) -> usize {
-        self.value
-    }
-    fn pow(&self, n: usize) -> Self {
-        let mut p = *self;
-        let mut ret = ModInt::one();
-        let mut nn = n;
-        while nn > 0 {
-            if nn & 1 == 1 {
-                ret *= p;
-            }
-            p *= p;
-            nn >>= 1;
-        }
-        ret
-    }
-    fn inv(&self) -> Self {
-        ModInt::new((ext_gcd(self.value, MOD).0 + MOD as isize) as usize)
-    }
-}
-
-impl ops::Add for ModInt {
-    type Output = ModInt;
-    fn add(self, other: Self) -> Self {
-        ModInt::new(self.value + other.value)
-    }
-}
-
-impl ops::Sub for ModInt {
-    type Output = ModInt;
-    fn sub(self, other: Self) -> Self {
-        ModInt::new(MOD + self.value - other.value)
-    }
-}
-
-impl ops::Mul for ModInt {
-    type Output = ModInt;
-    fn mul(self, other: Self) -> Self {
-        ModInt::new(self.value * other.value)
-    }
-}
-
-#[allow(clippy::suspicious_arithmetic_impl)]
-impl ops::Div for ModInt {
-    type Output = ModInt;
-    fn div(self, other: Self) -> Self {
-        self * other.inv()
-    }
-}
-
-impl ops::AddAssign for ModInt {
-    fn add_assign(&mut self, other: Self) {
-        *self = *self + other;
-    }
-}
-
-impl ops::SubAssign for ModInt {
-    fn sub_assign(&mut self, other: Self) {
-        *self = *self - other;
-    }
-}
-
-impl ops::MulAssign for ModInt {
-    fn mul_assign(&mut self, other: Self) {
-        *self = *self * other;
-    }
-}
-
-impl ops::DivAssign for ModInt {
-    fn div_assign(&mut self, other: Self) {
-        *self = *self / other;
-    }
-}
-
 #[derive(Default)]
 struct Solver {}
 impl Solver {
@@ -236,42 +145,61 @@ impl Solver {
             Q: usize
         }
 
-        let mut dp = vec![vec![M::zero(); N]; 2];
-        let mut prob_a = M::one();
-        let mut prob_b = M::one();
-        let mut ans = M::zero();
-        dp[0][A] = M::one();
-        dp[1][B] = M::one();
+        let mut dp = vec![vec![0_usize; N]; 2];
+        let mut prob_a = 1;
+        let mut prob_b = 1;
+        let mut ans = 0_usize;
+        dp[0][A] = 1;
+        dp[1][B] = 1;
 
         for _ in 0..N {
-            let mut ndp = vec![vec![M::zero(); N]; 2];
-            let mut prob_sum = M::zero();
+            let mut ndp = vec![vec![0_usize; N]; 2];
+            let mut prob_sum = 0_usize;
             for i in 0..N - 1 {
-                let prob = dp[0][i] / prob_a * prob_b / M::new(P);
-                for j in 1..=P {
-                    ndp[0][min!(i + j, N - 1)] += prob;
+                if dp[0][i] > 0 {
+                    let mut prob = dp[0][i] * mod_inv2(prob_a);
+                    prob %= MOD;
+                    prob *= prob_b;
+                    prob %= MOD;
+                    prob *= mod_inv2(P);
+                    prob %= MOD;
+                    for j in 1..=P {
+                        ndp[0][min!(i + j, N - 1)] += prob;
+                        ndp[0][min!(i + j, N - 1)] %= MOD;
+                    }
                 }
                 if i < N - 1 {
                     prob_sum += ndp[0][i];
+                    prob_sum %= MOD;
                 }
             }
             prob_a = prob_sum;
 
-            let mut prob_sum = M::zero();
+            let mut prob_sum = 0_usize;
             for i in 0..N - 1 {
-                let prob = dp[1][i] / prob_b * prob_a / M::new(Q);
-                for j in 1..=Q {
-                    ndp[1][min!(i + j, N - 1)] += prob;
+                if dp[1][i] > 0 {
+                    let mut prob = dp[1][i] * mod_inv2(prob_b);
+                    prob %= MOD;
+                    prob *= prob_a;
+                    prob %= MOD;
+                    prob *= mod_inv2(Q);
+                    prob %= MOD;
+                    for j in 1..=Q {
+                        ndp[1][min!(i + j, N - 1)] += prob;
+                        ndp[1][min!(i + j, N - 1)] %= MOD;
+                    }
                 }
                 if i < N - 1 {
                     prob_sum += ndp[1][i];
+                    prob_sum %= MOD;
                 }
             }
             prob_b = prob_sum;
             ans += ndp[0][N - 1];
+            ans %= MOD;
             dp = ndp;
         }
-        println!("{}", ans.value());
+        println!("{}", ans);
     }
 }
 
