@@ -7,6 +7,7 @@
 #![allow(clippy::neg_multiply)]
 #![allow(dead_code)]
 use std::collections::BTreeMap;
+use std::ops;
 
 use proconio::{
     fastout, input,
@@ -15,6 +16,7 @@ use proconio::{
 
 const MOD: usize = 1e9 as usize + 7;
 // const MOD: usize = 998244353;
+// const MOD: usize = 2147483647;
 
 #[macro_export]
 macro_rules! max {
@@ -105,28 +107,118 @@ impl UnionFind {
     }
 }
 
+type M = ModInt;
+#[derive(Debug, Clone, Copy)]
+struct ModInt {
+    value: usize,
+}
+
+impl ModInt {
+    fn new(n: usize) -> Self {
+        ModInt { value: n % MOD }
+    }
+    fn zero() -> Self {
+        ModInt { value: 0 }
+    }
+    fn one() -> Self {
+        ModInt { value: 1 }
+    }
+    fn value(&self) -> usize {
+        self.value
+    }
+    fn pow(&self, n: usize) -> Self {
+        let mut p = *self;
+        let mut ret = ModInt::one();
+        let mut nn = n;
+        while nn > 0 {
+            if nn & 1 == 1 {
+                ret *= p;
+            }
+            p *= p;
+            nn >>= 1;
+        }
+        ret
+    }
+    fn inv(&self) -> Self {
+        ModInt::new((ext_gcd(self.value, MOD).0 + MOD as isize) as usize)
+    }
+}
+
+impl ops::Add for ModInt {
+    type Output = ModInt;
+    fn add(self, other: Self) -> Self {
+        ModInt::new(self.value + other.value)
+    }
+}
+
+impl ops::Sub for ModInt {
+    type Output = ModInt;
+    fn sub(self, other: Self) -> Self {
+        ModInt::new(MOD + self.value - other.value)
+    }
+}
+
+impl ops::Mul for ModInt {
+    type Output = ModInt;
+    fn mul(self, other: Self) -> Self {
+        ModInt::new(self.value * other.value)
+    }
+}
+
+#[allow(clippy::suspicious_arithmetic_impl)]
+impl ops::Div for ModInt {
+    type Output = ModInt;
+    fn div(self, other: Self) -> Self {
+        self * other.inv()
+    }
+}
+
+impl ops::AddAssign for ModInt {
+    fn add_assign(&mut self, other: Self) {
+        *self = *self + other;
+    }
+}
+
+impl ops::SubAssign for ModInt {
+    fn sub_assign(&mut self, other: Self) {
+        *self = *self - other;
+    }
+}
+
+impl ops::MulAssign for ModInt {
+    fn mul_assign(&mut self, other: Self) {
+        *self = *self * other;
+    }
+}
+
+impl ops::DivAssign for ModInt {
+    fn div_assign(&mut self, other: Self) {
+        *self = *self / other;
+    }
+}
+
 #[derive(Debug, Clone)]
 struct Comb {
-    facts: Vec<usize>,
-    fact_invs: Vec<usize>,
+    fact: Vec<ModInt>,
+    fact_inverse: Vec<ModInt>,
 }
 
 impl Comb {
     fn new(n: usize) -> Self {
-        let mut facts = vec![1, 1];
-        let mut fact_invs = vec![1, 1];
-        let mut invs = vec![0, 1];
+        let mut fact = vec![M::one(), M::one()];
+        let mut fact_inverse = vec![M::one(), M::one()];
+        let mut inverse = vec![M::zero(), M::one()];
         for i in 2..=n {
-            facts.push(facts.last().unwrap() * i % MOD);
-            invs.push((MOD - invs[MOD % i]) * (MOD / i) % MOD);
-            fact_invs.push(fact_invs.last().unwrap() * invs.last().unwrap() % MOD);
+            fact.push(*fact.last().unwrap() * M::new(i));
+            inverse.push((M::zero() - inverse[MOD % i]) * M::new(MOD / i));
+            fact_inverse.push(*fact_inverse.last().unwrap() * *inverse.last().unwrap());
         }
-        Comb { facts, fact_invs }
+        Comb { fact, fact_inverse }
     }
-    fn nCr(&self, n: usize, r: usize) -> usize {
-        self.facts[n] * self.fact_invs[n - r] % MOD * self.fact_invs[r] % MOD
+    fn nCr(&self, n: usize, r: usize) -> ModInt {
+        self.fact[n] * self.fact_inverse[n - r] * self.fact_inverse[r]
     }
-    fn nHr(&self, n: usize, r: usize) -> usize {
+    fn nHr(&self, n: usize, r: usize) -> ModInt {
         self.nCr(n + r - 1, r)
     }
 }
@@ -143,7 +235,7 @@ impl Solver {
 
         let comb = Comb::new(n);
         let ans = comb.nCr(n, r);
-        println!("{}", ans);
+        println!("{}", ans.value());
     }
 }
 
@@ -174,7 +266,31 @@ fn eratosthenes(n: usize) -> Vec<bool> {
     is_prime_list
 }
 
-fn mod_pow(a: usize, b: usize, m: usize) -> usize {
+fn legendre(n: usize, p: usize) -> usize {
+    let mut cnt = 0_usize;
+    let mut pp = p;
+    while pp <= n {
+        cnt += n / pp;
+        pp *= p;
+    }
+    cnt
+}
+
+fn mod_pow(a: usize, b: usize) -> usize {
+    let mut p = a;
+    let mut ret = 1;
+    let mut n = b;
+    while n > 0 {
+        if n & 1 == 1 {
+            ret = ret * p % MOD;
+        }
+        p = p * p % MOD;
+        n >>= 1;
+    }
+    ret
+}
+
+fn mod_pow2(a: usize, b: usize, m: usize) -> usize {
     let mut p = a;
     let mut ret = 1;
     let mut n = b;
@@ -188,8 +304,8 @@ fn mod_pow(a: usize, b: usize, m: usize) -> usize {
     ret
 }
 
-fn mod_div(a: usize, b: usize, m: usize) -> usize {
-    (a * mod_pow(b, m - 2, m)) % m
+fn mod_inv(a: usize, b: usize) -> usize {
+    (a * mod_pow(b, MOD - 2)) % MOD
 }
 
 fn prime_factorize(n: usize) -> BTreeMap<usize, usize> {
@@ -232,4 +348,8 @@ fn ext_gcd(a: usize, b: usize) -> (isize, isize, usize) {
     }
     let (x, y, g) = ext_gcd(b % a, a);
     (y - b as isize / a as isize * x, x, g)
+}
+
+fn mod_inv2(x: usize) -> usize {
+    (ext_gcd(x, MOD).0 + MOD as isize) as usize % MOD
 }
