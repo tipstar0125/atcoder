@@ -151,16 +151,6 @@ fn main() {
         .unwrap();
 }
 
-fn rand_int(a: usize, b: usize) -> usize {
-    let mut rng: rand::rngs::StdRng = rand::SeedableRng::seed_from_u64(rand::thread_rng().gen());
-    rng.gen_range(a, b)
-}
-
-fn randouble() -> f64 {
-    let mut rng: rand::rngs::StdRng = rand::SeedableRng::seed_from_u64(rand::thread_rng().gen());
-    rng.gen::<f64>()
-}
-
 fn get_distance(x0: f64, y0: f64, x1: f64, y1: f64) -> f64 {
     ((x0 - x1).powf(2.0) + (y0 - y1).powf(2.0)).sqrt()
 }
@@ -208,13 +198,16 @@ fn play_hill_climbing(N: usize, XY: Vec<(f64, f64)>) {
     }
     ans.push(0);
     let mut current_score = get_score(&ans, &XY);
+    let mut rng = rand::thread_rng();
 
     let MAX = 2e5 as usize;
     for _ in 1..=MAX {
-        let mut L = rand_int(1, N);
-        let mut R = rand_int(1, N);
+        let mut L = rng.gen_range(1, N);
+        let mut R = rng.gen_range(1, N);
         if L > R {
             std::mem::swap(&mut L, &mut R);
+        } else if L == R {
+            continue;
         }
         ans[L..=R].reverse();
         let new_score = get_score(&ans, &XY);
@@ -235,12 +228,15 @@ fn play_hill_climbing_with_time_keeper(N: usize, XY: Vec<(f64, f64)>) {
     }
     ans.push(0);
     let mut current_score = get_score(&ans, &XY);
+    let mut rng = rand::thread_rng();
 
     loop {
-        let mut L = rand_int(1, N);
-        let mut R = rand_int(1, N);
+        let mut L = rng.gen_range(1, N);
+        let mut R = rng.gen_range(1, N);
         if L > R {
             std::mem::swap(&mut L, &mut R);
+        } else if L == R {
+            continue;
         }
         ans[L..=R].reverse();
         let new_score = get_score(&ans, &XY);
@@ -263,20 +259,23 @@ fn play_annealing(N: usize, XY: Vec<(f64, f64)>) {
     }
     ans.push(0);
     let mut current_score = get_score(&ans, &XY);
+    let mut rng = rand::thread_rng();
 
-    let MAX = 2e5 as usize;
+    let MAX = 1e6 as usize;
     for t in 1..=MAX {
-        let mut L = rand_int(1, N);
-        let mut R = rand_int(1, N);
+        let mut L = rng.gen_range(1, N);
+        let mut R = rng.gen_range(1, N);
         if L > R {
             std::mem::swap(&mut L, &mut R);
+        } else if L == R {
+            continue;
         }
         ans[L..=R].reverse();
         let new_score = get_score(&ans, &XY);
 
         let T = 30.0 - 28.0 * (t as f64) / (MAX as f64);
         let probability = ((current_score - new_score) / T).min(0.0).exp();
-        if randouble() < probability {
+        if rng.gen::<f64>() < probability {
             current_score = new_score;
         } else {
             ans[L..=R].reverse();
@@ -293,20 +292,23 @@ fn play_annealing_with_time_keeper(N: usize, XY: Vec<(f64, f64)>) {
     }
     ans.push(0);
     let mut current_score = get_score(&ans, &XY);
+    let mut rng = rand::thread_rng();
 
-    let MAX = 2e5 as usize;
+    let MAX = 1e6 as usize;
     for t in 1.. {
-        let mut L = rand_int(1, N);
-        let mut R = rand_int(1, N);
+        let mut L = rng.gen_range(1, N);
+        let mut R = rng.gen_range(1, N);
         if L > R {
             std::mem::swap(&mut L, &mut R);
+        } else if L == R {
+            continue;
         }
         ans[L..=R].reverse();
         let new_score = get_score(&ans, &XY);
 
         let T = (30.0 - 28.0 * (t as f64) / (MAX as f64)).max(2.0);
         let probability = ((current_score - new_score) / T).min(0.0).exp();
-        if randouble() < probability {
+        if rng.gen::<f64>() < probability {
             current_score = new_score;
         } else {
             ans[L..=R].reverse();
