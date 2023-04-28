@@ -461,6 +461,13 @@ fn mod_inv2(x: usize) -> usize {
     (ext_gcd(x, MOD).0 + MOD as isize) as usize % MOD
 }
 
+fn coordinate_compression<T: std::cmp::Ord + Copy>(v: Vec<T>) -> BTreeMap<T, usize> {
+    let mut vv = v;
+    vv.sort();
+    vv.dedup();
+    let ret = vv.iter().enumerate().map(|(i, &s)| (s, i)).collect();
+    ret
+}
 
 '''
 
