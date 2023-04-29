@@ -235,7 +235,7 @@ impl Solver {
             B: usize
         }
 
-        let mut dp = vec![0_usize; N + 1];
+        let mut dp = vec![0_usize; N+ 1];
         for i in 1..=N {
             if i >= B {
                 let mut a = dp[i - A];
