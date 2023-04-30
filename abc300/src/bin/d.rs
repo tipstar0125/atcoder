@@ -331,26 +331,26 @@ impl Solver {
             }
         }
 
-        let M = p_list.len();
+        let L = p_list.len();
 
         let mut ans = 0_usize;
-        for (i, &a) in p_list.iter().enumerate() {
-            let idx = p_list.upper_bound(&(N / (a * a)));
-            if i + 1 >= M || i + 1 > idx {
-                continue;
+        for i in 0..L {
+            let a = p_list[i];
+            let b_upper_idx = p_list.upper_bound(&(N / (a * a)));
+            if i + 1 >= L || i + 1 > b_upper_idx {
+                break;
             }
-            for &b in &p_list[i + 1..idx] {
+            for j in i + 1..b_upper_idx {
+                let b = p_list[j];
                 let cc = N / (a * a * b);
-                let mut idx2 = pp_list.upper_bound(&cc);
-                if idx2 == 0 {
-                    continue;
+                let mut k = pp_list.upper_bound(&cc);
+                if k == 0 {
+                    break;
                 }
-                idx2 -= 1;
-                let c = p_list[idx2];
+                k -= 1;
+                let c = p_list[k];
                 if b < c {
-                    let idx3 = p_list.lower_bound(&(b + 1));
-                    let idx4 = p_list.lower_bound(&c);
-                    ans += idx4 - idx3 + 1;
+                    ans += k - j;
                 }
             }
         }

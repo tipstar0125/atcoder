@@ -324,17 +324,17 @@ impl Solver {
             B: [Chars; H]
         }
 
+        let A: VecDeque<VecDeque<_>> = A.into_iter().map(|v| v.into_iter().collect()).collect();
+        let B: VecDeque<VecDeque<_>> = B.into_iter().map(|v| v.into_iter().collect()).collect();
+
         for s in 0..H {
             for t in 0..W {
-                let mut ok = true;
-                for i in 0..H {
-                    for j in 0..W {
-                        if A[(i + s) % H][(j + t) % W] != B[i][j] {
-                            ok = false;
-                        }
-                    }
-                }
-                if ok {
+                let mut tmp_A = A.clone();
+                tmp_A.rotate_right(s);
+                tmp_A = transpose_vec_deque(tmp_A);
+                tmp_A.rotate_right(t);
+                tmp_A = transpose_vec_deque(tmp_A);
+                if tmp_A == B {
                     println!("Yes");
                     return;
                 }

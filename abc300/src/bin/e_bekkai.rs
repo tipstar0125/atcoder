@@ -6,17 +6,16 @@
 #![allow(clippy::nonminimal_bool)]
 #![allow(clippy::neg_multiply)]
 #![allow(dead_code)]
-use std::collections::{BTreeMap, VecDeque};
+use std::collections::BTreeMap;
 use std::ops;
 
-use itertools::Itertools;
 use proconio::{
     fastout, input,
     marker::{Chars, Usize1},
 };
 
-const MOD: usize = 1e9 as usize + 7;
-// const MOD: usize = 998244353;
+// const MOD: usize = 1e9 as usize + 7;
+const MOD: usize = 998244353;
 // const MOD: usize = 2147483647;
 
 #[macro_export]
@@ -318,29 +317,12 @@ impl Solver {
     #[fastout]
     fn solve(&mut self) {
         input! {
-            H: usize,
-            W: usize,
-            A: [Chars; H],
-            B: [Chars; H]
+            N: usize
         }
 
-        for s in 0..H {
-            for t in 0..W {
-                let mut ok = true;
-                for i in 0..H {
-                    for j in 0..W {
-                        if A[(i + s) % H][(j + t) % W] != B[i][j] {
-                            ok = false;
-                        }
-                    }
-                }
-                if ok {
-                    println!("Yes");
-                    return;
-                }
-            }
-        }
-        println!("No");
+        let mut memo: BTreeMap<usize, M> = BTreeMap::new();
+        let ans = dp(N, &mut memo);
+        println!("{}", ans.value());
     }
 }
 
@@ -351,6 +333,25 @@ fn main() {
         .unwrap()
         .join()
         .unwrap();
+}
+
+fn dp(x: usize, memo: &mut BTreeMap<usize, M>) -> M {
+    if x == 1 {
+        return M::one();
+    }
+    let mut ret = M::zero();
+    for n in 2..=6 {
+        if x % n == 0 {
+            let xx = x / n;
+            if memo.contains_key(&xx) {
+                ret += memo[&xx] / M::new(5);
+            } else {
+                ret += dp(xx, memo) / M::new(5);
+            }
+        }
+    }
+    memo.entry(x).or_insert(ret);
+    ret
 }
 
 fn eratosthenes(n: usize) -> Vec<bool> {
@@ -465,32 +466,4 @@ fn coordinate_compression<T: std::cmp::Ord + Copy>(v: Vec<T>) -> BTreeMap<T, usi
     vv.dedup();
     let ret = vv.iter().enumerate().map(|(i, &s)| (s, i)).collect();
     ret
-}
-
-fn transpose_vec<T>(v: Vec<Vec<T>>) -> Vec<Vec<T>> {
-    assert!(!v.is_empty());
-    let N = v[0].len();
-    let mut iters: Vec<_> = v.into_iter().map(|n| n.into_iter()).collect();
-    (0..N)
-        .map(|_| {
-            iters
-                .iter_mut()
-                .map(|n| n.next().unwrap())
-                .collect::<Vec<T>>()
-        })
-        .collect()
-}
-
-fn transpose_vec_deque<T>(v: VecDeque<VecDeque<T>>) -> VecDeque<VecDeque<T>> {
-    assert!(!v.is_empty());
-    let N = v[0].len();
-    let mut iters: VecDeque<_> = v.into_iter().map(|n| n.into_iter()).collect();
-    (0..N)
-        .map(|_| {
-            iters
-                .iter_mut()
-                .map(|n| n.next().unwrap())
-                .collect::<VecDeque<T>>()
-        })
-        .collect()
 }

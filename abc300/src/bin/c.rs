@@ -325,46 +325,37 @@ impl Solver {
 
         let N = min!(H, W);
         let mut ans = vec![0_usize; N];
-        let delta: Vec<(isize, isize)> = vec![(1, 1), (1, -1), (-1, 1), (-1, -1)];
+        let delta = [(1, 1), (1, -1), (-1, 1), (-1, -1)];
 
-        let is_area = |row: usize, col: usize, dr: isize, dc: isize| -> (bool, usize, usize) {
-            let mut r = row as isize + dr;
-            let mut c = col as isize + dc;
-            let mut ok = true;
+        let eval = |row: usize, col: usize, dr: isize, dc: isize| -> bool {
+            let r = row as isize + dr;
+            let c = col as isize + dc;
             if r < 0 || r >= H as isize {
-                ok = false;
-                r = 0;
-                c = 0;
+                return false;
             }
             if c < 0 || c >= W as isize {
-                ok = false;
-                r = 0;
-                c = 0;
+                return false;
             }
-            (ok, r as usize, c as usize)
+            if C[r as usize][c as usize] != '#' {
+                return false;
+            }
+            true
         };
 
         for i in 0..H {
             for j in 0..W {
                 if C[i][j] == '#' {
                     let mut cnt = 0_isize;
-                    loop {
-                        let mut is_ok = true;
+                    let mut ok = true;
+                    while ok {
                         for &(dr, dc) in &delta {
-                            let (ok, row, col) = is_area(i, j, dr * (cnt + 1), dc * (cnt + 1));
-                            if !ok {
-                                is_ok = false;
-                                break;
-                            }
-                            if C[row][col] != '#' {
-                                is_ok = false;
+                            if !eval(i, j, dr * (cnt + 1), dc * (cnt + 1)) {
+                                ok = false;
                                 break;
                             }
                         }
-                        if is_ok {
+                        if ok {
                             cnt += 1;
-                        } else {
-                            break;
                         }
                     }
                     if cnt > 0 {

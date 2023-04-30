@@ -14,8 +14,8 @@ use proconio::{
     marker::{Chars, Usize1},
 };
 
-const MOD: usize = 1e9 as usize + 7;
-// const MOD: usize = 998244353;
+// const MOD: usize = 1e9 as usize + 7;
+const MOD: usize = 998244353;
 // const MOD: usize = 2147483647;
 
 #[macro_export]
@@ -317,8 +317,12 @@ impl Solver {
     #[fastout]
     fn solve(&mut self) {
         input! {
-            
+            N: usize
         }
+
+        let mut memo: BTreeMap<usize, M> = BTreeMap::new();
+        let ans = dp(1, &mut memo, N);
+        println!("{}", ans.value());
     }
 }
 
@@ -329,6 +333,26 @@ fn main() {
         .unwrap()
         .join()
         .unwrap();
+}
+
+fn dp(x: usize, memo: &mut BTreeMap<usize, M>, N: usize) -> M {
+    if x == N {
+        return M::one();
+    } else if x > N {
+        return M::zero();
+    }
+
+    let mut ret = M::zero();
+    for n in 2..=6 {
+        let xx = x * n;
+        if memo.contains_key(&xx) {
+            ret += memo[&xx] / M::new(5);
+        } else {
+            ret += dp(xx, memo, N) / M::new(5);
+        }
+    }
+    memo.entry(x).or_insert(ret);
+    ret
 }
 
 fn eratosthenes(n: usize) -> Vec<bool> {
@@ -444,4 +468,3 @@ fn coordinate_compression<T: std::cmp::Ord + Copy>(v: Vec<T>) -> BTreeMap<T, usi
     let ret = vv.iter().enumerate().map(|(i, &s)| (s, i)).collect();
     ret
 }
-
