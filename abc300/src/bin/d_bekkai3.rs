@@ -323,16 +323,13 @@ impl Solver {
 
         let prime_list = eratosthenes(3e5 as usize);
         let mut p = vec![];
-        let mut pp = vec![];
         for (i, &ok) in prime_list.iter().enumerate() {
             if ok {
                 p.push(i);
-                pp.push(i * i);
             }
         }
 
         let L = p.len();
-
         let eval = |a: usize, b: usize, c: usize| -> bool {
             let a = a as f64;
             let b = b as f64;
@@ -342,22 +339,24 @@ impl Solver {
 
         let mut ans = 0_usize;
         for i in 0..L {
-            let a = p[i];
-            if !eval(a, a, a) {
-                break;
-            }
-            for j in i + 1..L {
+            let mut j = i + 1;
+            let mut k = L - 1;
+            while j < k {
+                let a = p[i];
                 let b = p[j];
-                if !eval(a, b, b) {
+                if !eval(a, b, 1) {
                     break;
                 }
-                let cc = N / (a * a * b);
-                let k = pp.upper_bound(&cc) - 1;
-                if j < k {
-                    ans += k - j;
-                } else {
-                    break;
+                while j < k {
+                    let c = p[k];
+                    if !eval(a, b, c) {
+                        k -= 1;
+                    } else {
+                        break;
+                    }
                 }
+                ans += k - j;
+                j += 1;
             }
         }
         println!("{}", ans);
