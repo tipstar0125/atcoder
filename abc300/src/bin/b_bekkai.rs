@@ -12,7 +12,7 @@ use std::ops;
 use itertools::Itertools;
 use proconio::{
     fastout, input,
-    marker::{Chars, Usize1},
+    marker::{Bytes, Chars, Usize1},
 };
 
 const MOD: usize = 1e9 as usize + 7;
@@ -324,16 +324,13 @@ impl Solver {
             B: [Chars; H]
         }
 
-        let A: VecDeque<VecDeque<_>> = A.into_iter().map(|v| v.into_iter().collect()).collect();
-        let B: VecDeque<VecDeque<_>> = B.into_iter().map(|v| v.into_iter().collect()).collect();
-
         for s in 0..H {
             for t in 0..W {
                 let mut tmp_A = A.clone();
                 tmp_A.rotate_right(s);
-                tmp_A = transpose_vec_deque(tmp_A);
+                tmp_A = transpose_vec(tmp_A);
                 tmp_A.rotate_right(t);
-                tmp_A = transpose_vec_deque(tmp_A);
+                tmp_A = transpose_vec(tmp_A);
                 if tmp_A == B {
                     println!("Yes");
                     return;
