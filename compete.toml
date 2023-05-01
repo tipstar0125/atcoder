@@ -220,7 +220,7 @@ impl WeightedUnionFind {
 }
 
 type M = ModInt;
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Default)]
 struct ModInt {
     value: usize,
 }

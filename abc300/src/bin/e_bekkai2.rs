@@ -196,7 +196,7 @@ impl WeightedUnionFind {
 }
 
 type M = ModInt;
-#[derive(Debug, Clone, Copy, Default)]
+#[derive(Debug, Clone, Copy)]
 struct ModInt {
     value: usize,
 }
@@ -320,24 +320,8 @@ impl Solver {
             N: usize
         }
 
-        let mut dp: BTreeMap<usize, M> = BTreeMap::new();
-        *dp.entry(1).or_default() += M::one();
-        let mut ans = M::zero();
-
-        while !dp.is_empty() {
-            let mut ndp: BTreeMap<usize, M> = BTreeMap::new();
-            for (k, v) in &dp {
-                for i in 2..=6 {
-                    if k * i <= N {
-                        *ndp.entry(k * i).or_default() += *v / M::new(5);
-                    }
-                }
-            }
-            dp = ndp;
-            if dp.contains_key(&N) {
-                ans += dp[&N];
-            }
-        }
+        let mut memo: BTreeMap<usize, M> = BTreeMap::new();
+        let ans = dp(1, &mut memo, N);
         println!("{}", ans.value());
     }
 }
@@ -349,6 +333,26 @@ fn main() {
         .unwrap()
         .join()
         .unwrap();
+}
+
+fn dp(x: usize, memo: &mut BTreeMap<usize, M>, N: usize) -> M {
+    if x == N {
+        return M::one();
+    } else if x > N {
+        return M::zero();
+    }
+
+    let mut ret = M::zero();
+    for n in 2..=6 {
+        let xx = x * n;
+        if memo.contains_key(&xx) {
+            ret += memo[&xx] / M::new(5);
+        } else {
+            ret += dp(xx, memo, N) / M::new(5);
+        }
+    }
+    memo.entry(x).or_insert(ret);
+    ret
 }
 
 fn eratosthenes(n: usize) -> Vec<bool> {

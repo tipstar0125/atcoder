@@ -196,7 +196,7 @@ impl WeightedUnionFind {
 }
 
 type M = ModInt;
-#[derive(Debug, Clone, Copy, Default)]
+#[derive(Debug, Clone, Copy)]
 struct ModInt {
     value: usize,
 }
@@ -320,25 +320,43 @@ impl Solver {
             N: usize
         }
 
-        let mut dp: BTreeMap<usize, M> = BTreeMap::new();
-        *dp.entry(1).or_default() += M::one();
-        let mut ans = M::zero();
+        let mut n = N;
+        let mut cnt2 = 0_usize;
+        let mut cnt3 = 0_usize;
+        let mut cnt5 = 0_usize;
+        while n % 2 == 0 {
+            cnt2 += 1;
+            n /= 2;
+        }
+        while n % 3 == 0 {
+            cnt3 += 1;
+            n /= 3;
+        }
+        while n % 5 == 0 {
+            cnt5 += 1;
+            n /= 5;
+        }
+        if n > 1 {
+            println!("0");
+            return;
+        }
 
-        while !dp.is_empty() {
-            let mut ndp: BTreeMap<usize, M> = BTreeMap::new();
-            for (k, v) in &dp {
-                for i in 2..=6 {
-                    if k * i <= N {
-                        *ndp.entry(k * i).or_default() += *v / M::new(5);
-                    }
+        let MAX = 66;
+        let mut dp = vec![vec![vec![M::zero(); MAX]; MAX]; MAX];
+        dp[0][0][0] = M::one();
+        for i in 0..=cnt2 {
+            for j in 0..=cnt3 {
+                for k in 0..=cnt5 {
+                    let prob = dp[i][j][k] / M::new(5);
+                    dp[i + 1][j][k] += prob;
+                    dp[i][j + 1][k] += prob;
+                    dp[i + 2][j][k] += prob;
+                    dp[i][j][k + 1] += prob;
+                    dp[i + 1][j + 1][k] += prob;
                 }
             }
-            dp = ndp;
-            if dp.contains_key(&N) {
-                ans += dp[&N];
-            }
         }
-        println!("{}", ans.value());
+        println!("{}", dp[cnt2][cnt3][cnt5].value());
     }
 }
 
