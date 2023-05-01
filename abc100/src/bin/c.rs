@@ -317,8 +317,19 @@ impl Solver {
     #[fastout]
     fn solve(&mut self) {
         input! {
-
+            N: usize,
+            A: [usize; N]
         }
+
+        let mut ans = 0_usize;
+        for &a in &A {
+            let mut aa = a;
+            while aa % 2 == 0 {
+                ans += 1;
+                aa /= 2;
+            }
+        }
+        println!("{}", ans);
     }
 }
 
