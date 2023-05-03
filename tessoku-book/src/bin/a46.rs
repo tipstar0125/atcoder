@@ -13,6 +13,7 @@ use proconio::{
     fastout, input,
     marker::{Chars, Usize1},
 };
+use rand::Rng;
 
 #[inline]
 fn get_time() -> f64 {
@@ -51,6 +52,7 @@ struct State {
     best_route: Vec<usize>,
     best_score: f64,
     pos: Vec<usize>,
+    rng: rand::rngs::ThreadRng,
 }
 
 impl State {
@@ -74,10 +76,15 @@ impl State {
             edge[i].sort_by(|&a, b| a.partial_cmp(b).unwrap());
         }
 
-        let route = (0..N).collect_vec();
+        let mut route = (0..N).collect_vec();
+        route.push(0);
         let best_route = route.clone();
-        let pos = route.clone();
         let best_score = std::f64::INFINITY;
+        let rng = rand::thread_rng();
+        let mut pos = vec![0; N];
+        for i in 1..=N {
+            pos[route[i]] = i;
+        }
 
         State {
             size: N,
@@ -87,6 +94,7 @@ impl State {
             best_route,
             best_score,
             pos,
+            rng,
         }
     }
     fn greedy(&mut self) {
@@ -109,126 +117,103 @@ impl State {
                 }
             }
         }
+        route.push(0);
 
-        for i in 0..N {
+        for i in 1..=N {
             self.pos[route[i]] = i;
         }
-        self.route = route.clone();
+        self.route = route;
         self.evaluate_score();
     }
     #[inline]
     fn get_score(&self) -> f64 {
-        let N = self.size;
-        let ret = (0..N + 1)
-            .collect_vec()
+        self.route
             .windows(2)
-            .map(|w| self.dist[self.route[w[0] % N]][self.route[w[1] % N]])
-            .sum::<f64>();
-        ret
+            .map(|w| self.dist[w[0]][w[1]])
+            .sum::<f64>()
     }
     #[inline]
-    fn evaluate_score(&mut self) {
+    fn evaluate_score(&mut self) -> bool {
         let current_score = self.get_score();
-        if current_score < self.best_score {
+        let updated = current_score < self.best_score;
+        if updated {
             self.best_route = self.route.clone();
             self.best_score = current_score;
         }
+        updated
     }
     #[inline]
     fn try_2opt(&self, a: usize, b: usize) -> bool {
-        let N = self.size;
-        let va0 = self.route[a % N];
-        let va1 = self.route[(a + 1) % N];
-        let vb0 = self.route[b % N];
-        let vb1 = self.route[(b + 1) % N];
-
+        let (va0, va1) = (self.route[a - 1], self.route[a]);
+        let (vb0, vb1) = (self.route[b - 1], self.route[b]);
         let old = self.dist[va0][va1] + self.dist[vb0][vb1];
         let new = self.dist[va0][vb0] + self.dist[va1][vb1];
-        // let (a0, a1) = (self.route[a - 1], self.route[a]);
-        // let (b0, b1) = (self.route[b - 1], self.route[b]);
-        // let old = self.dist[a0][a1] + self.dist[b0][b1];
-        // let new = self.dist[a0][b0] + self.dist[a1][b1];
         new - old < 1e-5
     }
     #[inline]
     fn apply_2opt(&mut self, mut a: usize, mut b: usize) {
-        let N = self.size;
-        if (a + 1) % N > b % N {
+        if a > b {
             std::mem::swap(&mut a, &mut b);
         }
-        self.route[(a + 1) % N..=b % N].reverse();
-        for i in (a + 1) % N..=b % N {
+        self.route[a..b].reverse();
+        for i in a..b {
             self.pos[self.route[i]] = i;
         }
-        // if a > b {
-        //     std::mem::swap(&mut a, &mut b);
-        // }
-        // self.route[a..b].reverse();
-        // for i in a..b {
-        //     self.idx[self.route[i]] = i;
-        // }
     }
-    fn ans(&self) {
-        let mut ans: VecDeque<_> = self.best_route.iter().cloned().collect();
-        while ans[0] != 0 {
-            ans.rotate_right(1);
+    #[inline]
+    fn apply_double_bridge(&mut self, a: usize, b: usize, c: usize, d: usize) {
+        self.route[b..d].rotate_right(d - c);
+        self.route[a..d].rotate_right(d - b);
+        for i in a..d {
+            self.pos[self.route[i]] = i;
         }
-        ans.push_back(0);
-        println!("{}", ans.iter().map(|x| x + 1).join(" "));
-        // println!("{}", self.best_route.iter().map(|x| x + 1).join(" "));
     }
-}
-
-#[inline]
-fn local_search(state: &mut State, i0: &mut usize, improved: &mut bool) {
-    let N = state.size;
-    *improved = false;
-    for i in *i0..*i0 + N {
-        for j in i + 2..i + N - 1 {
-            if state.try_2opt(i, j) {
-                state.apply_2opt(i, j);
-                *improved = true;
-                *i0 = (i + 1) % N;
-                break;
+    #[inline]
+    fn legal_check(&self, a: usize, b: usize) -> bool {
+        (a as isize - b as isize).abs() > 1
+    }
+    #[inline]
+    fn kick(&mut self) {
+        if self.rng.gen::<bool>() {
+            let mut x = [0; 4];
+            while !x.windows(2).all(|w| self.legal_check(w[0], w[1])) {
+                for xi in x.iter_mut() {
+                    *xi = self.rng.gen_range(1, self.size);
+                }
+                x.sort();
+            }
+            self.apply_double_bridge(x[0], x[1], x[2], x[3]);
+        } else {
+            for _ in 0..10 {
+                let a = self.rng.gen_range(1, self.size + 1);
+                let mut b = self.rng.gen_range(1, self.size + 1);
+                while !self.legal_check(a, b) {
+                    b = self.rng.gen_range(1, self.size + 1);
+                }
+                self.apply_2opt(a, b);
             }
         }
-        if *improved {
-            break;
-        }
     }
-}
-
-fn solve1() {
-    let mut state = State::new();
-    let mut improved = true;
-    let mut i0 = 0;
-    while improved && get_time() < 0.98 {
-        for _ in 0..8 {
-            local_search(&mut state, &mut i0, &mut improved);
-        }
-        state.evaluate_score();
+    fn ans(&self) {
+        println!("{}", self.best_route.iter().map(|x| x + 1).join(" "));
     }
-    state.ans();
 }
 
 #[inline]
-fn local_search2(state: &mut State) {
+fn local_search(state: &mut State) {
     let N = state.size;
-    for a in 0..N {
-        // for a in 1..=N {
-        let va0 = state.route[a];
-        let va1 = state.route[(a + 1) % N];
-        // let va0 = state.route[a - 1];
-        // let va1 = state.route[a];
+    for a in 1..=N {
+        let va0 = state.route[a - 1];
+        let va1 = state.route[a];
         let current_dist = state.dist[va0][va1];
 
         for j in 0..N - 1 {
-            let (d, nvb) = state.edge[va0][j];
+            let (d, nvb1) = state.edge[va1][j];
             if current_dist <= d {
                 break;
             }
-            let b = state.pos[nvb];
-            if (a as isize - b as isize).abs() > 1 && state.try_2opt(a, b) {
+            let b = state.pos[nvb1];
+            if state.legal_check(a, b) && state.try_2opt(a, b) {
                 state.apply_2opt(a, b);
                 break;
             }
@@ -236,28 +221,36 @@ fn local_search2(state: &mut State) {
     }
 }
 
-fn solve2() {
-    let mut state = State::new();
-    state.greedy();
-    let mut iter = 0_usize;
-    while get_time() < 0.98 {
-        iter += 1;
-        for _ in 0..8 {
-            local_search2(&mut state);
-        }
-        state.evaluate_score();
-    }
-    eprintln!("iter: {}", iter);
-    eprintln!("score: {}", state.best_score);
-    state.ans();
-}
-
 #[derive(Default)]
 struct Solver {}
 impl Solver {
     #[fastout]
     fn solve(&mut self) {
-        solve2();
+        let mut state = State::new();
+        state.greedy();
+        let mut iter = 0_usize;
+        let mut try_num = 0;
+
+        while get_time() < 0.98 {
+            iter += 1;
+            for _ in 0..8 {
+                local_search(&mut state);
+            }
+            if !state.evaluate_score() {
+                try_num += 1;
+                if try_num >= 10 {
+                    try_num = 0;
+                    state.route = state.best_route.clone();
+                    for i in 1..=state.size {
+                        state.pos[state.route[i]] = i;
+                    }
+                }
+            }
+            state.kick();
+        }
+        eprintln!("iter: {}", iter);
+        eprintln!("score: {}", state.best_score);
+        state.ans();
     }
 }
 
