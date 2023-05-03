@@ -6,8 +6,6 @@
 #![allow(clippy::neg_multiply)]
 #![allow(dead_code)]
 
-use std::collections::VecDeque;
-
 use itertools::Itertools;
 use proconio::{
     fastout, input,
@@ -45,7 +43,7 @@ fn get_dist((x0, y0): (isize, isize), (x1, y1): (isize, isize)) -> f64 {
 
 #[derive(Debug)]
 struct State {
-    size: usize,
+    N: usize,
     edge: Vec<Vec<(f64, usize)>>,
     dist: Vec<Vec<f64>>,
     route: Vec<usize>,
@@ -87,7 +85,7 @@ impl State {
         }
 
         State {
-            size: N,
+            N,
             edge,
             dist,
             route,
@@ -98,16 +96,15 @@ impl State {
         }
     }
     fn greedy(&mut self) {
-        let N = self.size;
         let mut route = vec![];
-        let mut visited = vec![false; N];
+        let mut visited = vec![false; self.N];
         let start = 0;
         let mut now = start;
         route.push(start);
         visited[start] = true;
 
-        for _ in 0..N - 1 {
-            for i in 0..N - 1 {
+        for _ in 0..self.N - 1 {
+            for i in 0..self.N - 1 {
                 let (_, next) = self.edge[now][i];
                 if !visited[next] {
                     visited[next] = true;
@@ -119,7 +116,7 @@ impl State {
         }
         route.push(0);
 
-        for i in 1..=N {
+        for i in 1..=self.N {
             self.pos[route[i]] = i;
         }
         self.route = route;
@@ -178,17 +175,17 @@ impl State {
             let mut x = [0; 4];
             while !x.windows(2).all(|w| self.legal_check(w[0], w[1])) {
                 for xi in x.iter_mut() {
-                    *xi = self.rng.gen_range(1, self.size);
+                    *xi = self.rng.gen_range(1, self.N);
                 }
                 x.sort();
             }
             self.apply_double_bridge(x[0], x[1], x[2], x[3]);
         } else {
             for _ in 0..10 {
-                let a = self.rng.gen_range(1, self.size + 1);
-                let mut b = self.rng.gen_range(1, self.size + 1);
+                let a = self.rng.gen_range(1, self.N + 1);
+                let mut b = self.rng.gen_range(1, self.N + 1);
                 while !self.legal_check(a, b) {
-                    b = self.rng.gen_range(1, self.size + 1);
+                    b = self.rng.gen_range(1, self.N + 1);
                 }
                 self.apply_2opt(a, b);
             }
@@ -201,13 +198,12 @@ impl State {
 
 #[inline]
 fn local_search(state: &mut State) {
-    let N = state.size;
-    for a in 1..=N {
+    for a in 1..=state.N {
         let va0 = state.route[a - 1];
         let va1 = state.route[a];
         let current_dist = state.dist[va0][va1];
 
-        for j in 0..N - 1 {
+        for j in 0..state.N - 1 {
             let (d, nvb1) = state.edge[va1][j];
             if current_dist <= d {
                 break;
@@ -241,7 +237,7 @@ impl Solver {
                 if try_num >= 10 {
                     try_num = 0;
                     state.route = state.best_route.clone();
-                    for i in 1..=state.size {
+                    for i in 1..=state.N {
                         state.pos[state.route[i]] = i;
                     }
                 }
