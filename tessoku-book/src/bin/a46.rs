@@ -122,6 +122,34 @@ impl State {
         self.route = route;
         self.evaluate_score();
     }
+    fn annealing(&mut self) {
+        let MAX = 1e5 as usize;
+        let mut current_score = self.get_score();
+        for t in 1..=MAX {
+            let mut a = self.rng.gen_range(1, self.N + 1);
+            let mut b = self.rng.gen_range(1, self.N + 1);
+            if !self.legal_check(a, b) {
+                continue;
+            }
+            if a > b {
+                std::mem::swap(&mut a, &mut b);
+            }
+            self.route[a..b].reverse();
+            let new_score = self.get_score();
+
+            let T = 30.0 - 28.0 * (t as f64) / (MAX as f64);
+            let prob = ((current_score - new_score) / T).min(0.0).exp();
+            if self.rng.gen::<f64>() < prob {
+                current_score = new_score;
+            } else {
+                self.route[a..b].reverse();
+            }
+        }
+        for i in 1..=self.N {
+            self.pos[self.route[i]] = i;
+        }
+        self.evaluate_score();
+    }
     #[inline]
     fn get_score(&self) -> f64 {
         self.route
@@ -223,7 +251,9 @@ impl Solver {
     #[fastout]
     fn solve(&mut self) {
         let mut state = State::new();
+        get_time();
         state.greedy();
+        state.annealing();
         let mut iter = 0_usize;
         let mut try_num = 0;
 
