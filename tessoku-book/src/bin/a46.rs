@@ -74,8 +74,7 @@ impl State {
             edge[i].sort_by(|&a, b| a.partial_cmp(b).unwrap());
         }
 
-        let mut route = (0..N).collect_vec();
-        route.push(0);
+        let route = (0..N).chain(vec![0]).collect_vec();
         let best_route = route.clone();
         let best_score = std::f64::INFINITY;
         let rng = rand::thread_rng();
