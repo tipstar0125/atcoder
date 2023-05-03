@@ -9,6 +9,7 @@
 use std::collections::VecDeque;
 
 use itertools::Itertools;
+use ordered_float::NotNan;
 use proconio::{
     fastout, input,
     marker::{Chars, Usize1},
@@ -50,7 +51,7 @@ struct State {
     route: Vec<usize>,
     best_route: Vec<usize>,
     best_score: f64,
-    pos: Vec<usize>,
+    idx: Vec<usize>,
 }
 
 impl State {
@@ -74,33 +75,16 @@ impl State {
             edge[i].sort_by(|&a, b| a.partial_cmp(b).unwrap());
         }
 
-        let route = (0..N).collect_vec();
-        let best_route = route.clone();
-        let pos = route.clone();
-        let best_score = std::f64::INFINITY;
-
-        State {
-            size: N,
-            edge,
-            dist,
-            route,
-            best_route,
-            best_score,
-            pos,
-        }
-    }
-    fn greedy(&mut self) {
-        let N = self.size;
+        // initialize by greedy
         let mut route = vec![];
         let mut visited = vec![false; N];
         let start = 0;
         let mut now = start;
         route.push(start);
         visited[start] = true;
-
         for _ in 0..N - 1 {
             for i in 0..N - 1 {
-                let (_, next) = self.edge[now][i];
+                let (_, next) = edge[now][i];
                 if !visited[next] {
                     visited[next] = true;
                     route.push(next);
@@ -109,26 +93,53 @@ impl State {
                 }
             }
         }
+        // route.push(0);
 
+        let best_route = route.clone();
+        let best_score = (0..N + 1)
+            .collect_vec()
+            .windows(2)
+            .map(|w| dist[route[w[0] % N]][route[w[1] % N]])
+            .sum::<f64>();
+
+        let mut idx = vec![0; N];
         for i in 0..N {
-            self.pos[route[i]] = i;
+            idx[route[i]] = i;
         }
-        self.route = route.clone();
-        self.evaluate_score();
+
+        State {
+            size: N,
+            edge,
+            dist,
+            route,
+            best_route,
+            best_score,
+            idx,
+        }
     }
     #[inline]
-    fn get_score(&self) -> f64 {
+    fn get_score(&self, route: &[usize]) -> f64 {
         let N = self.size;
+        // let mut ret = self
+        //     .route
+        //     .windows(2)
+        //     .map(|w| self.dist[w[0]][w[1]])
+        //     .sum::<f64>();
         let ret = (0..N + 1)
             .collect_vec()
             .windows(2)
-            .map(|w| self.dist[self.route[w[0] % N]][self.route[w[1] % N]])
+            .map(|w| self.dist[route[w[0] % N]][route[w[1] % N]])
             .sum::<f64>();
+        // for i in 1..self.size {
+        //     ret += self.dist[route[i - 1]][route[i]];
+        // }
+        // ret += self.dist[route[0]][route[self.size - 1]];
         ret
     }
     #[inline]
     fn evaluate_score(&mut self) {
-        let current_score = self.get_score();
+        // let best_score = self.get_score(&self.best_route);
+        let current_score = self.get_score(&self.route);
         if current_score < self.best_score {
             self.best_route = self.route.clone();
             self.best_score = current_score;
@@ -158,7 +169,7 @@ impl State {
         }
         self.route[(a + 1) % N..=b % N].reverse();
         for i in (a + 1) % N..=b % N {
-            self.pos[self.route[i]] = i;
+            self.idx[self.route[i]] = i;
         }
         // if a > b {
         //     std::mem::swap(&mut a, &mut b);
@@ -174,8 +185,8 @@ impl State {
             ans.rotate_right(1);
         }
         ans.push_back(0);
-        println!("{}", ans.iter().map(|x| x + 1).join(" "));
         // println!("{}", self.best_route.iter().map(|x| x + 1).join(" "));
+        println!("{}", ans.iter().map(|x| x + 1).join(" "));
     }
 }
 
@@ -227,7 +238,7 @@ fn local_search2(state: &mut State) {
             if current_dist <= d {
                 break;
             }
-            let b = state.pos[nvb];
+            let b = state.idx[nvb];
             if (a as isize - b as isize).abs() > 1 && state.try_2opt(a, b) {
                 state.apply_2opt(a, b);
                 break;
@@ -238,7 +249,6 @@ fn local_search2(state: &mut State) {
 
 fn solve2() {
     let mut state = State::new();
-    state.greedy();
     let mut iter = 0_usize;
     while get_time() < 0.98 {
         iter += 1;
@@ -248,7 +258,7 @@ fn solve2() {
         state.evaluate_score();
     }
     eprintln!("iter: {}", iter);
-    eprintln!("score: {}", state.best_score);
+    eprintln!("score: {}", state.get_score(&state.best_route));
     state.ans();
 }
 
@@ -257,6 +267,7 @@ struct Solver {}
 impl Solver {
     #[fastout]
     fn solve(&mut self) {
+        // get_time();`
         solve2();
     }
 }

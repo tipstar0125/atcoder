@@ -156,7 +156,7 @@ impl Solver {
         }
 
         b = mod_inv2(b);
-        let ans = (a * b as usize) % m;
+        let ans = (a * b) % m;
         println!("{}", ans);
     }
 }

@@ -27,7 +27,7 @@ fn main() {
     }
 
     let b = power(b, m - 2, m);
-    let ans = (a * b as usize) % m;
+    let ans = (a * b) % m;
     println!("{}", ans);
 }
 
