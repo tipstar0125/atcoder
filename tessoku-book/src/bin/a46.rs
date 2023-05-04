@@ -6,6 +6,8 @@
 #![allow(clippy::neg_multiply)]
 #![allow(dead_code)]
 
+use std::collections::{BTreeMap, BTreeSet};
+
 use itertools::Itertools;
 use proconio::{
     fastout, input,
@@ -32,6 +34,80 @@ fn get_time() -> f64 {
         {
             ms - STIME
         }
+    }
+}
+
+#[derive(Debug, Clone)]
+struct UnionFind {
+    parent: Vec<isize>,
+    size: usize,
+}
+
+impl UnionFind {
+    fn new(n: usize) -> Self {
+        UnionFind {
+            parent: vec![-1; n],
+            size: n,
+        }
+    }
+    fn find(&mut self, x: usize) -> usize {
+        if self.parent[x] < 0 {
+            return x;
+        }
+        let root = self.find(self.parent[x] as usize);
+        self.parent[x] = root as isize;
+        root
+    }
+    fn unite(&mut self, x: usize, y: usize) -> Option<(usize, usize)> {
+        let root_x = self.find(x);
+        let root_y = self.find(y);
+        if root_x == root_y {
+            return None;
+        }
+        let size_x = -self.parent[root_x];
+        let size_y = -self.parent[root_y];
+        self.size -= 1;
+        if size_x >= size_y {
+            self.parent[root_x] -= size_y;
+            self.parent[root_y] = root_x as isize;
+            Some((root_x, root_y))
+        } else {
+            self.parent[root_y] -= size_x;
+            self.parent[root_x] = root_y as isize;
+            Some((root_y, root_x))
+        }
+    }
+    fn is_same(&mut self, x: usize, y: usize) -> bool {
+        self.find(x) == self.find(y)
+    }
+    fn is_root(&mut self, x: usize) -> bool {
+        self.find(x) == x
+    }
+    fn get_union_size(&mut self, x: usize) -> usize {
+        let root = self.find(x);
+        -self.parent[root] as usize
+    }
+    fn get_size(&self) -> usize {
+        self.size
+    }
+    fn roots(&self) -> Vec<usize> {
+        (0..self.parent.len())
+            .filter(|i| self.parent[*i] < 0)
+            .collect::<Vec<usize>>()
+    }
+    fn members(&mut self, x: usize) -> Vec<usize> {
+        let root = self.find(x);
+        (0..self.parent.len())
+            .filter(|i| self.find(*i) == root)
+            .collect::<Vec<usize>>()
+    }
+    fn all_group_members(&mut self) -> BTreeMap<usize, Vec<usize>> {
+        let mut groups_map: BTreeMap<usize, Vec<usize>> = BTreeMap::new();
+        for x in 0..self.parent.len() {
+            let r = self.find(x);
+            groups_map.entry(r).or_default().push(x);
+        }
+        groups_map
     }
 }
 
@@ -112,6 +188,60 @@ impl State {
                     break;
                 }
             }
+        }
+        route.push(0);
+
+        for i in 1..=self.N {
+            self.pos[route[i]] = i;
+        }
+        self.route = route;
+        self.evaluate_score();
+    }
+    fn kruskal(&mut self) {
+        let mut connection = vec![];
+        for (i, v) in self.edge.iter().enumerate() {
+            for (d, j) in v {
+                connection.push((i, *j, d));
+            }
+        }
+        connection.sort_by(|(_, _, a), (_, _, b)| a.partial_cmp(b).unwrap());
+        let mut uf = UnionFind::new(self.N);
+        let mut relation = vec![vec![]; self.N];
+
+        for &(i, j, _) in &connection {
+            if !uf.is_same(i, j) && relation[i].len() < 2 && relation[j].len() < 2 {
+                uf.unite(i, j);
+                relation[i].push(j);
+                relation[j].push(i);
+            }
+        }
+
+        let mut start = 0;
+        for (i, r) in relation.iter().enumerate() {
+            if r.len() == 1 {
+                start = i;
+            }
+        }
+
+        let mut visited = vec![false; self.N];
+        let mut route = vec![];
+        let mut now = start;
+        visited[start] = true;
+        route.push(start);
+
+        while route.len() < self.N {
+            let mut iter = relation[now].iter();
+            let mut nex = *iter.next().unwrap();
+            if visited[nex] {
+                nex = *iter.next().unwrap();
+            }
+            route.push(nex);
+            visited[nex] = true;
+            now = nex;
+        }
+
+        while route[0] != 0 {
+            route.rotate_right(1);
         }
         route.push(0);
 
@@ -251,7 +381,8 @@ impl Solver {
     fn solve(&mut self) {
         let mut state = State::new();
         get_time();
-        state.greedy();
+        state.kruskal();
+        // state.greedy();
         state.annealing();
         let mut iter = 0_usize;
         let mut try_num = 0;
