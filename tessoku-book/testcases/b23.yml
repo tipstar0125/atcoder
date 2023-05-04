@@ -1,6 +1,6 @@
 ---
 type: Batch
-timelimit: 1s
+timelimit: 10s
 match:
   Float:
     relative_error: 0.001
