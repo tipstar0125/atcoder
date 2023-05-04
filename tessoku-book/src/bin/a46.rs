@@ -26,7 +26,7 @@ fn get_time() -> f64 {
         }
         #[cfg(feature = "local")]
         {
-            (ms - STIME) * 1.5
+            (ms - STIME) * 0.5
         }
         #[cfg(not(feature = "local"))]
         {
