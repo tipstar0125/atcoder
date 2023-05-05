@@ -210,19 +210,16 @@ impl State {
 
         for &(i, j, _) in &connection {
             if !uf.is_same(i, j) && relation[i].len() < 2 && relation[j].len() < 2 {
+                if (i == 0 && !relation[i].is_empty()) || (j == 0 && !relation[j].is_empty()) {
+                    continue;
+                }
                 uf.unite(i, j);
                 relation[i].push(j);
                 relation[j].push(i);
             }
         }
 
-        let mut start = 0;
-        for (i, r) in relation.iter().enumerate() {
-            if r.len() == 1 {
-                start = i;
-            }
-        }
-
+        let start = 0;
         let mut visited = vec![false; self.N];
         let mut route = vec![];
         let mut now = start;
@@ -238,10 +235,6 @@ impl State {
             route.push(nex);
             visited[nex] = true;
             now = nex;
-        }
-
-        while route[0] != 0 {
-            route.rotate_right(1);
         }
         route.push(0);
 
