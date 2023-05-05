@@ -6,7 +6,10 @@
 #![allow(clippy::neg_multiply)]
 #![allow(dead_code)]
 
-use std::collections::{BTreeMap, BTreeSet};
+use std::{
+    collections::{BTreeMap, BTreeSet},
+    time::Instant,
+};
 
 use itertools::Itertools;
 use proconio::{
@@ -33,6 +36,33 @@ fn get_time() -> f64 {
         #[cfg(not(feature = "local"))]
         {
             ms - STIME
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+struct TimeKeeper {
+    start_time: Instant,
+    time_threshold: f64, // us
+}
+
+impl TimeKeeper {
+    fn new(ms: usize) -> Self {
+        TimeKeeper {
+            start_time: Instant::now(),
+            time_threshold: (ms * 1e3 as usize) as f64,
+        }
+    }
+    #[inline]
+    fn isTimeOver(&self) -> bool {
+        let elapsed_time = self.start_time.elapsed().as_micros() as f64;
+        #[cfg(feature = "local")]
+        {
+            elapsed_time * 0.5 >= self.time_threshold
+        }
+        #[cfg(not(feature = "local"))]
+        {
+            elapsed_time >= self.time_threshold
         }
     }
 }
@@ -373,6 +403,7 @@ impl Solver {
     #[fastout]
     fn solve(&mut self) {
         let mut state = State::new();
+        // let time_keeper = TimeKeeper::new(980);
         get_time();
         state.kruskal();
         // state.greedy();
@@ -381,6 +412,7 @@ impl Solver {
         let mut try_num = 0;
 
         while get_time() < 0.98 {
+        // while time_keeper.isTimeOver() {
             iter += 1;
             for _ in 0..8 {
                 local_search(&mut state);
