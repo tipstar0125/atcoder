@@ -3,4 +3,10 @@
     "editor.defaultFormatter": "rust-lang.rust-analyzer",
     "rust-analyzer.checkOnSave.command": "clippy",
     "rust-analyzer.checkOnSave.extraArgs": ["--", "-A", "clippy::needless_return"]
+}{
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "rust-lang.rust-analyzer",
+    "rust-analyzer.checkOnSave.command": "clippy",
+    "rust-analyzer.checkOnSave.extraArgs": ["--", "-A", "clippy::needless_return"]
 }
+

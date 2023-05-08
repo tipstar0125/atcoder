@@ -29,25 +29,133 @@ impl Solver {
             A: [usize; N]
         }
 
-        let mut cnt = vec![0; N];
-        for &x in &A[..M] {
-            cnt[x] += 1;
-        }
+        let mut cnt: BTreeMap<usize, usize> = BTreeMap::new();
+        let mut mp: BTreeMap<usize, usize> = BTreeMap::new();
 
-        let mut not_exists = cnt.iter().map(|&c| c == 0).collect_vec();
-        for i in 0..N - M {
-            cnt[A[i + M]] += 1;
-            cnt[A[i]] -= 1;
-            if cnt[A[i]] == 0 {
-                not_exists[A[i]] = true;
+        for i in 0..M {
+            let a = A[i];
+            *cnt.entry(a).or_default() += 1;
+            if cnt[&a] > 1 {
+                continue;
+            }
+
+            let mut iter1 = mp.range(..=a);
+            let mut iter2 = mp.range(a..);
+            if let Some((&k1, &v1)) = iter1.next_back() {
+                if k1 < a && v1 + 1 == a {
+                    if let Some((&k2, &v2)) = iter2.next() {
+                        if a + 1 == k2 {
+                            mp.insert(k1, v2);
+                            mp.remove(&k2);
+                        } else {
+                            mp.insert(k1, a);
+                        }
+                    } else {
+                        mp.insert(k1, a);
+                    }
+                } else if k1 < a {
+                    if let Some((&k2, &v2)) = iter2.next() {
+                        if a + 1 == k2 {
+                            mp.insert(a, v2);
+                            mp.remove(&k2);
+                        } else {
+                            mp.insert(a, a);
+                        }
+                    } else {
+                        mp.insert(a, a);
+                    }
+                }
+            } else if let Some((&k2, &v2)) = iter2.next() {
+                if a + 1 == k2 {
+                    mp.insert(a, v2);
+                    mp.remove(&k2);
+                } else {
+                    mp.insert(a, a);
+                }
+            } else {
+                mp.insert(a, a);
             }
         }
 
-        if let Some(ans) = not_exists.iter().position(|&b| b) {
-            println!("{}", ans);
-        } else {
-            println!("{}", N);
+        let mut ans = 0;
+        let (&k, &v) = mp.iter().next().unwrap();
+        if k == 0 {
+            ans = v + 1;
         }
+
+        for i in 0..N - M {
+            let del_idx = i;
+            let a_del = A[del_idx];
+            let add_idx = i + M;
+            let a_add = A[add_idx];
+            *cnt.entry(a_add).or_default() += 1;
+            *cnt.entry(a_del).or_default() -= 1;
+            if a_del == a_add {
+                continue;
+            }
+
+            if cnt[&a_add] == 1 {
+                let mut iter1 = mp.range(..=a_add);
+                let mut iter2 = mp.range(a_add..);
+                if let Some((&k1, &v1)) = iter1.next_back() {
+                    if k1 < a_add && v1 + 1 == a_add {
+                        if let Some((&k2, &v2)) = iter2.next() {
+                            if a_add + 1 == k2 {
+                                mp.insert(k1, v2);
+                                mp.remove(&k2);
+                            } else {
+                                mp.insert(k1, a_add);
+                            }
+                        } else {
+                            mp.insert(k1, a_add);
+                        }
+                    } else if k1 < a_add {
+                        if let Some((&k2, &v2)) = iter2.next() {
+                            if a_add + 1 == k2 {
+                                mp.insert(a_add, v2);
+                                mp.remove(&k2);
+                            } else {
+                                mp.insert(a_add, a_add);
+                            }
+                        } else {
+                            mp.insert(a_add, a_add);
+                        }
+                    }
+                } else if let Some((&k2, &v2)) = iter2.next() {
+                    if a_add + 1 == k2 {
+                        mp.insert(a_add, v2);
+                        mp.remove(&k2);
+                    } else {
+                        mp.insert(a_add, a_add);
+                    }
+                } else {
+                    mp.insert(a_add, a_add);
+                }
+            }
+
+            if cnt[&a_del] == 0 {
+                let mut iter = mp.range(..=a_del);
+                if let Some((&k, &v)) = iter.next_back() {
+                    if k == a_del {
+                        mp.insert(k + 1, v);
+                        mp.remove(&k);
+                    } else if v == a_del {
+                        mp.insert(k, v - 1);
+                    } else {
+                        mp.insert(k, a_del - 1);
+                        mp.insert(a_del + 1, v);
+                    }
+                }
+            }
+
+            let (&k, &v) = mp.iter().next().unwrap();
+            if k == 0 {
+                ans = min!(ans, v + 1);
+            } else {
+                ans = 0;
+            }
+        }
+        println!("{}", ans);
     }
 }
 
