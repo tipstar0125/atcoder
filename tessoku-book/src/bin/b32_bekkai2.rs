@@ -348,6 +348,7 @@ impl Solver {
         }
 
         let mut dp = vec![0_usize; N + 1];
+        let INF = 1_usize << 60;
 
         for i in 1..=N {
             let mut set = BTreeSet::new();
@@ -362,12 +363,24 @@ impl Solver {
                 continue;
             }
 
-            let m = set.iter().next_back().unwrap();
-            for j in 0..=m + 1 {
-                if !set.contains(&j) {
-                    dp[i] = j;
+            let start = *set.iter().next().unwrap();
+            if set.len() == 1 && start == 0 {
+                dp[i] = 1;
+            }
+
+            let mut stop = INF;
+            for v in set.iter().collect_vec().windows(2) {
+                if *v[0] + 1 < *v[1] {
+                    stop = *v[0];
                     break;
                 }
+            }
+            if stop == INF {
+                stop = *set.iter().next_back().unwrap();
+            }
+
+            if start == 0 {
+                dp[i] = stop + 1;
             }
         }
 
