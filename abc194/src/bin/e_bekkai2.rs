@@ -29,7 +29,7 @@ impl Solver {
             A: [usize; N]
         }
 
-        let mut cnt = vec![0; N + 1];
+        let mut cnt = vec![0; N];
         for &x in &A[..M] {
             cnt[x] += 1;
         }
@@ -43,8 +43,11 @@ impl Solver {
             }
         }
 
-        let ans = not_exists.iter().position(|&b| b).unwrap();
-        println!("{}", ans);
+        if let Some(ans) = not_exists.iter().position(|&b| b) {
+            println!("{}", ans);
+        } else {
+            println!("{}", N);
+        }
     }
 }
 
