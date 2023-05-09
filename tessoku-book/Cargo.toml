@@ -805,6 +805,7 @@ smallvec = "=1.2.0"
 
 [features]
 local = []
+seed = []
 
 [profile.dev]
 opt-level = 3

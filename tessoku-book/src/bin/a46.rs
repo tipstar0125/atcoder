@@ -6,6 +6,7 @@
 #![allow(clippy::neg_multiply)]
 #![allow(dead_code)]
 
+use rand::rngs::StdRng;
 use std::{
     collections::{BTreeMap, BTreeSet},
     time::Instant,
@@ -31,7 +32,7 @@ fn get_time() -> f64 {
         }
         #[cfg(feature = "local")]
         {
-            (ms - STIME) * 0.5
+            (ms - STIME) * 0.85
         }
         #[cfg(not(feature = "local"))]
         {
@@ -58,7 +59,7 @@ impl TimeKeeper {
         let elapsed_time = self.start_time.elapsed().as_micros() as f64;
         #[cfg(feature = "local")]
         {
-            elapsed_time * 0.5 >= self.time_threshold
+            elapsed_time * 0.85 >= self.time_threshold
         }
         #[cfg(not(feature = "local"))]
         {
@@ -156,7 +157,6 @@ struct State {
     best_route: Vec<usize>,
     best_score: f64,
     pos: Vec<usize>,
-    rng: rand::rngs::ThreadRng,
 }
 
 impl State {
@@ -183,7 +183,6 @@ impl State {
         let route = (0..N).chain(vec![0]).collect_vec();
         let best_route = route.clone();
         let best_score = std::f64::INFINITY;
-        let rng = rand::thread_rng();
         let mut pos = vec![0; N];
         for i in 1..=N {
             pos[route[i]] = i;
@@ -197,8 +196,10 @@ impl State {
             best_route,
             best_score,
             pos,
-            rng,
         }
+    }
+    fn init(&mut self) {
+        self.kruskal();
     }
     fn greedy(&mut self) {
         let mut route = vec![];
@@ -274,12 +275,12 @@ impl State {
         self.route = route;
         self.evaluate_score();
     }
-    fn annealing(&mut self) {
+    fn annealing(&mut self, rng: &mut StdRng) {
         let MAX = 1e5 as usize;
         let mut current_score = self.get_score();
         for t in 1..=MAX {
-            let mut a = self.rng.gen_range(1, self.N + 1);
-            let mut b = self.rng.gen_range(1, self.N + 1);
+            let mut a = rng.gen_range(1, self.N + 1);
+            let mut b = rng.gen_range(1, self.N + 1);
             if !self.legal_check(a, b) {
                 continue;
             }
@@ -291,7 +292,7 @@ impl State {
 
             let T = 30.0 - 28.0 * (t as f64) / (MAX as f64);
             let prob = ((current_score - new_score) / T).min(0.0).exp();
-            if self.rng.gen::<f64>() < prob {
+            if rng.gen::<f64>() < prob {
                 current_score = new_score;
             } else {
                 self.route[a..b].reverse();
@@ -350,22 +351,22 @@ impl State {
         (a as isize - b as isize).abs() > 1
     }
     #[inline]
-    fn kick(&mut self) {
-        if self.rng.gen::<bool>() {
+    fn kick(&mut self, rng: &mut StdRng) {
+        if rng.gen::<bool>() {
             let mut x = [0; 4];
             while !x.windows(2).all(|w| self.legal_check(w[0], w[1])) {
                 for xi in x.iter_mut() {
-                    *xi = self.rng.gen_range(1, self.N);
+                    *xi = rng.gen_range(1, self.N);
                 }
                 x.sort();
             }
             self.apply_double_bridge(x[0], x[1], x[2], x[3]);
         } else {
             for _ in 0..10 {
-                let a = self.rng.gen_range(1, self.N + 1);
-                let mut b = self.rng.gen_range(1, self.N + 1);
+                let a = rng.gen_range(1, self.N + 1);
+                let mut b = rng.gen_range(1, self.N + 1);
                 while !self.legal_check(a, b) {
-                    b = self.rng.gen_range(1, self.N + 1);
+                    b = rng.gen_range(1, self.N + 1);
                 }
                 self.apply_2opt(a, b);
             }
@@ -402,17 +403,24 @@ struct Solver {}
 impl Solver {
     #[fastout]
     fn solve(&mut self) {
+        #[allow(unused_mut)]
+        let mut seed = rand::thread_rng().gen();
+        #[cfg(feature = "seed")]
+        {
+            seed = 11216848234635351618;
+        }
+        eprintln!("seed: {}", seed);
+        let mut rng: rand::rngs::StdRng = rand::SeedableRng::seed_from_u64(seed);
+
         let mut state = State::new();
-        // let time_keeper = TimeKeeper::new(980);
-        get_time();
-        state.kruskal();
-        // state.greedy();
-        state.annealing();
+        let time_keeper = TimeKeeper::new(980);
+
+        state.init();
+        state.annealing(&mut rng);
         let mut iter = 0_usize;
         let mut try_num = 0;
 
-        while get_time() < 0.98 {
-        // while time_keeper.isTimeOver() {
+        while !time_keeper.isTimeOver() {
             iter += 1;
             for _ in 0..8 {
                 local_search(&mut state);
@@ -427,7 +435,7 @@ impl Solver {
                     }
                 }
             }
-            state.kick();
+            state.kick(&mut rng);
         }
         eprintln!("iter: {}", iter);
         eprintln!("score: {}", state.best_score);
