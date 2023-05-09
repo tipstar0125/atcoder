@@ -385,11 +385,11 @@ fn local_search(state: &mut State) {
         let current_dist = state.dist[va0][va1];
 
         for j in 0..state.N - 1 {
-            let (d, nvb1) = state.edge[va1][j];
+            let (d, vb1) = state.edge[va1][j];
             if current_dist <= d {
                 break;
             }
-            let b = state.pos[nvb1];
+            let b = state.pos[vb1];
             if state.legal_check(a, b) && state.try_2opt(a, b) {
                 state.apply_2opt(a, b);
                 break;
