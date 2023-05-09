@@ -275,10 +275,9 @@ impl State {
         self.route = route;
         self.evaluate_score();
     }
-    fn annealing(&mut self, rng: &mut StdRng) {
-        let MAX = 1e5 as usize;
+    fn annealing(&mut self, rng: &mut StdRng, number: usize, start_temp: f64, end_temp: f64) {
         let mut current_score = self.get_score();
-        for t in 1..=MAX {
+        for t in 0..=number {
             let mut a = rng.gen_range(1, self.N + 1);
             let mut b = rng.gen_range(1, self.N + 1);
             if !self.legal_check(a, b) {
@@ -290,8 +289,9 @@ impl State {
             self.route[a..b].reverse();
             let new_score = self.get_score();
 
-            let T = 30.0 - 28.0 * (t as f64) / (MAX as f64);
-            let prob = ((current_score - new_score) / T).min(0.0).exp();
+            let T = start_temp + (end_temp - start_temp) * (t as f64 / number as f64);
+            // current_score >= new_score => current_score - new_score >= 0 => good
+            let prob = ((current_score - new_score) / T).exp();
             if rng.gen::<f64>() < prob {
                 current_score = new_score;
             } else {
@@ -416,7 +416,7 @@ impl Solver {
         let time_keeper = TimeKeeper::new(980);
 
         state.init();
-        state.annealing(&mut rng);
+        state.annealing(&mut rng, 1e5 as usize, 28.0, 2.0);
         let mut iter = 0_usize;
         let mut try_num = 0;
 
