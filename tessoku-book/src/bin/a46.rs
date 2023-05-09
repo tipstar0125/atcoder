@@ -292,7 +292,8 @@ impl State {
             let T = start_temp + (end_temp - start_temp) * (t as f64 / number as f64);
             // current_score >= new_score => current_score - new_score >= 0 => good
             let prob = ((current_score - new_score) / T).exp();
-            if rng.gen::<f64>() < prob {  // 0 <= rng.gen::<f64>() <= 1
+            // 0 <= rng.gen::<f64>() <= 1
+            if rng.gen::<f64>() < prob {
                 current_score = new_score;
             } else {
                 self.route[a..b].reverse();
