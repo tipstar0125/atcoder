@@ -16,7 +16,7 @@ use proconio::{
 
 macro_rules! input(($($tt:tt)*) => (
     let stdin = std::io::stdin();
-    let mut stdin = proconio::source::line::LineSource::new(std::io::BufReader::new(stdin));
+    let mut stdin = proconio::source::line::LineSource::new(stdin.lock());
     proconio::input!(from &mut stdin, $($tt)*);
 ));
 
@@ -233,9 +233,12 @@ impl Comb {
 struct Solver {}
 impl Solver {
     fn solve(&mut self) {
-        input! {
-            N: usize
-        }
+        let N = {
+            input! {
+                n: usize
+            }
+            n
+        };
 
         let mut l = 1_usize;
         let mut r = N;
