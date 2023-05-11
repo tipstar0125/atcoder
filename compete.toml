@@ -31,7 +31,8 @@ src = '''
 #![allow(clippy::neg_multiply)]
 #![allow(dead_code)]
 use itertools::Itertools;
-use std::collections::{BTreeMap, BTreeSet, VecDeque};
+use std::cmp::Reverse;
+use std::collections::{BTreeMap, BTreeSet, BinaryHeap, VecDeque};
 
 use proconio::{
     fastout, input,
@@ -47,11 +48,7 @@ struct Solver {}
 impl Solver {
     #[fastout]
     fn solve(&mut self) {
-        // let mut stdin = LineSource::new(BufReader::new(io::stdin()));
-        // macro_rules! input(($($tt:tt)*) => (proconio::input!(from &mut stdin, $($tt)*)));
-        input! {
-
-        }
+        input! {}
     }
 }
 
@@ -62,6 +59,49 @@ fn main() {
         .unwrap()
         .join()
         .unwrap();
+}
+
+mod rnd {
+    static mut S: usize = 0;
+    static MAX: usize = 1e9 as usize;
+
+    #[inline]
+    pub fn init(seed: usize) {
+        unsafe {
+            if seed == 0 {
+                let t = std::time::SystemTime::now()
+                    .duration_since(std::time::UNIX_EPOCH)
+                    .unwrap()
+                    .as_secs() as usize;
+                S = t
+            } else {
+                S = seed;
+            }
+        }
+    }
+    #[inline]
+    pub fn gen() -> usize {
+        unsafe {
+            if S == 0 {
+                init(0);
+            }
+            S ^= S << 7;
+            S ^= S >> 9;
+            S
+        }
+    }
+    #[inline]
+    pub fn gen_range(a: usize, b: usize) -> usize {
+        gen() % (b - a) + a
+    }
+    #[inline]
+    pub fn gen_bool() -> bool {
+        gen() & 1 == 1
+    }
+    #[inline]
+    pub fn gen_float() -> f64 {
+        ((gen() % MAX) as f64) / MAX as f64
+    }
 }
 
 #[macro_export]
@@ -241,7 +281,7 @@ impl WeightedUnionFind {
     }
 }
 
-type M = ModInt;
+type Mod = ModInt;
 #[derive(Debug, Clone, Copy, Default)]
 struct ModInt {
     value: usize,
@@ -339,12 +379,12 @@ struct Comb {
 
 impl Comb {
     fn new(n: usize) -> Self {
-        let mut fact = vec![M::one(), M::one()];
-        let mut fact_inverse = vec![M::one(), M::one()];
-        let mut inverse = vec![M::zero(), M::one()];
+        let mut fact = vec![Mod::one(), Mod::one()];
+        let mut fact_inverse = vec![Mod::one(), Mod::one()];
+        let mut inverse = vec![Mod::zero(), Mod::one()];
         for i in 2..=n {
-            fact.push(*fact.last().unwrap() * M::new(i));
-            inverse.push((M::zero() - inverse[MOD % i]) * M::new(MOD / i));
+            fact.push(*fact.last().unwrap() * Mod::new(i));
+            inverse.push((Mod::zero() - inverse[MOD % i]) * Mod::new(MOD / i));
             fact_inverse.push(*fact_inverse.last().unwrap() * *inverse.last().unwrap());
         }
         Comb { fact, fact_inverse }
