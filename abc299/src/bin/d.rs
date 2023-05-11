@@ -7,14 +7,18 @@
 #![allow(clippy::neg_multiply)]
 #![allow(dead_code)]
 use std::collections::BTreeMap;
-use std::io::{self, stdin, stdout, BufReader, Write};
 use std::ops;
 
 use proconio::{
     fastout, input,
     marker::{Chars, Usize1},
-    source::line::LineSource,
 };
+
+macro_rules! input(($($tt:tt)*) => (
+    let stdin = std::io::stdin();
+    let mut stdin = proconio::source::line::LineSource::new(std::io::BufReader::new(stdin));
+    proconio::input!(from &mut stdin, $($tt)*);
+));
 
 const MOD: usize = 1e9 as usize + 7;
 // const MOD: usize = 998244353;
@@ -229,8 +233,6 @@ impl Comb {
 struct Solver {}
 impl Solver {
     fn solve(&mut self) {
-        let mut stdin = LineSource::new(BufReader::new(io::stdin()));
-        macro_rules! input(($($tt:tt)*) => (proconio::input!(from &mut stdin, $($tt)*)));
         input! {
             N: usize
         }
