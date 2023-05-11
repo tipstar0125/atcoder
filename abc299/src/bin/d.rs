@@ -239,7 +239,7 @@ impl Solver {
             }
             n
         };
-
+        
         let mut l = 1_usize;
         let mut r = N;
         while (r - l) > 1 {
