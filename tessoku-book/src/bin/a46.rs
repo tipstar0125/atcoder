@@ -6,18 +6,71 @@
 #![allow(clippy::neg_multiply)]
 #![allow(dead_code)]
 
-use rand::rngs::StdRng;
-use std::{
-    collections::{BTreeMap, BTreeSet},
-    time::Instant,
-};
+use std::collections::{BTreeMap, BTreeSet};
 
 use itertools::Itertools;
 use proconio::{
     fastout, input,
     marker::{Chars, Usize1},
 };
-use rand::Rng;
+
+macro_rules! input(($($tt:tt)*) => (
+    let stdin = std::io::stdin();
+    let mut stdin = proconio::source::line::LineSource::new(stdin.lock());
+    proconio::input!(from &mut stdin, $($tt)*);
+));
+
+use lazy_static::lazy_static;
+
+lazy_static! {
+    static ref N: usize = {
+        input! { n: usize }
+        n
+    };
+}
+
+mod rnd {
+    static mut S: usize = 0;
+    static MAX: usize = 1e9 as usize;
+
+    #[inline]
+    pub fn init(seed: usize) {
+        unsafe {
+            if seed == 0 {
+                let t = std::time::SystemTime::now()
+                    .duration_since(std::time::UNIX_EPOCH)
+                    .unwrap()
+                    .as_secs() as usize;
+                S = t
+            } else {
+                S = seed;
+            }
+        }
+    }
+    #[inline]
+    pub fn gen() -> usize {
+        unsafe {
+            if S == 0 {
+                init(0);
+            }
+            S ^= S << 7;
+            S ^= S >> 9;
+            S
+        }
+    }
+    #[inline]
+    pub fn gen_range(a: usize, b: usize) -> usize {
+        gen() % (b - a) + a
+    }
+    #[inline]
+    pub fn gen_bool() -> bool {
+        gen() & 1 == 1
+    }
+    #[inline]
+    pub fn gen_float() -> f64 {
+        ((gen() % MAX) as f64) / MAX as f64
+    }
+}
 
 #[inline]
 fn get_time() -> f64 {
@@ -43,14 +96,14 @@ fn get_time() -> f64 {
 
 #[derive(Debug, Clone)]
 struct TimeKeeper {
-    start_time: Instant,
+    start_time: std::time::Instant,
     time_threshold: f64, // us
 }
 
 impl TimeKeeper {
     fn new(ms: usize) -> Self {
         TimeKeeper {
-            start_time: Instant::now(),
+            start_time: std::time::Instant::now(),
             time_threshold: (ms * 1e3 as usize) as f64,
         }
     }
@@ -150,7 +203,6 @@ fn get_dist((x0, y0): (isize, isize), (x1, y1): (isize, isize)) -> f64 {
 
 #[derive(Debug)]
 struct State {
-    N: usize,
     edge: Vec<Vec<(f64, usize)>>,
     dist: Vec<Vec<f64>>,
     route: Vec<usize>,
@@ -162,15 +214,14 @@ struct State {
 impl State {
     fn new() -> Self {
         input! {
-            N: usize,
-            XY: [(isize, isize); N]
+            XY: [(isize, isize); *N]
         }
 
-        let mut dist = vec![vec![0.; N]; N];
-        let mut edge = vec![vec![]; N];
+        let mut dist = vec![vec![0.; *N]; *N];
+        let mut edge = vec![vec![]; *N];
 
-        for i in 0..N {
-            for j in 0..N {
+        for i in 0..*N {
+            for j in 0..*N {
                 let d = get_dist(XY[i], XY[j]);
                 dist[i][j] = d;
                 if i != j {
@@ -180,16 +231,15 @@ impl State {
             edge[i].sort_by(|&a, b| a.partial_cmp(b).unwrap());
         }
 
-        let route = (0..N).chain(vec![0]).collect_vec();
+        let route = (0..*N).chain(vec![0]).collect_vec();
         let best_route = route.clone();
         let best_score = std::f64::INFINITY;
-        let mut pos = vec![0; N];
-        for i in 1..=N {
+        let mut pos = vec![0; *N];
+        for i in 1..=*N {
             pos[route[i]] = i;
         }
 
         State {
-            N,
             edge,
             dist,
             route,
@@ -203,14 +253,14 @@ impl State {
     }
     fn greedy(&mut self) {
         let mut route = vec![];
-        let mut visited = vec![false; self.N];
+        let mut visited = vec![false; *N];
         let start = 0;
         let mut now = start;
         route.push(start);
         visited[start] = true;
 
-        for _ in 0..self.N - 1 {
-            for i in 0..self.N - 1 {
+        for _ in 0..*N - 1 {
+            for i in 0..*N - 1 {
                 let (_, next) = self.edge[now][i];
                 if !visited[next] {
                     visited[next] = true;
@@ -222,7 +272,7 @@ impl State {
         }
         route.push(0);
 
-        for i in 1..=self.N {
+        for i in 1..=*N {
             self.pos[route[i]] = i;
         }
         self.route = route;
@@ -236,8 +286,8 @@ impl State {
             }
         }
         connection.sort_by(|(_, _, a), (_, _, b)| a.partial_cmp(b).unwrap());
-        let mut uf = UnionFind::new(self.N);
-        let mut relation = vec![vec![]; self.N];
+        let mut uf = UnionFind::new(*N);
+        let mut relation = vec![vec![]; *N];
 
         for &(i, j, _) in &connection {
             if !uf.is_same(i, j) && relation[i].len() < 2 && relation[j].len() < 2 {
@@ -251,13 +301,13 @@ impl State {
         }
 
         let start = 0;
-        let mut visited = vec![false; self.N];
+        let mut visited = vec![false; *N];
         let mut route = vec![];
         let mut now = start;
         visited[start] = true;
         route.push(start);
 
-        while route.len() < self.N {
+        while route.len() < *N {
             let mut iter = relation[now].iter();
             let mut nex = *iter.next().unwrap();
             if visited[nex] {
@@ -269,17 +319,17 @@ impl State {
         }
         route.push(0);
 
-        for i in 1..=self.N {
+        for i in 1..=*N {
             self.pos[route[i]] = i;
         }
         self.route = route;
         self.evaluate_score();
     }
-    fn annealing(&mut self, rng: &mut StdRng, number: usize, start_temp: f64, end_temp: f64) {
+    fn annealing(&mut self, number: usize, start_temp: f64, end_temp: f64) {
         let mut current_score = self.get_score();
         for t in 0..=number {
-            let mut a = rng.gen_range(1, self.N + 1);
-            let mut b = rng.gen_range(1, self.N + 1);
+            let mut a = rnd::gen_range(1, *N + 1);
+            let mut b = rnd::gen_range(1, *N + 1);
             if !self.legal_check(a, b) {
                 continue;
             }
@@ -293,13 +343,13 @@ impl State {
             // current_score >= new_score => current_score - new_score >= 0 => good
             let prob = ((current_score - new_score) / T).exp();
             // 0 <= rng.gen::<f64>() <= 1
-            if rng.gen::<f64>() < prob {
+            if rnd::gen_float() < prob {
                 current_score = new_score;
             } else {
                 self.route[a..b].reverse();
             }
         }
-        for i in 1..=self.N {
+        for i in 1..=*N {
             self.pos[self.route[i]] = i;
         }
         self.evaluate_score();
@@ -352,22 +402,22 @@ impl State {
         (a as isize - b as isize).abs() > 1
     }
     #[inline]
-    fn kick(&mut self, rng: &mut StdRng) {
-        if rng.gen::<bool>() {
+    fn kick(&mut self) {
+        if rnd::gen_bool() {
             let mut x = [0; 4];
             while !x.windows(2).all(|w| self.legal_check(w[0], w[1])) {
                 for xi in x.iter_mut() {
-                    *xi = rng.gen_range(1, self.N);
+                    *xi = rnd::gen_range(1, *N);
                 }
                 x.sort();
             }
             self.apply_double_bridge(x[0], x[1], x[2], x[3]);
         } else {
             for _ in 0..10 {
-                let a = rng.gen_range(1, self.N + 1);
-                let mut b = rng.gen_range(1, self.N + 1);
+                let a = rnd::gen_range(1, *N + 1);
+                let mut b = rnd::gen_range(1, *N + 1);
                 while !self.legal_check(a, b) {
-                    b = rng.gen_range(1, self.N + 1);
+                    b = rnd::gen_range(1, *N + 1);
                 }
                 self.apply_2opt(a, b);
             }
@@ -380,12 +430,12 @@ impl State {
 
 #[inline]
 fn local_search(state: &mut State) {
-    for a in 1..=state.N {
+    for a in 1..=*N {
         let va0 = state.route[a - 1];
         let va1 = state.route[a];
         let current_dist = state.dist[va0][va1];
 
-        for j in 0..state.N - 1 {
+        for j in 0..*N - 1 {
             let (d, vb1) = state.edge[va1][j];
             if current_dist <= d {
                 break;
@@ -404,20 +454,22 @@ struct Solver {}
 impl Solver {
     #[fastout]
     fn solve(&mut self) {
-        #[allow(unused_mut)]
-        let mut seed = rand::thread_rng().gen();
+        lazy_static::initialize(&N);
+
+        #[allow(unused_mut, unused_assignments)]
+        let mut seed = 0;
         #[cfg(feature = "seed")]
         {
             seed = 11216848234635351618;
         }
         eprintln!("seed: {}", seed);
-        let mut rng: rand::rngs::StdRng = rand::SeedableRng::seed_from_u64(seed);
+        rnd::init(seed);
 
         let mut state = State::new();
         let time_keeper = TimeKeeper::new(980);
 
         state.init();
-        state.annealing(&mut rng, 1e5 as usize, 28.0, 2.0);
+        state.annealing(1e5 as usize, 28.0, 2.0);
         let mut iter = 0_usize;
         let mut try_num = 0;
 
@@ -431,12 +483,12 @@ impl Solver {
                 if try_num >= 10 {
                     try_num = 0;
                     state.route = state.best_route.clone();
-                    for i in 1..=state.N {
+                    for i in 1..=*N {
                         state.pos[state.route[i]] = i;
                     }
                 }
             }
-            state.kick(&mut rng);
+            state.kick();
         }
         eprintln!("iter: {}", iter);
         eprintln!("score: {}", state.best_score);
