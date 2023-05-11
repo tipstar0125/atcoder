@@ -312,6 +312,8 @@ impl Comb {
     }
 }
 
+const DIJ4: [(usize, usize); 4] = [(1, 1), (1, !0), (!0, 1), (!0, !0)];
+
 #[derive(Default)]
 struct Solver {}
 impl Solver {
@@ -325,18 +327,22 @@ impl Solver {
 
         let N = min!(H, W);
         let mut ans = vec![0_usize; N];
-        let delta = [(1, 1), (1, -1), (-1, 1), (-1, -1)];
 
-        let eval = |row: usize, col: usize, dr: isize, dc: isize| -> bool {
-            let r = row as isize + dr;
-            let c = col as isize + dc;
-            if r < 0 || r >= H as isize {
+        let mut a = !0_usize;
+        println!("{}", a);
+        a = a.wrapping_mul(2);
+        println!("{}", a);
+
+        let eval = |row: usize, col: usize, dr: usize, dc: usize, cnt: usize| -> bool {
+            let r = row.wrapping_add(dr.wrapping_mul(cnt));
+            let c = col.wrapping_add(dc.wrapping_mul(cnt));
+            if r >= H {
                 return false;
             }
-            if c < 0 || c >= W as isize {
+            if c >= W {
                 return false;
             }
-            if C[r as usize][c as usize] != '#' {
+            if C[r][c] != '#' {
                 return false;
             }
             true
@@ -345,11 +351,11 @@ impl Solver {
         for i in 0..H {
             for j in 0..W {
                 if C[i][j] == '#' {
-                    let mut cnt = 0_isize;
+                    let mut cnt = 0_usize;
                     let mut ok = true;
                     while ok {
-                        for &(dr, dc) in &delta {
-                            if !eval(i, j, dr * (cnt + 1), dc * (cnt + 1)) {
+                        for &(dr, dc) in &DIJ4 {
+                            if !eval(i, j, dr, dc, cnt + 1) {
                                 ok = false;
                                 break;
                             }
@@ -359,7 +365,7 @@ impl Solver {
                         }
                     }
                     if cnt > 0 {
-                        ans[cnt as usize - 1] += 1;
+                        ans[cnt - 1] += 1;
                     }
                 }
             }
