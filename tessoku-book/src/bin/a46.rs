@@ -97,19 +97,19 @@ fn get_time() -> f64 {
 #[derive(Debug, Clone)]
 struct TimeKeeper {
     start_time: std::time::Instant,
-    time_threshold: f64, // us
+    time_threshold: f64,
 }
 
 impl TimeKeeper {
-    fn new(ms: usize) -> Self {
+    fn new(time_threshold: f64) -> Self {
         TimeKeeper {
             start_time: std::time::Instant::now(),
-            time_threshold: (ms * 1e3 as usize) as f64,
+            time_threshold,
         }
     }
     #[inline]
     fn isTimeOver(&self) -> bool {
-        let elapsed_time = self.start_time.elapsed().as_micros() as f64;
+        let elapsed_time = self.start_time.elapsed().as_nanos() as f64 * 1e-9;
         #[cfg(feature = "local")]
         {
             elapsed_time * 0.85 >= self.time_threshold
@@ -466,7 +466,7 @@ impl Solver {
         rnd::init(seed);
 
         let mut state = State::new();
-        let time_keeper = TimeKeeper::new(980);
+        let time_keeper = TimeKeeper::new(0.98);
 
         state.init();
         state.annealing(1e5 as usize, 28.0, 2.0);
