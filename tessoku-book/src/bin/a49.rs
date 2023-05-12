@@ -25,10 +25,12 @@ macro_rules! input(($($tt:tt)*) => (
 use lazy_static::lazy_static;
 
 lazy_static! {
-    static ref T: usize = {
-        input! { t: usize }
-        t
+    static ref _INPUT: (usize, Vec<(usize, usize, usize)>) = {
+        input! { t: usize, pqr: [(Usize1, Usize1, Usize1); t], }
+        (t, pqr)
     };
+    static ref T: usize = _INPUT.0;
+    static ref PQR: Vec<(usize, usize, usize)> = _INPUT.1.clone();
 }
 
 mod rnd {
@@ -103,29 +105,21 @@ impl TimeKeeper {
 
 #[derive(Debug, Clone, Eq)]
 struct State {
-    PQR: Vec<(usize, usize, usize)>,
     X: [isize; N],
     turn: usize,
     score: usize,
     evaluated_score: usize,
     fist_action: bool,
-    actions: Vec<char>,
 }
 
 impl State {
     fn new() -> Self {
-        input! {
-            PQR: [(Usize1, Usize1, Usize1); *T]
-        }
-
         State {
-            PQR,
             X: [0; N],
             turn: 0,
             score: 0,
             evaluated_score: 0,
             fist_action: true,
-            actions: vec![],
         }
     }
     fn get_score(&self) -> usize {
@@ -137,20 +131,15 @@ impl State {
     fn advance(&mut self, action: bool) {
         let d = if action { 1 } else { -1 };
 
-        let p = self.PQR[self.turn].0;
-        let q = self.PQR[self.turn].1;
-        let r = self.PQR[self.turn].2;
+        let p = (*PQR)[self.turn].0;
+        let q = (*PQR)[self.turn].1;
+        let r = (*PQR)[self.turn].2;
         self.X[p] += d;
         self.X[q] += d;
         self.X[r] += d;
         self.score += self.get_score();
 
         self.turn += 1;
-        if action {
-            self.actions.push('A');
-        } else {
-            self.actions.push('B');
-        }
     }
     fn evaluate_score(&mut self) {
         self.evaluated_score = self.score;
@@ -243,19 +232,26 @@ struct Solver {}
 impl Solver {
     #[fastout]
     fn solve(&mut self) {
-        lazy_static::initialize(&T);
+        lazy_static::initialize(&_INPUT);
 
         let mut state = State::new();
         let start = std::time::Instant::now();
         let LIMIT = 1000; // [msec]
         let time_threshold = (LIMIT / *T / 10 * 4) as f64 * 1e-3; // [sec]
+        let mut ans = vec![];
 
         while !state.isDone() {
-            // state.advance(random_action());
-            // state.advance(greedy_action(&state));
-            state.advance(beam_search_action(&state, 10000, time_threshold));
+            // let action = random_action();
+            // let action = greedy_action(&state);
+            let action = beam_search_action(&state, 10000, time_threshold);
+            if action {
+                ans.push('A');
+            } else {
+                ans.push('B');
+            }
+            state.advance(action);
         }
-        println!("{}", state.actions.iter().join(" "));
+        println!("{}", ans.iter().join(" "));
 
         #[allow(unused_mut, unused_assignments)]
         let mut elapsed_time = start.elapsed().as_micros() as f64 * 1e-6;
