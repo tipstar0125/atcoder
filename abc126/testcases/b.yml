@@ -1,0 +1,27 @@
+---
+type: Batch
+timelimit: 2s
+match: Lines
+
+cases:
+  - name: sample1
+    in: |
+      1905
+    out: |
+      YYMM
+  - name: sample2
+    in: |
+      0112
+    out: |
+      AMBIGUOUS
+  - name: sample3
+    in: |
+      1700
+    out: |
+      NA
+
+extend:
+  - type: Text
+    path: "./b"
+    in: /in/*.txt
+    out: /out/*.txt
