@@ -227,6 +227,55 @@ fn beam_search_action(state: &State, beam_width: usize, time_threshold: f64) -> 
     best_state.fist_action
 }
 
+fn chokudai_search_action(
+    state: &State,
+    beam_width: usize,
+    beam_depth: usize,
+    time_threshold: f64,
+) -> bool {
+    let mut beam = vec![BinaryHeap::new(); beam_depth + 1];
+    beam[0].push(state.clone());
+    let time_keeper = TimeKeeper::new(time_threshold);
+    let mut beam_num = 0;
+
+    while !time_keeper.isTimeOver() {
+        beam_num += 1;
+        for t in 0..beam_depth {
+            for _ in 0..beam_width {
+                if beam[t].is_empty() {
+                    break;
+                }
+                if beam[t].peek().unwrap().isDone() {
+                    break;
+                }
+                let now_state = beam[t].pop().unwrap().clone();
+                let mut next_state_A = now_state.clone();
+                let mut next_state_B = now_state.clone();
+                next_state_A.advance(true);
+                next_state_A.evaluate_score();
+                next_state_B.advance(false);
+                next_state_B.evaluate_score();
+                if t == 0 {
+                    next_state_A.fist_action = true;
+                    next_state_B.fist_action = false;
+                }
+                beam[t + 1].push(next_state_A);
+                beam[t + 1].push(next_state_B);
+            }
+        }
+    }
+    let mut ret = true;
+    for t in (0..=beam_depth).rev() {
+        let now_beam = &beam[t];
+        if !now_beam.is_empty() {
+            ret = now_beam.peek().unwrap().fist_action;
+            break;
+        }
+    }
+    eprintln!("{}", beam_num);
+    ret
+}
+
 #[derive(Default)]
 struct Solver {}
 impl Solver {
@@ -237,13 +286,14 @@ impl Solver {
         let mut state = State::new();
         let start = std::time::Instant::now();
         let LIMIT = 1000; // [msec]
-        let time_threshold = (LIMIT / *T / 10 * 4) as f64 * 1e-3; // [sec]
+        let time_threshold = (LIMIT / *T / 10 * 8) as f64 * 1e-3; // [sec]
         let mut ans = vec![];
 
         while !state.isDone() {
             // let action = random_action();
             // let action = greedy_action(&state);
-            let action = beam_search_action(&state, 10000, time_threshold);
+            // let action = beam_search_action(&state, 10000, time_threshold);
+            let action = chokudai_search_action(&state, 10000, 12, time_threshold);
             if action {
                 ans.push('A');
             } else {
