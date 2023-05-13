@@ -1,0 +1,36 @@
+---
+type: Batch
+timelimit: 2s
+match: Lines
+
+cases:
+  - name: sample1
+    in: |
+      ch@ku@ai
+      choku@@i
+    out: |
+      Yes
+  - name: sample2
+    in: |
+      ch@kud@i
+      akidu@ho
+    out: |
+      Yes
+  - name: sample3
+    in: |
+      aoki
+      @ok@
+    out: |
+      No
+  - name: sample4
+    in: |
+      aa
+      bb
+    out: |
+      No
+
+extend:
+  - type: Text
+    path: "./c"
+    in: /in/*.txt
+    out: /out/*.txt
