@@ -1,0 +1,44 @@
+---
+type: Batch
+timelimit: 2s
+match: Lines
+
+cases:
+  - name: sample1
+    in: |
+      january
+      february
+      march
+      april
+      may
+      june
+      july
+      august
+      september
+      october
+      november
+      december
+    out: |
+      8
+  - name: sample2
+    in: |
+      rrrrrrrrrr
+      srrrrrrrrr
+      rsr
+      ssr
+      rrs
+      srsrrrrrr
+      rssrrrrrr
+      sss
+      rrr
+      srr
+      rsrrrrrrrr
+      ssrrrrrrrr
+    out: |
+      11
+
+extend:
+  - type: Text
+    path: "./b"
+    in: /in/*.txt
+    out: /out/*.txt
