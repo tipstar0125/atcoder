@@ -24,7 +24,27 @@ struct Solver {}
 impl Solver {
     #[fastout]
     fn solve(&mut self) {
-        input! {}
+        input! {
+            D: usize,
+            N: Chars
+        }
+
+        let L = N.len();
+        let mut dp = vec![vec![vec![Mod::zero(); D]; 2]; L + 1];
+        dp[0][0][0] = Mod::one();
+        for i in 1..=L {
+            let n = (N[i - 1] as u8 - b'0') as usize;
+            for smaller in 0..=1 {
+                for d in 0..D {
+                    for x in (0..).take_while(|&x| x <= if smaller == 1 { 9 } else { n }) {
+                        let add = dp[i - 1][smaller][d];
+                        dp[i][smaller | if x < n { 1 } else { 0 }][(d + x) % D] += add;
+                    }
+                }
+            }
+        }
+        let ans = dp[L][0][0] + dp[L][1][0] - Mod::one();
+        println!("{}", ans.value());
     }
 }
 
