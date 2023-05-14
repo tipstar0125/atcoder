@@ -6,7 +6,6 @@
 #![allow(clippy::nonminimal_bool)]
 #![allow(clippy::neg_multiply)]
 #![allow(dead_code)]
-use self::counter::BTreeCounter;
 use itertools::Itertools;
 use std::cmp::Reverse;
 use std::collections::{BTreeMap, BTreeSet, BinaryHeap, VecDeque};
@@ -30,25 +29,53 @@ impl Solver {
             T: Chars
         }
 
-        let mut sc: BTreeCounter<_> = S.into_iter().collect();
-        let mut tc: BTreeCounter<_> = T.into_iter().collect();
-        let set: BTreeSet<_> = "atcoder".to_string().chars().collect();
+        let N = S.len();
+        let mut mp_s = vec![0_usize; 26];
+        let mut mp_t = vec![0_usize; 26];
+        let mut at_cnt_s = 0_usize;
+        let mut at_cnt_t = 0_usize;
+        for i in 0..N {
+            if S[i] == '@' {
+                at_cnt_s += 1;
+            } else {
+                let num = (S[i] as u8 - b'a') as usize;
+                mp_s[num] += 1;
+            }
 
-        for c in b'a'..=b'z' {
-            let c = c as char;
-            let num_s = sc.get(&c);
-            let num_t = tc.get(&c);
-            if num_s == num_t {
+            if T[i] == '@' {
+                at_cnt_t += 1;
+            } else {
+                let num = (T[i] as u8 - b'a') as usize;
+                mp_t[num] += 1;
+            }
+        }
+
+        let ss = "atcoder".to_string();
+        let mut set = BTreeSet::new();
+        for c in ss.chars() {
+            let num = (c as u8 - b'a') as usize;
+            set.insert(num);
+        }
+
+        for i in 0..26 {
+            if mp_s[i] == mp_t[i] {
                 continue;
-            }
-            if !set.contains(&c) {
-                println!("No");
-                return;
-            }
-            if num_s > num_t && num_s - num_t <= tc.get(&('@')) {
-                tc.remove_count(&('@'), num_s - num_t);
-            } else if num_t > num_s && num_t - num_s <= sc.get(&('@')) {
-                sc.remove_count(&('@'), num_t - num_s);
+            } else if mp_s[i] > mp_t[i] && set.contains(&i) {
+                let cnt = mp_s[i] - mp_t[i];
+                if at_cnt_t >= cnt {
+                    at_cnt_t -= cnt;
+                } else {
+                    println!("No");
+                    return;
+                }
+            } else if mp_s[i] < mp_t[i] && set.contains(&i) {
+                let cnt = mp_t[i] - mp_s[i];
+                if at_cnt_s >= cnt {
+                    at_cnt_s -= cnt;
+                } else {
+                    println!("No");
+                    return;
+                }
             } else {
                 println!("No");
                 return;
@@ -65,140 +92,6 @@ fn main() {
         .unwrap()
         .join()
         .unwrap();
-}
-
-mod counter {
-    use std::{
-        borrow::Borrow,
-        collections::{btree_map, BTreeMap},
-        fmt::{self, Debug},
-        iter::{Extend, FromIterator},
-        ops::RangeBounds,
-    };
-    #[derive(Clone)]
-    pub struct BTreeCounter<T> {
-        map: BTreeMap<T, usize>,
-    }
-    impl<T> Debug for BTreeCounter<T>
-    where
-        T: Debug,
-    {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            f.debug_map().entries(self.iter()).finish()
-        }
-    }
-    impl<T> Default for BTreeCounter<T>
-    where
-        T: Ord,
-    {
-        fn default() -> Self {
-            Self {
-                map: BTreeMap::default(),
-            }
-        }
-    }
-    impl<T> BTreeCounter<T> {
-        pub fn len(&self) -> usize {
-            self.map.len()
-        }
-        pub fn is_empty(&self) -> bool {
-            self.map.is_empty()
-        }
-        pub fn keys(&self) -> btree_map::Keys<'_, T, usize> {
-            self.map.keys()
-        }
-        pub fn values(&self) -> btree_map::Values<'_, T, usize> {
-            self.map.values()
-        }
-        pub fn iter(&self) -> btree_map::Iter<'_, T, usize> {
-            self.map.iter()
-        }
-        pub fn range<Q, R>(&self, range: R) -> btree_map::Range<'_, T, usize>
-        where
-            Q: Ord,
-            R: RangeBounds<Q>,
-            T: Borrow<Q> + Ord,
-        {
-            self.map.range(range)
-        }
-    }
-    impl<T> BTreeCounter<T>
-    where
-        T: Ord,
-    {
-        pub fn new() -> Self {
-            Self::default()
-        }
-        pub fn clear(&mut self) {
-            self.map.clear();
-        }
-        pub fn get(&self, item: &T) -> usize {
-            self.map.get(item).cloned().unwrap_or_default()
-        }
-        pub fn add(&mut self, item: T) {
-            self.add_count(item, 1)
-        }
-        pub fn add_count(&mut self, item: T, count: usize) {
-            *self.map.entry(item).or_default() += count;
-        }
-        pub fn remove(&mut self, item: &T) -> bool {
-            self.remove_count(item, 1) == 1
-        }
-        pub fn remove_count(&mut self, item: &T, count: usize) -> usize {
-            if let Some(cnt) = self.map.get_mut(item) {
-                if *cnt <= count {
-                    let cnt = *cnt;
-                    self.map.remove(item);
-                    cnt
-                } else {
-                    *cnt -= count;
-                    count
-                }
-            } else {
-                0
-            }
-        }
-    }
-    impl<T> Extend<T> for BTreeCounter<T>
-    where
-        T: Ord,
-    {
-        fn extend<I: IntoIterator<Item = T>>(&mut self, iter: I) {
-            for item in iter {
-                self.add(item)
-            }
-        }
-    }
-    impl<T> Extend<(T, usize)> for BTreeCounter<T>
-    where
-        T: Ord,
-    {
-        fn extend<I: IntoIterator<Item = (T, usize)>>(&mut self, iter: I) {
-            for (item, count) in iter {
-                self.add_count(item, count)
-            }
-        }
-    }
-    impl<T> FromIterator<T> for BTreeCounter<T>
-    where
-        T: Ord,
-    {
-        fn from_iter<I: IntoIterator<Item = T>>(iter: I) -> Self {
-            let mut map = Self::default();
-            map.extend(iter);
-            map
-        }
-    }
-    impl<T> FromIterator<(T, usize)> for BTreeCounter<T>
-    where
-        T: Ord,
-    {
-        fn from_iter<I: IntoIterator<Item = (T, usize)>>(iter: I) -> Self {
-            let mut map = Self::default();
-            map.extend(iter);
-            map
-        }
-    }
 }
 
 mod rnd {
