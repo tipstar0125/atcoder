@@ -30,31 +30,29 @@ impl Solver {
         }
 
         let L = S.len();
-        let mut n = vec![];
-        for i in (0..L).rev() {
-            n.push((N >> i) % 2);
-        }
-
         let mut ans = 0_usize;
-        for i in 0..L {
-            let add = 1_usize << (L - i - 1);
-            if S[i] == '1' {
-                ans += add;
-            }
-        }
+        let mut X = vec![];
 
         for i in 0..L {
-            let add = 1_usize << (L - i - 1);
-            if S[i] == '?' && ans + add <= N {
-                ans += add;
+            let p = 1 << i;
+            if S[L - i - 1] == '1' {
+                ans += p;
+            } else if S[L - i - 1] == '?' {
+                X.push(p);
             }
         }
-
         if ans > N {
             println!("-1");
-        } else {
-            println!("{}", ans);
+            return;
         }
+
+        for x in X.iter().rev() {
+            if ans + x <= N {
+                ans += x;
+            }
+        }
+
+        println!("{}", ans);
     }
 }
 
