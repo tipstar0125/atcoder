@@ -1,0 +1,36 @@
+---
+type: Batch
+timelimit: 2s
+match: Lines
+
+cases:
+  - name: sample1
+    in: |
+      8
+      abacbabc
+    out: |
+      3
+  - name: sample2
+    in: |
+      8
+      abababab
+    out: |
+      0
+  - name: sample3
+    in: |
+      5
+      abcde
+    out: |
+      -1
+  - name: sample4
+    in: |
+      26
+      codefestivaltwozeroonefive
+    out: |
+      11
+
+extend:
+  - type: Text
+    path: "./b"
+    in: /in/*.txt
+    out: /out/*.txt
