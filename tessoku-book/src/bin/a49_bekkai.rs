@@ -123,7 +123,7 @@ impl State {
         }
     }
     fn get_score(&self) -> usize {
-        self.X.iter().filter(|&&x| x == 0).count()
+        self.X.iter().fold(0, |sum, &x| sum + x.abs()) as usize
     }
     fn isDone(&self) -> bool {
         self.turn == *T
@@ -152,9 +152,9 @@ impl std::cmp::PartialOrd for State {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
         if self.score == other.score {
             Some(std::cmp::Ordering::Equal)
-        } else if self.score < other.score {
-            Some(std::cmp::Ordering::Greater)
         } else if self.score > other.score {
+            Some(std::cmp::Ordering::Greater)
+        } else if self.score < other.score {
             Some(std::cmp::Ordering::Less)
         } else {
             None
@@ -166,7 +166,7 @@ impl std::cmp::Ord for State {
     fn cmp(&self, other: &Self) -> std::cmp::Ordering {
         if self.score == other.score {
             std::cmp::Ordering::Equal
-        } else if self.score < other.score {
+        } else if self.score > other.score {
             std::cmp::Ordering::Greater
         } else {
             std::cmp::Ordering::Less
@@ -184,7 +184,7 @@ impl Solver {
         let state = State::new();
         let start = std::time::Instant::now();
 
-        let beam_width = 30000;
+        let beam_width = 20000;
         let mut beam = vec![vec![]; *T + 1];
         beam[0].push(state);
 
@@ -216,7 +216,6 @@ impl Solver {
             before_index = beam[t][before_index].before_index;
             ans.push_front(if last_action { 'A' } else { 'B' });
         }
-        eprintln!("Score: {}", beam[*T][0].score);
         println!("{}", ans.iter().join(" "));
 
         #[allow(unused_mut, unused_assignments)]
