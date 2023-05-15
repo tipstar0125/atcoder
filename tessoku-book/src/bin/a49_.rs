@@ -6,7 +6,7 @@
 #![allow(clippy::neg_multiply)]
 #![allow(dead_code)]
 
-use std::collections::{BTreeMap, BTreeSet, BinaryHeap, VecDeque};
+use std::collections::{BTreeMap, BTreeSet, BinaryHeap};
 
 use itertools::Itertools;
 use proconio::{
@@ -108,8 +108,8 @@ struct State {
     X: [isize; N],
     turn: usize,
     score: usize,
-    last_action: bool,
-    before_index: usize,
+    evaluated_score: usize,
+    fist_action: bool,
 }
 
 impl State {
@@ -118,8 +118,8 @@ impl State {
             X: [0; N],
             turn: 0,
             score: 0,
-            last_action: true,
-            before_index: 0,
+            evaluated_score: 0,
+            fist_action: true,
         }
     }
     fn get_score(&self) -> usize {
@@ -130,31 +130,35 @@ impl State {
     }
     fn advance(&mut self, action: bool) {
         let d = if action { 1 } else { -1 };
+
         let p = (*PQR)[self.turn].0;
         let q = (*PQR)[self.turn].1;
         let r = (*PQR)[self.turn].2;
-
         self.X[p] += d;
         self.X[q] += d;
         self.X[r] += d;
         self.score += self.get_score();
+
         self.turn += 1;
+    }
+    fn evaluate_score(&mut self) {
+        self.evaluated_score = self.score;
     }
 }
 
 impl std::cmp::PartialEq for State {
     fn eq(&self, other: &Self) -> bool {
-        self.score == other.score
+        self.evaluated_score == other.evaluated_score
     }
 }
 
 impl std::cmp::PartialOrd for State {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        if self.score == other.score {
+        if self.evaluated_score == other.evaluated_score {
             Some(std::cmp::Ordering::Equal)
-        } else if self.score > other.score {
+        } else if self.evaluated_score < other.evaluated_score {
             Some(std::cmp::Ordering::Greater)
-        } else if self.score < other.score {
+        } else if self.evaluated_score > other.evaluated_score {
             Some(std::cmp::Ordering::Less)
         } else {
             None
@@ -164,14 +168,112 @@ impl std::cmp::PartialOrd for State {
 
 impl std::cmp::Ord for State {
     fn cmp(&self, other: &Self) -> std::cmp::Ordering {
-        if self.score == other.score {
+        if self.evaluated_score == other.evaluated_score {
             std::cmp::Ordering::Equal
-        } else if self.score > other.score {
+        } else if self.evaluated_score < other.evaluated_score {
             std::cmp::Ordering::Greater
         } else {
             std::cmp::Ordering::Less
         }
     }
+}
+
+fn random_action() -> bool {
+    rnd::gen_bool()
+}
+
+fn greedy_action(state: &State) -> bool {
+    let mut state_A = state.clone();
+    let mut state_B = state.clone();
+    state_A.advance(true);
+    state_A.evaluate_score();
+    state_B.advance(false);
+    state_B.evaluate_score();
+    state_A > state_B
+}
+
+fn beam_search_action(state: &State, beam_width: usize, time_threshold: f64) -> bool {
+    let mut now_beam = BinaryHeap::new();
+    let mut best_state = state;
+    now_beam.push(state.clone());
+    let time_keeper = TimeKeeper::new(time_threshold);
+
+    for t in 0.. {
+        let mut next_beam = BinaryHeap::new();
+        for _ in 0..beam_width {
+            if now_beam.is_empty() {
+                break;
+            }
+            let now_state = now_beam.pop().unwrap();
+            let mut next_state_A = now_state.clone();
+            let mut next_state_B = now_state.clone();
+            next_state_A.advance(true);
+            next_state_A.evaluate_score();
+            next_state_B.advance(false);
+            next_state_B.evaluate_score();
+            if t == 0 {
+                next_state_A.fist_action = true;
+                next_state_B.fist_action = false;
+            }
+            next_beam.push(next_state_A);
+            next_beam.push(next_state_B);
+        }
+        now_beam = next_beam;
+        best_state = now_beam.peek().unwrap();
+        if best_state.isDone() || time_keeper.isTimeOver() {
+            break;
+        }
+    }
+    best_state.fist_action
+}
+
+fn chokudai_search_action(
+    state: &State,
+    beam_width: usize,
+    beam_depth: usize,
+    time_threshold: f64,
+) -> bool {
+    let mut beam = vec![BinaryHeap::new(); beam_depth + 1];
+    beam[0].push(state.clone());
+    let time_keeper = TimeKeeper::new(time_threshold);
+    let mut beam_num = 0;
+
+    while !time_keeper.isTimeOver() {
+        beam_num += 1;
+        for t in 0..beam_depth {
+            for _ in 0..beam_width {
+                if beam[t].is_empty() {
+                    break;
+                }
+                if beam[t].peek().unwrap().isDone() {
+                    break;
+                }
+                let now_state = beam[t].pop().unwrap().clone();
+                let mut next_state_A = now_state.clone();
+                let mut next_state_B = now_state.clone();
+                next_state_A.advance(true);
+                next_state_A.evaluate_score();
+                next_state_B.advance(false);
+                next_state_B.evaluate_score();
+                if t == 0 {
+                    next_state_A.fist_action = true;
+                    next_state_B.fist_action = false;
+                }
+                beam[t + 1].push(next_state_A);
+                beam[t + 1].push(next_state_B);
+            }
+        }
+    }
+    let mut ret = true;
+    for t in (0..=beam_depth).rev() {
+        let now_beam = &beam[t];
+        if !now_beam.is_empty() {
+            ret = now_beam.peek().unwrap().fist_action;
+            break;
+        }
+    }
+    eprintln!("{}", beam_num);
+    ret
 }
 
 #[derive(Default)]
@@ -181,40 +283,23 @@ impl Solver {
     fn solve(&mut self) {
         lazy_static::initialize(&_INPUT);
 
-        let state = State::new();
+        let mut state = State::new();
         let start = std::time::Instant::now();
+        let LIMIT = 1000; // [msec]
+        let time_threshold = (LIMIT / *T / 10 * 8) as f64 * 1e-3; // [sec]
+        let mut ans = vec![];
 
-        let beam_width = 20000;
-        let mut beam = vec![vec![]; *T + 1];
-        beam[0].push(state);
-
-        for t in 1..=*T {
-            let L = beam[t - 1].len();
-            let mut cnt = 0;
-
-            'outer: for i in 0..L {
-                for j in 0..2 {
-                    let mut now_state = beam[t - 1][i].clone();
-                    now_state.advance(j == 0);
-                    now_state.last_action = j == 0;
-                    now_state.before_index = i;
-                    if cnt < beam_width {
-                        beam[t].push(now_state);
-                        cnt += 1;
-                    } else {
-                        break 'outer;
-                    }
-                }
+        while !state.isDone() {
+            // let action = random_action();
+            // let action = greedy_action(&state);
+            // let action = beam_search_action(&state, 10000, time_threshold);
+            let action = chokudai_search_action(&state, 10000, 12, time_threshold);
+            if action {
+                ans.push('A');
+            } else {
+                ans.push('B');
             }
-            beam[t].sort();
-        }
-
-        let mut ans = VecDeque::new();
-        let mut before_index = 0;
-        for t in (1..=*T).rev() {
-            let last_action = beam[t][before_index].last_action;
-            before_index = beam[t][before_index].before_index;
-            ans.push_front(if last_action { 'A' } else { 'B' });
+            state.advance(action);
         }
         println!("{}", ans.iter().join(" "));
 
