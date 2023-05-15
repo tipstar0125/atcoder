@@ -186,6 +186,7 @@ impl std::cmp::Ord for State {
     }
 }
 
+
 #[derive(Default)]
 struct Solver {}
 impl Solver {
@@ -197,11 +198,11 @@ impl Solver {
         let start = std::time::Instant::now();
 
         let beam_width = 60000;
-        let mut beam = vec![Vec::with_capacity(beam_width); *T + 1];
+        let mut beam = vec![vec![]; *T + 1];
         beam[0].push(state);
 
         for t in 1..=*T {
-            let mut candidate = Vec::with_capacity(beam[t - 1].len() * 2);
+            let mut candidate = vec![];
 
             for (i, now_state) in beam[t - 1].iter().enumerate() {
                 for j in 0..2 {

@@ -76,21 +76,6 @@ mod rnd {
     }
 }
 
-#[macro_export]
-macro_rules! max {
-    ($x: expr) => ($x);
-    ($x: expr, $( $y: expr ),+) => {
-        std::cmp::max($x, max!($( $y ),+))
-    }
-}
-#[macro_export]
-macro_rules! min {
-    ($x: expr) => ($x);
-    ($x: expr, $( $y: expr ),+) => {
-        std::cmp::min($x, min!($( $y ),+))
-    }
-}
-
 #[derive(Debug, Clone)]
 struct TimeKeeper {
     start_time: std::time::Instant,
@@ -120,7 +105,7 @@ impl TimeKeeper {
 
 #[derive(Debug, Clone, Eq)]
 struct State {
-    X: [i8; N],
+    X: [isize; N],
     turn: usize,
     score: usize,
     last_action: bool,
@@ -140,11 +125,14 @@ impl State {
     fn get_score(&self) -> usize {
         self.X.iter().filter(|&&x| x == 0).count()
     }
+    fn isDone(&self) -> bool {
+        self.turn == *T
+    }
     fn advance(&mut self, action: bool) {
         let d = if action { 1 } else { -1 };
-        let p = PQR[self.turn].0;
-        let q = PQR[self.turn].1;
-        let r = PQR[self.turn].2;
+        let p = (*PQR)[self.turn].0;
+        let q = (*PQR)[self.turn].1;
+        let r = (*PQR)[self.turn].2;
 
         self.X[p] += d;
         self.X[q] += d;
@@ -196,25 +184,29 @@ impl Solver {
         let state = State::new();
         let start = std::time::Instant::now();
 
-        let beam_width = 60000;
-        let mut beam = vec![Vec::with_capacity(beam_width); *T + 1];
+        let beam_width = 30000;
+        let mut beam = vec![vec![]; *T + 1];
         beam[0].push(state);
 
         for t in 1..=*T {
-            let mut candidate = Vec::with_capacity(beam[t - 1].len() * 2);
+            let L = beam[t - 1].len();
+            let mut cnt = 0;
 
-            for (i, now_state) in beam[t - 1].iter().enumerate() {
+            'outer: for i in 0..L {
                 for j in 0..2 {
-                    let mut next_state = now_state.clone();
-                    let action = j == 0;
-                    next_state.advance(action);
-                    next_state.last_action = action;
-                    next_state.before_index = i;
-                    candidate.push(next_state);
+                    let mut now_state = beam[t - 1][i].clone();
+                    now_state.advance(j == 0);
+                    now_state.last_action = j == 0;
+                    now_state.before_index = i;
+                    if cnt < beam_width {
+                        beam[t].push(now_state);
+                        cnt += 1;
+                    } else {
+                        break 'outer;
+                    }
                 }
             }
-            candidate.sort();
-            beam[t] = candidate[..min!(beam_width, candidate.len())].to_vec();
+            beam[t].sort();
         }
 
         let mut ans = VecDeque::new();
