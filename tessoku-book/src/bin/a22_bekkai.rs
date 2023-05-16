@@ -30,12 +30,26 @@ impl Solver {
             B: [Usize1; N-1]
         }
 
-        let INF = 1_isize << 60;
-        let mut dp = vec![-INF; N];
-        dp[0] = 0;
-        for i in 0..N - 1 {
-            dp[A[i]] = max!(dp[A[i]], dp[i] + 100);
-            dp[B[i]] = max!(dp[B[i]], dp[i] + 150);
+        let mut dp = vec![0_usize; N];
+        let mut Q = VecDeque::new();
+        Q.push_back(0);
+
+        while !Q.is_empty() {
+            let idx = Q.pop_front().unwrap();
+            let ni1 = A[idx];
+            let ni2 = B[idx];
+            if ni1 < N - 1 && dp[idx] + 100 > dp[ni1] {
+                dp[ni1] = dp[idx] + 100;
+                Q.push_back(ni1);
+            } else if ni1 == N - 1 {
+                dp[N - 1] = max!(dp[N - 1], dp[idx] + 100);
+            }
+            if ni2 < N - 1 && dp[idx] + 150 > dp[ni2] {
+                dp[ni2] = dp[idx] + 150;
+                Q.push_back(ni2);
+            } else if ni2 == N - 1 {
+                dp[N - 1] = max!(dp[N - 1], dp[idx] + 150);
+            }
         }
         println!("{}", dp[N - 1]);
     }
