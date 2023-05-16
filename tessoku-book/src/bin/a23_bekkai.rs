@@ -32,27 +32,26 @@ impl Solver {
 
         let INF = 1_usize << 60;
         let MAX = 1 << N;
-        let mut dp = vec![vec![INF; MAX]; M + 1];
-        dp[0][0] = 0;
-
-        for i in 1..=M {
+        let mut dp = vec![INF; MAX];
+        for row in A {
             let mut num = 0;
-            for (j, a) in A[i - 1].iter().rev().enumerate() {
+            for (i, a) in row.iter().rev().enumerate() {
                 if *a == 1 {
-                    num += 1 << j;
+                    num += 1 << i;
                 }
             }
-
-            for j in 0..MAX {
-                dp[i][j | num] = min!(dp[i][j | num], dp[i - 1][j] + 1);
-                dp[i][j] = min!(dp[i][j], dp[i - 1][j]);
-            }
+            dp[num] = 1;
         }
 
-        if dp[M][MAX - 1] == INF {
+        for i in 0..MAX {
+            for j in 0..MAX {
+                dp[i | j] = min!(dp[i | j], dp[i] + dp[j]);
+            }
+        }
+        if dp[MAX-1] == INF {
             println!("-1");
         } else {
-            println!("{}", dp[M][MAX - 1]);
+            println!("{}", dp[MAX-1]);
         }
     }
 }
