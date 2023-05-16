@@ -36,12 +36,7 @@ impl Solver {
         dp[0][0] = 0;
 
         for i in 1..=M {
-            let mut num = 0;
-            for (j, a) in A[i - 1].iter().rev().enumerate() {
-                if *a == 1 {
-                    num += 1 << j;
-                }
-            }
+            let num = usize::from_str_radix(A[i - 1].iter().join("").as_str(), 2).unwrap();
 
             for j in 0..MAX {
                 dp[i][j | num] = min!(dp[i][j | num], dp[i - 1][j] + 1);
