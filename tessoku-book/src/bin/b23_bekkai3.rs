@@ -47,13 +47,20 @@ impl Solver {
         let mut dp = vec![vec![INF; N]; MAX];
         dp[0][0] = 0.0;
 
-        for s in 1..MAX {
+        for s in 0..MAX {
             for from in 0..N {
                 for to in 0..N {
-                    if s & (1 << to) == 0 {
+                    if dp[s][from] == INF || from == to {
                         continue;
                     }
-                    dp[s][to] = dp[s][to].min(dp[s ^ (1 << to)][from] + dist[from][to]);
+                    // from: 1 -> to: 0 except for s = 0
+                    if s != 0 && s & (1 << from) == 0 {
+                        continue;
+                    }
+                    if s & (1 << to) == 1 {
+                        continue;
+                    }
+                    dp[s | 1 << to][to] = dp[s | 1 << to][to].min(dp[s][from] + dist[from][to]);
                 }
             }
         }

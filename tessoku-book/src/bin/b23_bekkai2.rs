@@ -21,6 +21,33 @@ const MOD: usize = 1e9 as usize + 7;
 // const MOD: usize = 998244353;
 // const MOD: usize = 2147483647;
 
+const INF: f64 = std::f64::MAX;
+
+fn dp(s: usize, to: usize, dist: &Vec<Vec<f64>>, N: usize, memo: &mut Vec<Vec<f64>>) -> f64 {
+    if s == 0 {
+        if to == 0 {
+            return 0.0;
+        } else {
+            return INF;
+        }
+    }
+
+    if s & (1 << to) == 0 {
+        return INF;
+    }
+
+    if memo[s][to] != 0.0 {
+        return memo[s][to];
+    }
+
+    let mut ret = INF;
+    for from in 0..N {
+        ret = ret.min(dp(s ^ (1 << to), from, dist, N, memo) + dist[from][to]);
+    }
+    memo[s][to] = ret;
+    ret
+}
+
 #[derive(Default)]
 struct Solver {}
 impl Solver {
@@ -42,23 +69,9 @@ impl Solver {
             }
         }
 
-        let INF = std::f64::MAX;
-        let MAX = 1_usize << N;
-        let mut dp = vec![vec![INF; N]; MAX];
-        dp[0][0] = 0.0;
-
-        for s in 1..MAX {
-            for from in 0..N {
-                for to in 0..N {
-                    if s & (1 << to) == 0 {
-                        continue;
-                    }
-                    dp[s][to] = dp[s][to].min(dp[s ^ (1 << to)][from] + dist[from][to]);
-                }
-            }
-        }
-
-        println!("{}", dp[MAX - 1][0]);
+        let mut memo = vec![vec![0.0; N]; 1 << N];
+        let ans = dp((1 << N) - 1, 0, &dist, N, &mut memo);
+        println!("{}", ans);
     }
 }
 

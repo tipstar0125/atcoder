@@ -31,34 +31,46 @@ impl Solver {
             XY: [(f64, f64); N]
         }
 
-        let mut dist = vec![vec![0.0; N]; N];
+        let mut dist = vec![vec![NotNan::new(0.0).unwrap(); N]; N];
         for i in 0..N {
             for j in 0..N {
                 let (xi, yi) = XY[i];
                 let (xj, yj) = XY[j];
                 let dx = xi - xj;
                 let dy = yi - yj;
-                dist[i][j] = (dx * dx + dy * dy).sqrt();
+                dist[i][j] = NotNan::new((dx * dx + dy * dy).sqrt()).unwrap();
             }
         }
 
-        let INF = std::f64::MAX;
+        let INF = 1e18;
         let MAX = 1_usize << N;
-        let mut dp = vec![vec![INF; N]; MAX];
-        dp[0][0] = 0.0;
+        let mut dp = vec![vec![NotNan::new(INF).unwrap(); N]; MAX];
+        dp[1][0] = NotNan::new(0.0).unwrap();
 
-        for s in 1..MAX {
-            for from in 0..N {
-                for to in 0..N {
-                    if s & (1 << to) == 0 {
-                        continue;
-                    }
-                    dp[s][to] = dp[s][to].min(dp[s ^ (1 << to)][from] + dist[from][to]);
+        for i in 1..MAX {
+            let mut to_list = vec![];
+            let mut from_list = vec![];
+            for j in 0..N {
+                if (i >> j) & 1 == 1 {
+                    from_list.push(j);
+                } else {
+                    to_list.push(j);
+                }
+            }
+
+            for &from in &from_list {
+                for &to in &to_list {
+                    let next = i | (1 << to);
+                    dp[next][to] = min!(dp[next][to], dp[i][from] + dist[from][to]);
                 }
             }
         }
 
-        println!("{}", dp[MAX - 1][0]);
+        let mut ans = NotNan::new(INF).unwrap();
+        for i in 1..N {
+            ans = min!(ans, dp[MAX - 1][i] + dist[i][0]);
+        }
+        println!("{}", ans);
     }
 }
 
