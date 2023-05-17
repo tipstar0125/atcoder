@@ -42,10 +42,10 @@ impl Solver {
             }
         }
 
-        let INF = std::f64::MAX;
+        let INF = NotNan::new(1e18).unwrap();
         let MAX = 1_usize << N;
         let mut dp = vec![vec![INF; N]; MAX];
-        dp[0][0] = 0.0;
+        dp[0][0] = NotNan::new(0.0).unwrap();
 
         for s in 1..MAX {
             for from in 0..N {
@@ -53,7 +53,7 @@ impl Solver {
                     if s & (1 << to) == 0 {
                         continue;
                     }
-                    dp[s][to] = dp[s][to].min(dp[s ^ (1 << to)][from] + dist[from][to]);
+                    dp[s][to] = min!(dp[s][to], dp[s ^ (1 << to)][from] + dist[from][to]);
                 }
             }
         }
