@@ -13,10 +13,6 @@ use proconio::{
     marker::{Chars, Usize1},
 };
 
-const MOD: usize = 1e9 as usize + 7;
-// const MOD: usize = 998244353;
-// const MOD: usize = 2147483647;
-
 #[macro_export]
 macro_rules! max {
     ($x: expr) => ($x);
@@ -31,17 +27,15 @@ macro_rules! min {
         std::cmp::min($x, min!($( $y ),+))
     }
 }
-
 #[derive(Debug, Clone)]
 struct UnionFind {
     parent: Vec<isize>,
     size: usize,
 }
-
 impl UnionFind {
     fn new(n: usize) -> Self {
         UnionFind {
-            parent: vec![-1; n],
+            parent: vec![-1; n + 1],
             size: n,
         }
     }
@@ -85,73 +79,37 @@ impl UnionFind {
     fn get_size(&self) -> usize {
         self.size
     }
-    fn roots(&self) -> Vec<usize> {
-        (0..self.parent.len())
-            .filter(|i| self.parent[*i] < 0)
-            .collect::<Vec<usize>>()
-    }
-    fn members(&mut self, x: usize) -> Vec<usize> {
-        let root = self.find(x);
-        (0..self.parent.len())
-            .filter(|i| self.find(*i) == root)
-            .collect::<Vec<usize>>()
-    }
-    fn all_group_members(&mut self) -> BTreeMap<usize, Vec<usize>> {
-        let mut groups_map: BTreeMap<usize, Vec<usize>> = BTreeMap::new();
-        for x in 0..self.parent.len() {
-            let r = self.find(x);
-            groups_map.entry(r).or_default().push(x);
-        }
-        groups_map
-    }
 }
-
-#[derive(Debug, Clone)]
-struct Comb {
-    facts: Vec<usize>,
-    fact_invs: Vec<usize>,
-}
-
-impl Comb {
-    fn new(n: usize) -> Self {
-        let mut facts = vec![1, 1];
-        let mut fact_invs = vec![1, 1];
-        let mut invs = vec![0, 1];
-        for i in 2..=n {
-            facts.push(facts.last().unwrap() * i % MOD);
-            invs.push((MOD - invs[MOD % i]) * (MOD / i) % MOD);
-            fact_invs.push(fact_invs.last().unwrap() * invs.last().unwrap() % MOD);
-        }
-        Comb { facts, fact_invs }
-    }
-    fn nCr(&self, n: usize, r: usize) -> usize {
-        self.facts[n] * self.fact_invs[n - r] % MOD * self.fact_invs[r] % MOD
-    }
-    fn nHr(&self, n: usize, r: usize) -> usize {
-        self.nCr(n + r - 1, r)
-    }
-}
-
 #[derive(Default)]
 struct Solver {}
 impl Solver {
     #[fastout]
     fn solve(&mut self) {
         input! {
-            N: usize,
-            W: [isize; N]
+            R: usize,
+            X: usize,
+            Y: usize
         }
 
-        let mut ans = 1e18 as isize;
-        for t in 1..N {
-            let s1 = W[..t].iter().sum::<isize>();
-            let s2 = W[t..].iter().sum::<isize>();
-            ans = min!(ans, (s1 - s2).abs());
+        if X * X + Y * Y < R * R {
+            println!("2");
+            return;
         }
-        println!("{}", ans);
+
+        let mut l = 0_usize;
+        let mut r = 1e6 as usize;
+        let eval = |v: usize| -> bool { R * R * v * v >= X * X + Y * Y };
+        while r - l > 1 {
+            let m = (l + r) / 2;
+            if eval(m) {
+                r = m;
+            } else {
+                l = m;
+            }
+        }
+        println!("{}", r);
     }
 }
-
 fn main() {
     std::thread::Builder::new()
         .stack_size(128 * 1024 * 1024)
@@ -179,31 +137,7 @@ fn eratosthenes(n: usize) -> Vec<bool> {
     is_prime_list
 }
 
-fn legendre(n: usize, p: usize) -> usize {
-    let mut cnt = 0_usize;
-    let mut pp = p;
-    while pp <= n {
-        cnt += n / pp;
-        pp *= p;
-    }
-    cnt
-}
-
-fn mod_pow(a: usize, b: usize) -> usize {
-    let mut p = a;
-    let mut ret = 1;
-    let mut n = b;
-    while n > 0 {
-        if n & 1 == 1 {
-            ret = ret * p % MOD;
-        }
-        p = p * p % MOD;
-        n >>= 1;
-    }
-    ret
-}
-
-fn mod_pow2(a: usize, b: usize, m: usize) -> usize {
+fn mod_pow(a: usize, b: usize, m: usize) -> usize {
     let mut p = a;
     let mut ret = 1;
     let mut n = b;
@@ -217,8 +151,8 @@ fn mod_pow2(a: usize, b: usize, m: usize) -> usize {
     ret
 }
 
-fn mod_inv(a: usize, b: usize) -> usize {
-    (a * mod_pow(b, MOD - 2)) % MOD
+fn mod_div(a: usize, b: usize, m: usize) -> usize {
+    (a * mod_pow(b, m - 2, m)) % m
 }
 
 fn prime_factorize(n: usize) -> BTreeMap<usize, usize> {
@@ -252,17 +186,4 @@ fn enum_dividers(n: usize) -> Vec<usize> {
     }
     ret.sort();
     ret
-}
-
-// ax+by=gcd(a, b)
-fn ext_gcd(a: usize, b: usize) -> (isize, isize, usize) {
-    if a == 0 {
-        return (0, 1, b);
-    }
-    let (x, y, g) = ext_gcd(b % a, a);
-    (y - b as isize / a as isize * x, x, g)
-}
-
-fn mod_inv2(x: usize) -> usize {
-    (ext_gcd(x, MOD).0 + MOD as isize) as usize % MOD
 }

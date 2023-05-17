@@ -67,3 +67,9 @@ rustc-hash = "=1.1.0"
 smallvec = "=1.2.0"
 
 [dev-dependencies]
+
+[features]
+local = []
+
+[profile.dev]
+opt-level = 3
