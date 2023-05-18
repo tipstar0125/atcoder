@@ -18,13 +18,96 @@ use proconio::{
 const MOD: usize = 1e9 as usize + 7;
 // const MOD: usize = 998244353;
 // const MOD: usize = 2147483647;
+const DIJ4: [(usize, usize); 4] = [(!0, 0), (0, !0), (1, 0), (0, 1)];
 
 #[derive(Default)]
 struct Solver {}
 impl Solver {
     #[fastout]
     fn solve(&mut self) {
-        input! {}
+        input! {
+            H: usize,
+            W: usize,
+            T: usize,
+            A: [Chars; H]
+        }
+
+        let mut start_pos = (0, 0);
+        let mut goal_pos = (0, 0);
+        let mut snacks = vec![];
+        for i in 0..H {
+            for j in 0..W {
+                let a = A[i][j];
+                if a == 'S' {
+                    start_pos = (i, j);
+                } else if a == 'G' {
+                    goal_pos = (i, j);
+                } else if a == 'o' {
+                    snacks.push((i, j));
+                }
+            }
+        }
+        let mut pos = vec![];
+        pos.push(start_pos);
+        pos.extend(snacks);
+        pos.push(goal_pos);
+
+        let INF = 1e9 as usize;
+        let L = pos.len();
+        let mut dist = vec![vec![INF; H * W]; L];
+
+        for (i, &(si, sj)) in pos.iter().enumerate() {
+            let mut Q = VecDeque::new();
+            Q.push_back((si, sj));
+            dist[i][si * W + sj] = 0;
+            while !Q.is_empty() {
+                let (r, c) = Q.pop_front().unwrap();
+                let d = dist[i][r * W + c];
+                for &(dr, dc) in &DIJ4 {
+                    let row = r.wrapping_add(dr);
+                    let col = c.wrapping_add(dc);
+                    if row < H
+                        && col < W
+                        && A[row][col] != '#'
+                        && dist[i][row * W + col].chmin(d + 1)
+                    {
+                        Q.push_back((row, col));
+                    }
+                }
+            }
+        }
+
+        let mut d = vec![vec![INF; L]; L];
+        for i in 0..L {
+            for j in 0..L {
+                d[i][j] = dist[i][pos[j].0 * W + pos[j].1];
+            }
+        }
+
+        let MAX = 1_usize << L;
+        let mut dp = vec![vec![INF; L]; MAX];
+        dp[0][0] = 0;
+        for s in 1..MAX {
+            for from in 0..L {
+                for to in 0..L {
+                    if s & (1 << to) == 0 {
+                        continue;
+                    }
+                    let dd = dp[s ^ (1 << to)][from];
+                    dp[s][to].chmin(dd + d[from][to]);
+                }
+            }
+        }
+
+        let mut ans = -1;
+        for s in 0..MAX {
+            if dp[s][L - 1] > T {
+                continue;
+            }
+            let cnt = s.count_ones() as isize - 2;
+            ans = max!(ans, cnt);
+        }
+        println!("{}", ans);
     }
 }
 
@@ -92,6 +175,26 @@ macro_rules! min {
     ($x: expr) => ($x);
     ($x: expr, $( $y: expr ),+) => {
         std::cmp::min($x, min!($( $y ),+))
+    }
+}
+
+pub trait ChangeMinMax {
+    fn chmin(&mut self, x: Self) -> bool;
+    fn chmax(&mut self, x: Self) -> bool;
+}
+
+impl<T: PartialOrd> ChangeMinMax for T {
+    fn chmin(&mut self, x: Self) -> bool {
+        *self > x && {
+            *self = x;
+            true
+        }
+    }
+    fn chmax(&mut self, x: Self) -> bool {
+        *self < x && {
+            *self = x;
+            true
+        }
     }
 }
 

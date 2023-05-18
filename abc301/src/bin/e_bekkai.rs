@@ -6,10 +6,10 @@
 #![allow(clippy::nonminimal_bool)]
 #![allow(clippy::neg_multiply)]
 #![allow(dead_code)]
-use std::collections::BTreeMap;
-use std::ops;
-
 use itertools::Itertools;
+use std::cmp::Reverse;
+use std::collections::{BTreeMap, BTreeSet, BinaryHeap, VecDeque};
+
 use proconio::{
     fastout, input,
     marker::{Chars, Usize1},
@@ -18,6 +18,164 @@ use proconio::{
 const MOD: usize = 1e9 as usize + 7;
 // const MOD: usize = 998244353;
 // const MOD: usize = 2147483647;
+
+#[derive(Default)]
+struct Solver {}
+impl Solver {
+    #[fastout]
+    fn solve(&mut self) {
+        input! {
+            H: usize,
+            W: usize,
+            T: usize,
+            A: [Chars; H]
+        }
+
+        let mut start_pos = 0;
+        let mut goal_pos = 0;
+        let mut snacks = vec![];
+        for i in 0..H {
+            for j in 0..W {
+                let pos = i * W + j;
+                let a = A[i][j];
+                if a == 'S' {
+                    start_pos = pos;
+                } else if a == 'G' {
+                    goal_pos = pos;
+                } else if a == 'o' {
+                    snacks.push(pos);
+                }
+            }
+        }
+        let mut pos = vec![];
+        pos.push(start_pos);
+        pos.extend(snacks);
+        pos.push(goal_pos);
+
+        let mut G = vec![vec![]; H * W];
+        for i in 0..H {
+            for j in 1..W {
+                if A[i][j - 1] != '#' && A[i][j] != '#' {
+                    let u = i * W + j - 1;
+                    let v = i * W + j;
+                    G[u].push(v);
+                    G[v].push(u);
+                }
+            }
+        }
+        for j in 0..W {
+            for i in 1..H {
+                if A[i - 1][j] != '#' && A[i][j] != '#' {
+                    let u = (i - 1) * W + j;
+                    let v = i * W + j;
+                    G[u].push(v);
+                    G[v].push(u);
+                }
+            }
+        }
+
+        let INF = 1e9 as usize;
+        let L = pos.len();
+        let mut dist = vec![vec![INF; H * W]; L];
+        for (i, &start) in pos.iter().enumerate() {
+            let mut Q = VecDeque::new();
+            Q.push_back(start);
+            dist[i][start] = 0;
+            while !Q.is_empty() {
+                let p = Q.pop_front().unwrap();
+                for &next in &G[p] {
+                    if dist[i][p] + 1 < dist[i][next] {
+                        dist[i][next] = dist[i][p] + 1;
+                        Q.push_back(next);
+                    }
+                }
+            }
+        }
+
+        let mut d = vec![vec![INF; L]; L];
+        for i in 0..L {
+            for j in 0..L {
+                d[i][j] = dist[i][pos[j]];
+            }
+        }
+
+        let MAX = 1_usize << L;
+        let mut dp = vec![vec![INF; L]; MAX];
+        dp[0][0] = 0;
+        for s in 1..MAX {
+            for from in 0..L {
+                for to in 0..L {
+                    if s & (1 << to) == 0 {
+                        continue;
+                    }
+                    dp[s][to] = min!(dp[s][to], dp[s ^ (1 << to)][from] + d[from][to]);
+                }
+            }
+        }
+
+        let mut ans = -1;
+        for s in 0..MAX {
+            if dp[s][L - 1] > T {
+                continue;
+            }
+            let cnt = s.count_ones() as isize - 2;
+            ans = max!(ans, cnt);
+        }
+        println!("{}", ans);
+    }
+}
+
+fn main() {
+    std::thread::Builder::new()
+        .stack_size(128 * 1024 * 1024)
+        .spawn(|| Solver::default().solve())
+        .unwrap()
+        .join()
+        .unwrap();
+}
+
+mod rnd {
+    static mut S: usize = 0;
+    static MAX: usize = 1e9 as usize;
+
+    #[inline]
+    pub fn init(seed: usize) {
+        unsafe {
+            if seed == 0 {
+                let t = std::time::SystemTime::now()
+                    .duration_since(std::time::UNIX_EPOCH)
+                    .unwrap()
+                    .as_secs() as usize;
+                S = t
+            } else {
+                S = seed;
+            }
+        }
+    }
+    #[inline]
+    pub fn gen() -> usize {
+        unsafe {
+            if S == 0 {
+                init(0);
+            }
+            S ^= S << 7;
+            S ^= S >> 9;
+            S
+        }
+    }
+    #[inline]
+    pub fn gen_range(a: usize, b: usize) -> usize {
+        gen() % (b - a) + a
+    }
+    #[inline]
+    pub fn gen_bool() -> bool {
+        gen() & 1 == 1
+    }
+    #[inline]
+    pub fn gen_float() -> f64 {
+        ((gen() % MAX) as f64) / MAX as f64
+    }
+}
 
 #[macro_export]
 macro_rules! max {
@@ -196,8 +354,8 @@ impl WeightedUnionFind {
     }
 }
 
-type M = ModInt;
-#[derive(Debug, Clone, Copy)]
+type Mod = ModInt;
+#[derive(Debug, Clone, Copy, Default)]
 struct ModInt {
     value: usize,
 }
@@ -233,21 +391,21 @@ impl ModInt {
     }
 }
 
-impl ops::Add for ModInt {
+impl std::ops::Add for ModInt {
     type Output = ModInt;
     fn add(self, other: Self) -> Self {
         ModInt::new(self.value + other.value)
     }
 }
 
-impl ops::Sub for ModInt {
+impl std::ops::Sub for ModInt {
     type Output = ModInt;
     fn sub(self, other: Self) -> Self {
         ModInt::new(MOD + self.value - other.value)
     }
 }
 
-impl ops::Mul for ModInt {
+impl std::ops::Mul for ModInt {
     type Output = ModInt;
     fn mul(self, other: Self) -> Self {
         ModInt::new(self.value * other.value)
@@ -255,32 +413,32 @@ impl ops::Mul for ModInt {
 }
 
 #[allow(clippy::suspicious_arithmetic_impl)]
-impl ops::Div for ModInt {
+impl std::ops::Div for ModInt {
     type Output = ModInt;
     fn div(self, other: Self) -> Self {
         self * other.inv()
     }
 }
 
-impl ops::AddAssign for ModInt {
+impl std::ops::AddAssign for ModInt {
     fn add_assign(&mut self, other: Self) {
         *self = *self + other;
     }
 }
 
-impl ops::SubAssign for ModInt {
+impl std::ops::SubAssign for ModInt {
     fn sub_assign(&mut self, other: Self) {
         *self = *self - other;
     }
 }
 
-impl ops::MulAssign for ModInt {
+impl std::ops::MulAssign for ModInt {
     fn mul_assign(&mut self, other: Self) {
         *self = *self * other;
     }
 }
 
-impl ops::DivAssign for ModInt {
+impl std::ops::DivAssign for ModInt {
     fn div_assign(&mut self, other: Self) {
         *self = *self / other;
     }
@@ -294,12 +452,12 @@ struct Comb {
 
 impl Comb {
     fn new(n: usize) -> Self {
-        let mut fact = vec![M::one(), M::one()];
-        let mut fact_inverse = vec![M::one(), M::one()];
-        let mut inverse = vec![M::zero(), M::one()];
+        let mut fact = vec![Mod::one(), Mod::one()];
+        let mut fact_inverse = vec![Mod::one(), Mod::one()];
+        let mut inverse = vec![Mod::zero(), Mod::one()];
         for i in 2..=n {
-            fact.push(*fact.last().unwrap() * M::new(i));
-            inverse.push((M::zero() - inverse[MOD % i]) * M::new(MOD / i));
+            fact.push(*fact.last().unwrap() * Mod::new(i));
+            inverse.push((Mod::zero() - inverse[MOD % i]) * Mod::new(MOD / i));
             fact_inverse.push(*fact_inverse.last().unwrap() * *inverse.last().unwrap());
         }
         Comb { fact, fact_inverse }
@@ -312,70 +470,29 @@ impl Comb {
     }
 }
 
-const DIJ4: [(usize, usize); 4] = [(1, 1), (1, !0), (!0, 1), (!0, !0)];
-
-#[derive(Default)]
-struct Solver {}
-impl Solver {
-    #[fastout]
-    fn solve(&mut self) {
-        input! {
-            H: usize,
-            W: usize,
-            C: [Chars; H]
-        }
-
-        let N = min!(H, W);
-        let mut ans = vec![0_usize; N];
-
-        let eval = |row: usize, col: usize, dr: usize, dc: usize, cnt: usize| -> bool {
-            let r = row.wrapping_add(dr.wrapping_mul(cnt));
-            let c = col.wrapping_add(dc.wrapping_mul(cnt));
-            if r >= H {
-                return false;
-            }
-            if c >= W {
-                return false;
-            }
-            if C[r][c] != '#' {
-                return false;
-            }
-            true
-        };
-
-        for i in 0..H {
-            for j in 0..W {
-                if C[i][j] == '#' {
-                    let mut cnt = 0_usize;
-                    let mut ok = true;
-                    while ok {
-                        for &(dr, dc) in &DIJ4 {
-                            if !eval(i, j, dr, dc, cnt + 1) {
-                                ok = false;
-                                break;
-                            }
-                        }
-                        if ok {
-                            cnt += 1;
-                        }
-                    }
-                    if cnt > 0 {
-                        ans[cnt - 1] += 1;
-                    }
-                }
-            }
-        }
-        println!("{}", ans.iter().join(" "));
-    }
+trait ArgOrd<T> {
+    fn argmax(&self) -> Option<usize>;
+    fn argmin(&self) -> Option<usize>;
+    fn argsort(&self) -> Vec<usize>;
+    fn argsort_reverse(&self) -> Vec<usize>;
 }
 
-fn main() {
-    std::thread::Builder::new()
-        .stack_size(128 * 1024 * 1024)
-        .spawn(|| Solver::default().solve())
-        .unwrap()
-        .join()
-        .unwrap();
+impl<T: Ord> ArgOrd<T> for [T] {
+    fn argmax(&self) -> Option<usize> {
+        (0..self.len()).max_by_key(|&i| &self[i])
+    }
+
+    fn argmin(&self) -> Option<usize> {
+        (0..self.len()).min_by_key(|&i| &self[i])
+    }
+    fn argsort(&self) -> Vec<usize> {
+        (0..self.len()).sorted_by_key(|&i| &self[i]).collect_vec()
+    }
+    fn argsort_reverse(&self) -> Vec<usize> {
+        (0..self.len())
+            .sorted_by_key(|&i| std::cmp::Reverse(&self[i]))
+            .collect_vec()
+    }
 }
 
 fn eratosthenes(n: usize) -> Vec<bool> {
@@ -490,4 +607,43 @@ fn coordinate_compression<T: std::cmp::Ord + Copy>(v: Vec<T>) -> BTreeMap<T, usi
     vv.dedup();
     let ret = vv.iter().enumerate().map(|(i, &s)| (s, i)).collect();
     ret
+}
+
+fn transpose_vec<T>(v: Vec<Vec<T>>) -> Vec<Vec<T>> {
+    assert!(!v.is_empty());
+    let N = v[0].len();
+    let mut iters: Vec<_> = v.into_iter().map(|n| n.into_iter()).collect();
+    (0..N)
+        .map(|_| {
+            iters
+                .iter_mut()
+                .map(|n| n.next().unwrap())
+                .collect::<Vec<T>>()
+        })
+        .collect()
+}
+
+fn transpose_vec_deque<T>(v: VecDeque<VecDeque<T>>) -> VecDeque<VecDeque<T>> {
+    assert!(!v.is_empty());
+    let N = v[0].len();
+    let mut iters: VecDeque<_> = v.into_iter().map(|n| n.into_iter()).collect();
+    (0..N)
+        .map(|_| {
+            iters
+                .iter_mut()
+                .map(|n| n.next().unwrap())
+                .collect::<VecDeque<T>>()
+        })
+        .collect()
+}
+
+fn run_length_encoding<T: Eq>(v: Vec<T>) -> Vec<(T, usize)> {
+    let mut v = v.into_iter().map(|v| (v, 1)).collect::<Vec<_>>();
+    v.dedup_by(|a, b| {
+        a.0 == b.0 && {
+            b.1 += a.1;
+            true
+        }
+    });
+    v
 }
