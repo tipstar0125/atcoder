@@ -68,7 +68,7 @@ impl RollingHash {
             p %= m;
             power.push(p);
 
-            let num = (s[i] as u8 - b'a' + 1) as usize;
+            let num = s[i] as u8 as usize;
             h *= base;
             h += num;
             h %= m;
