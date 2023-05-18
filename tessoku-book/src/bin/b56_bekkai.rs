@@ -25,7 +25,7 @@ impl Solver {
             N: usize,
             Q: usize,
             mut S: Chars,
-            LR: [(usize, usize); Q]
+            LR: [(Usize1, usize); Q]
         }
 
         let S_rev: Vec<char> = S.clone().into_iter().rev().collect();
@@ -33,9 +33,9 @@ impl Solver {
         let rh = RH::new(S);
 
         for &(l, r) in &LR {
-            let l_rev = 2 * N - r + 1;
+            let l_rev = 2 * N - r;
             let r_rev = l_rev + r - l;
-            if rh.calc(l, r) == rh.calc(l_rev, r_rev) {
+            if rh.get(l, r) == rh.get(l_rev, r_rev) {
                 println!("Yes");
             } else {
                 println!("No");
@@ -62,7 +62,7 @@ impl RollingHash {
         let mut power = vec![p];
         let mut h = 0_usize;
         let mut hash = vec![h];
-        
+
         for i in 0..n {
             p *= base;
             p %= m;
@@ -76,8 +76,8 @@ impl RollingHash {
         }
         RollingHash { m, power, hash }
     }
-    fn calc(&self, l: usize, r: usize) -> usize {
-        (self.m + self.hash[r] - self.hash[l - 1] * self.power[r - l + 1] % self.m) % self.m
+    fn get(&self, l: usize, r: usize) -> usize {
+        (self.m + self.hash[r] - self.hash[l] * self.power[r - l] % self.m) % self.m
     }
 }
 

@@ -25,13 +25,13 @@ impl Solver {
             _N: usize,
             Q: usize,
             S: Chars,
-            ABCD: [(usize, usize, usize, usize); Q]
+            ABCD: [(Usize1, usize, Usize1, usize); Q]
         }
 
         let rh = RH::new(S);
 
         for &(a, b, c, d) in &ABCD {
-            if rh.calc(a, b) == rh.calc(c, d) {
+            if rh.get(a, b) == rh.get(c, d) {
                 println!("Yes");
             } else {
                 println!("No");
@@ -51,22 +51,20 @@ impl RollingHash {
     fn new(s: Vec<char>) -> Self {
         let n = s.len();
         let base = rnd::gen_range(2, 1000);
-        let mut p = 1_usize;
-        let mut power = vec![p];
-
         let mod_list = vec![1e9 as usize + 7, 998244353, 2147483647];
         let m = mod_list[rnd::gen_range(0, mod_list.len())];
 
-        for _ in 0..n {
+        let mut p = 1_usize;
+        let mut power = vec![p];
+        let mut h = 0_usize;
+        let mut hash = vec![h];
+
+        for i in 0..n {
             p *= base;
             p %= m;
             power.push(p);
-        }
 
-        let mut h = 0_usize;
-        let mut hash = vec![h];
-        for i in 0..n {
-            let num = (s[i] as u8 - b'a' + 1) as usize;
+            let num = s[i] as u8 as usize;
             h *= base;
             h += num;
             h %= m;
@@ -74,8 +72,8 @@ impl RollingHash {
         }
         RollingHash { m, power, hash }
     }
-    fn calc(&self, l: usize, r: usize) -> usize {
-        (self.m + self.hash[r] - self.hash[l - 1] * self.power[r - l + 1] % self.m) % self.m
+    fn get(&self, l: usize, r: usize) -> usize {
+        (self.m + self.hash[r] - self.hash[l] * self.power[r - l] % self.m) % self.m
     }
 }
 
