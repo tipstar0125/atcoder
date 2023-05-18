@@ -228,7 +228,14 @@ impl ModInt {
         ret
     }
     fn inv(&self) -> Self {
-        ModInt::new((ext_gcd(self.value, MOD).0 + MOD as isize) as usize)
+        ModInt::new((self.ext_gcd(self.value, MOD).0 + MOD as isize) as usize)
+    }
+    fn ext_gcd(&self, a: usize, b: usize) -> (isize, isize, usize) {
+        if a == 0 {
+            return (0, 1, b);
+        }
+        let (x, y, g) = ext_gcd(b % a, a);
+        (y - b as isize / a as isize * x, x, g)
     }
 }
 
