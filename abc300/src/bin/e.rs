@@ -195,7 +195,7 @@ impl WeightedUnionFind {
     }
 }
 
-type M = ModInt;
+type Mod = ModInt;
 #[derive(Debug, Clone, Copy, Default)]
 struct ModInt {
     value: usize,
@@ -228,32 +228,33 @@ impl ModInt {
         ret
     }
     fn inv(&self) -> Self {
-        ModInt::new((self.ext_gcd(self.value, MOD).0 + MOD as isize) as usize)
-    }
-    fn ext_gcd(&self, a: usize, b: usize) -> (isize, isize, usize) {
-        if a == 0 {
-            return (0, 1, b);
+        fn ext_gcd(a: usize, b: usize) -> (isize, isize, usize) {
+            if a == 0 {
+                return (0, 1, b);
+            }
+            let (x, y, g) = ext_gcd(b % a, a);
+            (y - b as isize / a as isize * x, x, g)
         }
-        let (x, y, g) = ext_gcd(b % a, a);
-        (y - b as isize / a as isize * x, x, g)
+        
+        ModInt::new((ext_gcd(self.value, MOD).0 + MOD as isize) as usize)
     }
 }
 
-impl ops::Add for ModInt {
+impl std::ops::Add for ModInt {
     type Output = ModInt;
     fn add(self, other: Self) -> Self {
         ModInt::new(self.value + other.value)
     }
 }
 
-impl ops::Sub for ModInt {
+impl std::ops::Sub for ModInt {
     type Output = ModInt;
     fn sub(self, other: Self) -> Self {
         ModInt::new(MOD + self.value - other.value)
     }
 }
 
-impl ops::Mul for ModInt {
+impl std::ops::Mul for ModInt {
     type Output = ModInt;
     fn mul(self, other: Self) -> Self {
         ModInt::new(self.value * other.value)
@@ -261,32 +262,32 @@ impl ops::Mul for ModInt {
 }
 
 #[allow(clippy::suspicious_arithmetic_impl)]
-impl ops::Div for ModInt {
+impl std::ops::Div for ModInt {
     type Output = ModInt;
     fn div(self, other: Self) -> Self {
         self * other.inv()
     }
 }
 
-impl ops::AddAssign for ModInt {
+impl std::ops::AddAssign for ModInt {
     fn add_assign(&mut self, other: Self) {
         *self = *self + other;
     }
 }
 
-impl ops::SubAssign for ModInt {
+impl std::ops::SubAssign for ModInt {
     fn sub_assign(&mut self, other: Self) {
         *self = *self - other;
     }
 }
 
-impl ops::MulAssign for ModInt {
+impl std::ops::MulAssign for ModInt {
     fn mul_assign(&mut self, other: Self) {
         *self = *self * other;
     }
 }
 
-impl ops::DivAssign for ModInt {
+impl std::ops::DivAssign for ModInt {
     fn div_assign(&mut self, other: Self) {
         *self = *self / other;
     }
@@ -300,12 +301,12 @@ struct Comb {
 
 impl Comb {
     fn new(n: usize) -> Self {
-        let mut fact = vec![M::one(), M::one()];
-        let mut fact_inverse = vec![M::one(), M::one()];
-        let mut inverse = vec![M::zero(), M::one()];
+        let mut fact = vec![Mod::one(), Mod::one()];
+        let mut fact_inverse = vec![Mod::one(), Mod::one()];
+        let mut inverse = vec![Mod::zero(), Mod::one()];
         for i in 2..=n {
-            fact.push(*fact.last().unwrap() * M::new(i));
-            inverse.push((M::zero() - inverse[MOD % i]) * M::new(MOD / i));
+            fact.push(*fact.last().unwrap() * Mod::new(i));
+            inverse.push((Mod::zero() - inverse[MOD % i]) * Mod::new(MOD / i));
             fact_inverse.push(*fact_inverse.last().unwrap() * *inverse.last().unwrap());
         }
         Comb { fact, fact_inverse }
@@ -327,16 +328,16 @@ impl Solver {
             N: usize
         }
 
-        let mut dp: BTreeMap<usize, M> = BTreeMap::new();
-        *dp.entry(1).or_default() += M::one();
-        let mut ans = M::zero();
+        let mut dp: BTreeMap<usize, Mod> = BTreeMap::new();
+        *dp.entry(1).or_default() += Mod::one();
+        let mut ans = Mod::zero();
 
         while !dp.is_empty() {
-            let mut ndp: BTreeMap<usize, M> = BTreeMap::new();
+            let mut ndp: BTreeMap<usize, Mod> = BTreeMap::new();
             for (k, v) in &dp {
                 for i in 2..=6 {
                     if k * i <= N {
-                        *ndp.entry(k * i).or_default() += *v / M::new(5);
+                        *ndp.entry(k * i).or_default() += *v / Mod::new(5);
                     }
                 }
             }
