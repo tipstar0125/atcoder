@@ -25,8 +25,12 @@ impl Solver {
             A: usize,
             B: usize
         }
-        println!("{}", (A + B - 1) / B);
+        println!("{}", ceil(A, B));
     }
+}
+
+fn ceil(a: usize, b: usize) -> usize {
+    (a + b - 1) / b
 }
 
 fn main() {
