@@ -1,0 +1,56 @@
+---
+type: Batch
+timelimit: 2s
+match: Lines
+
+cases:
+  - name: sample1
+    in: |
+      4
+      hoge
+      english
+      hoge
+      enigma
+    out: |
+      No
+  - name: sample2
+    in: |
+      9
+      basic
+      c
+      cpp
+      php
+      python
+      nadesico
+      ocaml
+      lua
+      assembly
+    out: |
+      Yes
+  - name: sample3
+    in: |
+      8
+      a
+      aa
+      aaa
+      aaaa
+      aaaaa
+      aaaaaa
+      aaa
+      aaaaaaa
+    out: |
+      No
+  - name: sample4
+    in: |
+      3
+      abc
+      arc
+      agc
+    out: |
+      No
+
+extend:
+  - type: Text
+    path: "./b"
+    in: /in/*.txt
+    out: /out/*.txt
