@@ -16,8 +16,7 @@ use proconio::{
     marker::{Chars, Usize1},
 };
 
-const DIJ9: [(usize, usize); 9] = [
-    (0, 0),
+const DIJ8: [(usize, usize); 8] = [
     (!0, !0),
     (0, !0),
     (1, !0),
@@ -43,7 +42,7 @@ impl Solver {
         let snuke: Vec<char> = snuke.chars().collect();
         for i in 0..H {
             for j in 0..W {
-                for &(dr, dc) in &DIJ9 {
+                for &(dr, dc) in &DIJ8 {
                     let mut ans = vec![];
                     for (cnt, &x) in snuke.iter().enumerate() {
                         let row = i.wrapping_add(dr.wrapping_mul(cnt));
