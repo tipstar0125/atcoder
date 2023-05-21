@@ -16,7 +16,8 @@ use proconio::{
     marker::{Chars, Usize1},
 };
 
-const DIJ8: [(usize, usize); 8] = [
+const DIJ9: [(usize, usize); 9] = [
+    (0, 0),
     (!0, !0),
     (0, !0),
     (1, !0),
@@ -38,35 +39,29 @@ impl Solver {
             S: [Chars; H]
         }
 
-        let is_area = |r: usize, c: usize, dr: usize, dc: usize, cnt: usize| -> bool {
-            let row = r.wrapping_add(dr.wrapping_mul(cnt));
-            let col = c.wrapping_add(dc.wrapping_mul(cnt));
-            row < H && col < W
-        };
-        let snuke = vec!['n', 'u', 'k', 'e'];
+        let snuke = "snuke";
+        let snuke: Vec<char> = snuke.chars().collect();
         for i in 0..H {
             for j in 0..W {
-                if S[i][j] == 's' {
-                    for &(dr, dc) in &DIJ8 {
-                        let mut ans = vec![(i, j)];
-                        for (cnt, &x) in snuke.iter().enumerate() {
-                            if !is_area(i, j, dr, dc, cnt + 1) {
-                                break;
-                            }
-                            let row = i.wrapping_add(dr.wrapping_mul(cnt + 1));
-                            let col = j.wrapping_add(dc.wrapping_mul(cnt + 1));
-                            if S[row][col] != x {
-                                break;
-                            } else {
-                                ans.push((row, col));
-                            }
+                for &(dr, dc) in &DIJ9 {
+                    let mut ans = vec![];
+                    for (cnt, &x) in snuke.iter().enumerate() {
+                        let row = i.wrapping_add(dr.wrapping_mul(cnt));
+                        let col = j.wrapping_add(dc.wrapping_mul(cnt));
+                        if row >= H || col >= W {
+                            break;
                         }
-                        if ans.len() == 5 {
-                            for &(row, col) in &ans {
-                                println!("{} {}", row + 1, col + 1);
-                            }
-                            return;
+                        if S[row][col] != x {
+                            break;
+                        } else {
+                            ans.push((row, col));
                         }
+                    }
+                    if ans.len() == 5 {
+                        for &(row, col) in &ans {
+                            println!("{} {}", row + 1, col + 1);
+                        }
+                        return;
                     }
                 }
             }

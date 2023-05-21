@@ -39,12 +39,9 @@ impl Solver {
                     u: Usize1,
                     v: Usize1
                 }
-                if G[u].is_empty() {
-                    cnt -= 1;
-                }
-                if G[v].is_empty() {
-                    cnt -= 1;
-                }
+
+                cnt -= G[u].is_empty() as usize;
+                cnt -= G[v].is_empty() as usize;
                 G[u].insert(v);
                 G[v].insert(u);
             } else {
@@ -52,17 +49,11 @@ impl Solver {
                     v: Usize1
                 }
 
-                for &next in G[v].clone().iter() {
+                cnt += !G[v].is_empty() as usize;
+                for next in std::mem::take(&mut G[v]) {
                     G[next].remove(&v);
-                    if G[next].is_empty() {
-                        cnt += 1
-                    }
+                    cnt += G[next].is_empty() as usize;
                 }
-
-                if !G[v].is_empty() {
-                    cnt += 1;
-                }
-                G[v].clear();
             }
             println!("{}", cnt);
         }

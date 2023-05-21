@@ -33,22 +33,22 @@ impl Solver {
                 S: [Usize1; A]
             }
             for &s in &S {
-                G[i].push(s + N);
-                G[s + N].push(i);
+                G[i].push((s + N, 1));
+                G[s + N].push((i, 0));
             }
         }
 
-        let mut Q = VecDeque::new();
+        let mut Q = BinaryHeap::new();
         let INF = 1_usize << 60;
         let mut dist = vec![INF; N + M];
-        Q.push_back(N);
         dist[N] = 0;
+        Q.push(Reverse((dist[N], N)));
         while !Q.is_empty() {
-            let pos = Q.pop_front().unwrap();
-            for &next in &G[pos] {
-                if dist[pos] + 1 < dist[next] {
-                    dist[next] = dist[pos] + 1;
-                    Q.push_back(next);
+            let Reverse((_, pos)) = Q.pop().unwrap();
+            for &(next, d) in &G[pos] {
+                if dist[pos] + d < dist[next] {
+                    dist[next] = dist[pos] + d;
+                    Q.push(Reverse((dist[next], next)));
                 }
             }
         }
@@ -56,7 +56,7 @@ impl Solver {
         if dist[N + M - 1] >= INF {
             println!("-1");
         } else {
-            let ans = dist[N + M - 1] / 2 - 1;
+            let ans = dist[N + M - 1] - 1;
             println!("{}", ans);
         }
     }
