@@ -138,14 +138,26 @@ impl State {
                     continue;
                 }
                 let add_h = h as isize - manhattan_dist;
-                let before_diff = (A[i][j] - self.mountain[i][j]).abs();
-                let now_diff = (A[i][j] - (self.mountain[i][j] + add_h)).abs();
+                let a = A[i][j];
+                let mountain = self.mountain[i][j];
+                let before_diff = if a <= mountain {
+                    (mountain - a) * 2
+                } else {
+                    a - mountain
+                };
+                let now_diff = if a <= mountain + add_h {
+                    (mountain + add_h - a) * 2
+                } else {
+                    a - mountain - add_h
+                };
+                // let before_diff = (A[i][j] - self.mountain[i][j]).abs();
+                // let now_diff = (A[i][j] - (self.mountain[i][j] + add_h)).abs();
                 score += before_diff - now_diff;
             }
         }
         score
     }
-    fn advance(&mut self, x: usize, y: usize, h: usize) {
+    fn advance(&mut self, x: usize, y: usize, h: usize, bit: &mut BinaryIndexedTree) {
         for i in 0..N {
             for j in 0..N {
                 let manhattan_dist =
@@ -155,6 +167,8 @@ impl State {
                 }
                 let add_h = h as isize - manhattan_dist;
                 self.mountain[i][j] += add_h;
+                let delta = -min!(bit.range_sum(i * N + j, i * N + j + 1), add_h);
+                bit.add(i * N + j, delta);
             }
         }
         self.turn += 1;
@@ -182,23 +196,50 @@ impl Solver {
         let mut state = State::new();
         let mut query = vec![];
 
-        let start_temp = 30.0;
-        let end_temp = 2.0;
+        // let start_temp = 30.0;
+        // let end_temp = 2.0;
+
+        let get_point_lower_start = 10000;
+        let get_point_lower_end = 0;
+
+        let mut bit = BinaryIndexedTree::new(N * N);
+        for i in 0..N {
+            for j in 0..N {
+                let pos = i * N + j;
+                bit.add(pos, A[i][j]);
+            }
+        }
+        let mut rnd_max = bit.sum(N * N) as usize;
 
         while !state.isDone() && !time_keeper.isTimeOver() {
-            let x = rnd::gen_range(0, N);
-            let y = rnd::gen_range(0, N);
+            // let x = rnd::gen_range(0, N);
+            // let y = rnd::gen_range(0, N);
+
+            let r = rnd::gen_range(0, rnd_max);
+            let pos = bit.upper_bound(r as isize);
+            let x = pos / N;
+            let y = pos % N;
+            // let h_upper = min!(N, max!(2, (state.mountain[x][y] - A[x][y]).abs()) as usize);
+            // let h = h_upper;
             let h = rnd::gen_range(1, N + 1);
 
             let current_score = state.score;
             let new_score = state.get_score(x, y, h);
-            let T = start_temp + (end_temp - start_temp) * (state.turn as f64 / MAX_Q as f64);
-            // new_score >= current_score => new_score - current_score >= 0 => good
-            let prob = ((new_score as f64 - current_score as f64) / T).exp();
-            // 0 <= rng.gen::<f64>() <= 1
-            if rnd::gen_float() < prob {
-                state.advance(x, y, h);
+
+            // let T = start_temp + (end_temp - start_temp) * (state.turn as f64 / MAX_Q as f64);
+            // // new_score >= current_score => new_score - current_score >= 0 => good
+            // let prob = ((new_score as f64 - current_score as f64) / T).exp();
+            // // 0 <= rng.gen::<f64>() <= 1
+            // if rnd::gen_float() < prob {
+
+            let get_point_lower = get_point_lower_start
+                - (get_point_lower_start - get_point_lower_end) * state.turn / MAX_Q;
+
+            if new_score >= current_score + get_point_lower as isize {
+                // if new_score >= current_score {
+                state.advance(x, y, h, &mut bit);
                 query.push((x, y, h));
+                rnd_max = bit.sum(N * N) as usize;
             }
         }
 
@@ -215,6 +256,120 @@ impl Solver {
             elapsed_time *= 1.5;
         }
         eprintln!("Elapsed time: {}sec", elapsed_time);
+    }
+}
+
+#[macro_export]
+macro_rules! max {
+    ($x: expr) => ($x);
+    ($x: expr, $( $y: expr ),+) => {
+        std::cmp::max($x, max!($( $y ),+))
+    }
+}
+#[macro_export]
+macro_rules! min {
+    ($x: expr) => ($x);
+    ($x: expr, $( $y: expr ),+) => {
+        std::cmp::min($x, min!($( $y ),+))
+    }
+}
+
+#[derive(Debug, Clone)]
+struct BinaryIndexedTree {
+    size: usize,
+    data: Vec<isize>,
+}
+
+impl BinaryIndexedTree {
+    fn new(n: usize) -> Self {
+        BinaryIndexedTree {
+            size: n,
+            data: vec![0; n],
+        }
+    }
+    fn lsb(&self, i: usize) -> usize {
+        i & i.wrapping_neg()
+    }
+    fn build(&mut self, v: &[isize]) {
+        assert_eq!(self.size, v.len(), "size not correct!");
+        self.data = v.to_vec();
+        for i in 1..=self.size {
+            let lsb = self.lsb(i);
+            if i + lsb <= self.size {
+                self.data[i + lsb - 1] += self.data[i - 1];
+            }
+        }
+    }
+    fn push(&mut self, mut x: isize) {
+        self.size += 1;
+        let mut d = 1;
+        let k = self.lsb(self.size);
+        while d != k {
+            x += self.data[self.size - d - 1];
+            d <<= 1;
+        }
+        self.data.push(x);
+    }
+    fn add(&mut self, i: usize, x: isize) {
+        let mut idx = i + 1;
+        while idx <= self.size {
+            self.data[idx - 1] += x;
+            idx += self.lsb(idx);
+        }
+    }
+    //  [0, r)
+    fn sum(&self, i: usize) -> isize {
+        let mut ret = 0;
+        let mut idx = i;
+        while idx > 0 {
+            ret += self.data[idx - 1];
+            idx -= self.lsb(idx);
+        }
+        ret
+    }
+    // [l, r)
+    fn range_sum(&self, l: usize, r: usize) -> isize {
+        self.sum(r) - self.sum(l)
+    }
+    fn lower_bound(&self, x: isize) -> usize {
+        let mut i = 0;
+        let mut k = 1;
+        let mut x = x;
+        while k <= self.size {
+            k <<= 1;
+        }
+        while k > 0 {
+            if i + k <= self.size && self.data[i + k - 1] < x {
+                x -= self.data[i + k - 1];
+                i += k;
+            }
+            k >>= 1;
+        }
+        if x > 0 {
+            i
+        } else {
+            0
+        }
+    }
+    fn upper_bound(&self, x: isize) -> usize {
+        let mut i = 0;
+        let mut k = 1;
+        let mut x = x;
+        while k <= self.size {
+            k <<= 1;
+        }
+        while k > 0 {
+            if i + k <= self.size && self.data[i + k - 1] <= x {
+                x -= self.data[i + k - 1];
+                i += k;
+            }
+            k >>= 1;
+        }
+        if i < self.size {
+            i
+        } else {
+            self.size
+        }
     }
 }
 
