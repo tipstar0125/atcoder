@@ -26,48 +26,49 @@ impl Solver {
             UV: [(Usize1, Usize1); N - 1]
         }
 
-        let mut degs = vec![0_usize; N];
         let mut G = vec![vec![]; N];
         for &(u, v) in &UV {
-            degs[u] += 1;
-            degs[v] += 1;
             G[u].push(v);
             G[v].push(u);
         }
 
-        let mut iter = 1_usize..;
-        let INF = 9e18 as usize;
-        let mut ans = vec![(INF, 0); N];
-        let mut Q = VecDeque::new();
+        let mut cnt = 1_usize;
+        let mut ans = vec![(0, 0); N];
         let mut visited = vec![false; N];
-        for (i, &d) in degs.iter().enumerate() {
-            if d == 1 && i != 0 {
-                let x = iter.next().unwrap();
-                ans[i] = (x, x);
-                Q.push_back(i);
-                visited[i] = true;
-            }
-        }
+        visited[0] = true;
+        dfs(0, &G, &mut visited, &mut ans, &mut cnt);
 
-        while !Q.is_empty() {
-            let pos = Q.pop_front().unwrap();
-            for &next in &G[pos] {
-                if !visited[next] {
-                    degs[next] -= 1;
-                    ans[next].0 = min!(ans[next].0, ans[pos].0);
-                    ans[next].1 = max!(ans[next].1, ans[pos].1);
-                    if degs[next] == 1 && next != 0 {
-                        Q.push_back(next);
-                        visited[next] = true;
-                    }
-                }
-            }
-        }
-
-        for row in &ans {
-            println!("{} {}", row.0, row.1);
+        for &a in &ans {
+            println!("{} {}", a.0, a.1);
         }
     }
+}
+
+fn dfs(
+    pos: usize,
+    G: &Vec<Vec<usize>>,
+    visited: &mut Vec<bool>,
+    ans: &mut Vec<(usize, usize)>,
+    cnt: &mut usize,
+) -> (usize, usize) {
+    let INF = 1_usize << 60;
+    let mut lr = (INF, 0);
+    for &next in &G[pos] {
+        if !visited[next] {
+            visited[next] = true;
+            let (l, r) = dfs(next, G, visited, ans, cnt);
+            lr.0 = min!(lr.0, l);
+            lr.1 = max!(lr.1, r);
+        }
+    }
+
+    if lr == (INF, 0) {
+        lr = (*cnt, *cnt);
+        *cnt += 1;
+    }
+    ans[pos] = lr;
+
+    lr
 }
 
 #[macro_export]
