@@ -130,6 +130,7 @@ impl State {
     }
     fn get_score(&self, x: usize, y: usize, h: usize) -> isize {
         let mut score = self.score;
+        let penalty = 100;
         for i in 0..N {
             for j in 0..N {
                 let manhattan_dist =
@@ -140,8 +141,14 @@ impl State {
                 let add_h = h as isize - manhattan_dist;
                 let a = A[i][j];
                 let mountain = self.mountain[i][j];
-                let before_diff = (a - mountain).abs();
-                let now_diff = (a - (mountain + add_h)).abs();
+                let mut before_diff = (a - mountain).abs();
+                if mountain >= a {
+                    before_diff += penalty;
+                }
+                let mut now_diff = (a - (mountain + add_h)).abs();
+                if mountain + add_h >= a {
+                    now_diff += penalty;
+                }
                 score += before_diff - now_diff;
             }
         }
