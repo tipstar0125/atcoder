@@ -293,23 +293,31 @@ impl Solver {
                     is_removed = true;
                 }
             } else {
-                let r = rnd::gen_range(0, rnd_max);
-                let pos = bit.upper_bound(r as isize);
-                let x = pos / N;
-                let y = pos % N;
-                let h = rnd::gen_range(1, N + 1);
-
+                let mut beam = BinaryHeap::new();
                 let current_score = state.score;
-                let new_score = state.get_score(x, y, h, false);
-
-                if new_score >= current_score {
-                    state.advance(x, y, h, &mut bit, false);
-                    state.score = new_score;
-                    rnd_max = bit.sum(N * N) as usize;
-                    query[removed_idx] = (x, y, h);
-                    is_removed = false;
-                    cnt += 1;
+                for _ in 0..10 {
+                    let r = rnd::gen_range(0, rnd_max);
+                    let pos = bit.upper_bound(r as isize);
+                    let x = pos / N;
+                    let y = pos % N;
+                    let h = rnd::gen_range(1, N + 1);
+                    let new_score = state.get_score(x, y, h, false);
+                    if new_score >= current_score {
+                        beam.push((new_score, x, y, h));
+                    }
                 }
+
+                if beam.is_empty() {
+                    continue;
+                }
+
+                let (best_score, x, y, h) = beam.pop().unwrap();
+                state.advance(x, y, h, &mut bit, false);
+                state.score = best_score;
+                rnd_max = bit.sum(N * N) as usize;
+                query[removed_idx] = (x, y, h);
+                is_removed = false;
+                cnt += 1;
             }
         }
         eprintln!("update cnt: {}", cnt);
