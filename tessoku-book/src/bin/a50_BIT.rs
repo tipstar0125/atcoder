@@ -140,14 +140,24 @@ impl State {
                 let add_h = h as isize - manhattan_dist;
                 let a = A[i][j];
                 let mountain = self.mountain[i][j];
-                let before_diff = (a - mountain).abs();
-                let now_diff = (a - (mountain + add_h)).abs();
+                let before_diff = if a <= mountain {
+                    (mountain - a) * 2
+                } else {
+                    a - mountain
+                };
+                let now_diff = if a <= mountain + add_h {
+                    (mountain + add_h - a) * 2
+                } else {
+                    a - mountain - add_h
+                };
+                // let before_diff = (A[i][j] - self.mountain[i][j]).abs();
+                // let now_diff = (A[i][j] - (self.mountain[i][j] + add_h)).abs();
                 score += before_diff - now_diff;
             }
         }
         score
     }
-    fn advance(&mut self, x: usize, y: usize, h: usize) {
+    fn advance(&mut self, x: usize, y: usize, h: usize, bit: &mut BinaryIndexedTree) {
         for i in 0..N {
             for j in 0..N {
                 let manhattan_dist =
@@ -157,6 +167,8 @@ impl State {
                 }
                 let add_h = h as isize - manhattan_dist;
                 self.mountain[i][j] += add_h;
+                let delta = -min!(bit.range_sum(i * N + j, i * N + j + 1), add_h);
+                bit.add(i * N + j, delta);
             }
         }
         self.turn += 1;
@@ -184,17 +196,50 @@ impl Solver {
         let mut state = State::new();
         let mut query = vec![];
 
+        // let start_temp = 30.0;
+        // let end_temp = 2.0;
+
+        let get_point_lower_start = 10000;
+        let get_point_lower_end = 0;
+
+        let mut bit = BinaryIndexedTree::new(N * N);
+        for i in 0..N {
+            for j in 0..N {
+                let pos = i * N + j;
+                bit.add(pos, A[i][j]);
+            }
+        }
+        let mut rnd_max = bit.sum(N * N) as usize;
+
         while !state.isDone() && !time_keeper.isTimeOver() {
-            let x = rnd::gen_range(0, N);
-            let y = rnd::gen_range(0, N);
+            // let x = rnd::gen_range(0, N);
+            // let y = rnd::gen_range(0, N);
+
+            let r = rnd::gen_range(0, rnd_max);
+            let pos = bit.upper_bound(r as isize);
+            let x = pos / N;
+            let y = pos % N;
+            // let h_upper = min!(N, max!(2, (state.mountain[x][y] - A[x][y]).abs()) as usize);
+            // let h = h_upper;
             let h = rnd::gen_range(1, N + 1);
 
             let current_score = state.score;
             let new_score = state.get_score(x, y, h);
 
-            if new_score >= current_score {
-                state.advance(x, y, h);
+            // let T = start_temp + (end_temp - start_temp) * (state.turn as f64 / MAX_Q as f64);
+            // // new_score >= current_score => new_score - current_score >= 0 => good
+            // let prob = ((new_score as f64 - current_score as f64) / T).exp();
+            // // 0 <= rng.gen::<f64>() <= 1
+            // if rnd::gen_float() < prob {
+
+            let get_point_lower = get_point_lower_start
+                - (get_point_lower_start - get_point_lower_end) * state.turn / MAX_Q;
+
+            if new_score >= current_score + get_point_lower as isize {
+                // if new_score >= current_score {
+                state.advance(x, y, h, &mut bit);
                 query.push((x, y, h));
+                rnd_max = bit.sum(N * N) as usize;
             }
         }
 
