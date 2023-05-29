@@ -169,14 +169,7 @@ impl State {
         }
         score
     }
-    fn advance(
-        &mut self,
-        x: usize,
-        y: usize,
-        h: usize,
-        bit: &mut BinaryIndexedTree,
-        is_redo: bool,
-    ) {
+    fn advance(&mut self, x: usize, y: usize, h: usize, is_redo: bool) {
         for i in 0..N {
             for j in 0..N {
                 let manhattan_dist =
@@ -189,8 +182,6 @@ impl State {
                     add_h *= -1;
                 }
                 self.mountain[i][j] += add_h;
-                let delta = -min!(bit.range_sum(i * N + j, i * N + j + 1), add_h);
-                bit.add(i * N + j, delta);
             }
         }
         self.turn += 1;
@@ -218,24 +209,13 @@ impl Solver {
         let mut state = State::new();
         let mut query = vec![];
 
-        let get_point_lower_start = 300000;
+        let get_point_lower_start = 200000;
         let get_point_lower_end = 0;
         let mut cnt = 0;
 
-        let mut bit = BinaryIndexedTree::new(N * N);
-        for i in 0..N {
-            for j in 0..N {
-                let pos = i * N + j;
-                bit.add(pos, A[i][j]);
-            }
-        }
-        let mut rnd_max = bit.sum(N * N) as usize;
-
         while !state.isDone() && !time_keeper.isTimeOver() && cnt < 1000 {
-            let r = rnd::gen_range(0, rnd_max);
-            let pos = bit.upper_bound(r as isize);
-            let x = pos / N;
-            let y = pos % N;
+            let x = rnd::gen_range(0, N);
+            let y = rnd::gen_range(0, N);
             let h = rnd::gen_range(1, N + 1);
 
             let current_score = state.score;
@@ -245,10 +225,9 @@ impl Solver {
                 - (get_point_lower_start - get_point_lower_end) * state.turn / MAX_Q;
 
             if new_score >= current_score + get_point_lower as isize {
-                state.advance(x, y, h, &mut bit, false);
+                state.advance(x, y, h, false);
                 state.score = new_score;
                 query.push((x, y, h));
-                rnd_max = bit.sum(N * N) as usize;
             }
             cnt += 1;
         }
@@ -257,20 +236,17 @@ impl Solver {
         eprintln!("{}", greedy_len);
 
         while !state.isDone() && !time_keeper.isTimeOver() {
-            let r = rnd::gen_range(0, rnd_max);
-            let pos = bit.upper_bound(r as isize);
-            let x = pos / N;
-            let y = pos % N;
+            let x = rnd::gen_range(0, N);
+            let y = rnd::gen_range(0, N);
             let h = rnd::gen_range(1, N + 1);
 
             let current_score = state.score;
             let new_score = state.get_score(x, y, h, false);
 
             if new_score >= current_score {
-                state.advance(x, y, h, &mut bit, false);
+                state.advance(x, y, h, false);
                 state.score = new_score;
                 query.push((x, y, h));
-                rnd_max = bit.sum(N * N) as usize;
             }
         }
 
@@ -286,26 +262,22 @@ impl Solver {
                 let current_score = state.score;
                 let new_score = state.get_score(x, y, h, true);
                 if new_score >= current_score {
-                    state.advance(x, y, h, &mut bit, true);
+                    state.advance(x, y, h, true);
                     state.score = new_score;
-                    rnd_max = bit.sum(N * N) as usize;
                     removed_idx = idx;
                     is_removed = true;
                 }
             } else {
-                let r = rnd::gen_range(0, rnd_max);
-                let pos = bit.upper_bound(r as isize);
-                let x = pos / N;
-                let y = pos % N;
+                let x = rnd::gen_range(0, N);
+                let y = rnd::gen_range(0, N);
                 let h = rnd::gen_range(1, N + 1);
 
                 let current_score = state.score;
                 let new_score = state.get_score(x, y, h, false);
 
                 if new_score >= current_score {
-                    state.advance(x, y, h, &mut bit, false);
+                    state.advance(x, y, h, false);
                     state.score = new_score;
-                    rnd_max = bit.sum(N * N) as usize;
                     query[removed_idx] = (x, y, h);
                     is_removed = false;
                     cnt += 1;
@@ -344,105 +316,6 @@ macro_rules! min {
     ($x: expr) => ($x);
     ($x: expr, $( $y: expr ),+) => {
         std::cmp::min($x, min!($( $y ),+))
-    }
-}
-
-#[derive(Debug, Clone)]
-struct BinaryIndexedTree {
-    size: usize,
-    data: Vec<isize>,
-}
-
-impl BinaryIndexedTree {
-    fn new(n: usize) -> Self {
-        BinaryIndexedTree {
-            size: n,
-            data: vec![0; n],
-        }
-    }
-    fn lsb(&self, i: usize) -> usize {
-        i & i.wrapping_neg()
-    }
-    fn build(&mut self, v: &[isize]) {
-        assert_eq!(self.size, v.len(), "size not correct!");
-        self.data = v.to_vec();
-        for i in 1..=self.size {
-            let lsb = self.lsb(i);
-            if i + lsb <= self.size {
-                self.data[i + lsb - 1] += self.data[i - 1];
-            }
-        }
-    }
-    fn push(&mut self, mut x: isize) {
-        self.size += 1;
-        let mut d = 1;
-        let k = self.lsb(self.size);
-        while d != k {
-            x += self.data[self.size - d - 1];
-            d <<= 1;
-        }
-        self.data.push(x);
-    }
-    fn add(&mut self, i: usize, x: isize) {
-        let mut idx = i + 1;
-        while idx <= self.size {
-            self.data[idx - 1] += x;
-            idx += self.lsb(idx);
-        }
-    }
-    //  [0, r)
-    fn sum(&self, i: usize) -> isize {
-        let mut ret = 0;
-        let mut idx = i;
-        while idx > 0 {
-            ret += self.data[idx - 1];
-            idx -= self.lsb(idx);
-        }
-        ret
-    }
-    // [l, r)
-    fn range_sum(&self, l: usize, r: usize) -> isize {
-        self.sum(r) - self.sum(l)
-    }
-    fn lower_bound(&self, x: isize) -> usize {
-        let mut i = 0;
-        let mut k = 1;
-        let mut x = x;
-        while k <= self.size {
-            k <<= 1;
-        }
-        while k > 0 {
-            if i + k <= self.size && self.data[i + k - 1] < x {
-                x -= self.data[i + k - 1];
-                i += k;
-            }
-            k >>= 1;
-        }
-        if x > 0 {
-            i
-        } else {
-            0
-        }
-    }
-    fn upper_bound(&self, x: isize) -> usize {
-        let mut i = 0;
-        let mut k = 1;
-        let mut x = x;
-        while k <= self.size {
-            k <<= 1;
-        }
-        while k > 0 {
-            if i + k <= self.size && self.data[i + k - 1] <= x {
-                x -= self.data[i + k - 1];
-                i += k;
-            }
-            k >>= 1;
-        }
-        if i < self.size {
-            i
-        } else {
-            self.size
-        }
     }
 }
 
