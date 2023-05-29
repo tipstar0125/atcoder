@@ -226,6 +226,7 @@ impl Solver {
 
             if new_score >= current_score + get_point_lower as isize {
                 state.advance(x, y, h, false);
+                state.score = new_score;
                 query.push((x, y, h));
             }
             cnt += 1;
