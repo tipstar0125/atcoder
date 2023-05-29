@@ -219,6 +219,7 @@ impl Solver {
 
             if new_score >= current_score {
                 state.advance(x, y, h, false);
+                state.score = new_score;
                 query.push((x, y, h));
             }
         }
@@ -235,6 +236,7 @@ impl Solver {
                 let new_score = state.get_score(x, y, h, true);
                 if new_score >= current_score {
                     state.advance(x, y, h, true);
+                    state.score = new_score;
                     removed_idx = idx;
                     is_removed = true;
                 }
@@ -248,6 +250,7 @@ impl Solver {
 
                 if new_score >= current_score {
                     state.advance(x, y, h, false);
+                    state.score = new_score;
                     query[removed_idx] = (x, y, h);
                     is_removed = false;
                 }

@@ -209,56 +209,51 @@ impl Solver {
         let mut state = State::new();
         let mut query = vec![];
 
-        let mut get_point_lower_start = 300000;
+        let get_point_lower_start = 200000;
         let get_point_lower_end = 0;
-        loop {
-            let mut cnt = 0;
-            while !state.isDone() && !time_keeper.isTimeOver() && cnt < 1000 {
-                let x = rnd::gen_range(0, N);
-                let y = rnd::gen_range(0, N);
-                let h = rnd::gen_range(1, N + 1);
+        let mut cnt = 0;
 
-                let current_score = state.score;
-                let new_score = state.get_score(x, y, h, false);
+        while !state.isDone() && !time_keeper.isTimeOver() && cnt < 1000 {
+            let x = rnd::gen_range(0, N);
+            let y = rnd::gen_range(0, N);
+            let h = rnd::gen_range(1, N + 1);
 
-                let get_point_lower = get_point_lower_start
-                    - (get_point_lower_start - get_point_lower_end) * state.turn / MAX_Q;
+            let current_score = state.score;
+            let new_score = state.get_score(x, y, h, false);
 
-                if new_score >= current_score + get_point_lower as isize {
-                    state.advance(x, y, h, false);
-                    query.push((x, y, h));
-                }
-                cnt += 1;
+            let get_point_lower = get_point_lower_start
+                - (get_point_lower_start - get_point_lower_end) * state.turn / MAX_Q;
+
+            if new_score >= current_score + get_point_lower as isize {
+                state.advance(x, y, h, false);
+                query.push((x, y, h));
             }
-            get_point_lower_start /= 10;
-            eprintln!("{}", get_point_lower_start);
-            if state.isDone() || time_keeper.isTimeOver() {
-                break;
-            }
+            cnt += 1;
         }
 
         let greedy_len = query.len();
         eprintln!("{}", greedy_len);
 
-        // while !state.isDone() && !time_keeper.isTimeOver() {
-        //     let x = rnd::gen_range(0, N);
-        //     let y = rnd::gen_range(0, N);
-        //     let h = rnd::gen_range(1, N + 1);
+        while !state.isDone() && !time_keeper.isTimeOver() {
+            let x = rnd::gen_range(0, N);
+            let y = rnd::gen_range(0, N);
+            let h = rnd::gen_range(1, N + 1);
 
-        //     let current_score = state.score;
-        //     let new_score = state.get_score(x, y, h, false);
+            let current_score = state.score;
+            let new_score = state.get_score(x, y, h, false);
 
-        //     if new_score >= current_score {
-        //         state.advance(x, y, h, false);
-        //         query.push((x, y, h));
-        //     }
-        // }
+            if new_score >= current_score {
+                state.advance(x, y, h, false);
+                state.score = new_score;
+                query.push((x, y, h));
+            }
+        }
 
         let L = query.len();
         eprintln!("{}", L);
         let mut is_removed = false;
         let mut removed_idx = L;
-        let mut cnt = 0;
+        cnt = 0;
         while !time_keeper.isTimeOver() {
             if !is_removed {
                 let idx = rnd::gen_range(0, L);
@@ -267,6 +262,7 @@ impl Solver {
                 let new_score = state.get_score(x, y, h, true);
                 if new_score >= current_score {
                     state.advance(x, y, h, true);
+                    state.score = new_score;
                     removed_idx = idx;
                     is_removed = true;
                 }
@@ -280,6 +276,7 @@ impl Solver {
 
                 if new_score >= current_score {
                     state.advance(x, y, h, false);
+                    state.score = new_score;
                     query[removed_idx] = (x, y, h);
                     is_removed = false;
                     cnt += 1;

@@ -238,6 +238,7 @@ impl Solver {
             if new_score >= current_score + get_point_lower as isize {
                 // if new_score >= current_score {
                 state.advance(x, y, h, &mut bit);
+                state.score = new_score;
                 query.push((x, y, h));
                 rnd_max = bit.sum(N * N) as usize;
             }
