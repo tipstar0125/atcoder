@@ -237,6 +237,23 @@ impl Solver {
             }
         }
 
+        let greedy_len = query.len();
+        eprintln!("{}", greedy_len);
+
+        // while !state.isDone() && !time_keeper.isTimeOver() {
+        //     let x = rnd::gen_range(0, N);
+        //     let y = rnd::gen_range(0, N);
+        //     let h = rnd::gen_range(1, N + 1);
+
+        //     let current_score = state.score;
+        //     let new_score = state.get_score(x, y, h, false);
+
+        //     if new_score >= current_score {
+        //         state.advance(x, y, h, false);
+        //         query.push((x, y, h));
+        //     }
+        // }
+
         let L = query.len();
         eprintln!("{}", L);
         let mut is_removed = false;
