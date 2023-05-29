@@ -209,52 +209,33 @@ impl Solver {
         let mut state = State::new();
         let mut query = vec![];
 
-        let get_point_lower_start = 200000;
-        let get_point_lower_end = 0;
-        let mut cnt = 0;
-
-        while !state.isDone() && !time_keeper.isTimeOver() && cnt < 1000 {
-            let x = rnd::gen_range(0, N);
-            let y = rnd::gen_range(0, N);
-            let h = rnd::gen_range(1, N + 1);
-
-            let current_score = state.score;
-            let new_score = state.get_score(x, y, h, false);
-
-            let get_point_lower = get_point_lower_start
-                - (get_point_lower_start - get_point_lower_end) * state.turn / MAX_Q;
-
-            if new_score >= current_score + get_point_lower as isize {
-                state.advance(x, y, h, false);
-                state.score = new_score;
-                query.push((x, y, h));
-            }
-            cnt += 1;
-        }
-
-        let greedy_len = query.len();
-        eprintln!("{}", greedy_len);
-
         while !state.isDone() && !time_keeper.isTimeOver() {
-            let x = rnd::gen_range(0, N);
-            let y = rnd::gen_range(0, N);
-            let h = rnd::gen_range(1, N + 1);
-
+            let mut heap = BinaryHeap::new();
             let current_score = state.score;
-            let new_score = state.get_score(x, y, h, false);
-
-            if new_score >= current_score {
-                state.advance(x, y, h, false);
-                state.score = new_score;
-                query.push((x, y, h));
+            for _ in 0..10 {
+                let x = rnd::gen_range(0, N);
+                let y = rnd::gen_range(0, N);
+                let h = rnd::gen_range(1, N + 1);
+                let new_score = state.get_score(x, y, h, false);
+                if new_score >= current_score {
+                    heap.push((new_score, x, y, h));
+                }
             }
+
+            if heap.is_empty() {
+                continue;
+            }
+            let (best_score, x, y, h) = heap.pop().unwrap();
+            state.advance(x, y, h, false);
+            state.score = best_score;
+            query.push((x, y, h));
         }
 
         let L = query.len();
         eprintln!("{}", L);
         let mut is_removed = false;
         let mut removed_idx = L;
-        cnt = 0;
+        let mut cnt = 0;
         while !time_keeper.isTimeOver() {
             if !is_removed {
                 let idx = rnd::gen_range(0, L);
@@ -284,7 +265,8 @@ impl Solver {
                 }
             }
         }
-        eprintln!("{}", cnt);
+        eprintln!("update cnt: {}", cnt);
+        eprintln!("Score: {}", state.score);
 
         println!("{}", L);
         for i in 0..L {
