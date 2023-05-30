@@ -190,7 +190,7 @@ fn init(state: &mut State, query: &mut [(usize, usize, usize)]) {
     for i in 0..MAX_Q {
         let x = rnd::gen_range(0, N);
         let y = rnd::gen_range(0, N);
-        let h = rnd::gen_range(1, N + 1);
+        let h = 1;
         assert!(state.is_legal_action(x, y, h));
         state.change(query[i], (x, y, h));
         query[i] = (x, y, h);
@@ -215,48 +215,29 @@ impl Solver {
         rnd::init(seed);
 
         let start = std::time::Instant::now();
-        let time_limit = 5.98;
-        let time_keeper = TimeKeeper::new(time_limit);
+        let time_keeper = TimeKeeper::new(5.98);
         let mut state = State::new();
         let mut query = vec![(0, 0, 0); MAX_Q];
 
         init(&mut state, &mut query);
         let mut cnt = 0;
 
-        let start_temp = 180.0;
-        let end_temp = 1.0;
-
-        let mut h_limit = 20;
-
         while !time_keeper.isTimeOver() {
             let idx = rnd::gen_range(0, MAX_Q);
-            let current_score = state.score;
             let (x0, y0, h0) = query[idx];
-            let dx = rnd::gen_range_neg_wrapping(5);
-            let dy = rnd::gen_range_neg_wrapping(5);
-            if time_keeper.get_time() > 0.5 {
-                h_limit = 8;
-            }
-            if current_score >= 199_900_000 {
-                h_limit = 2;
-            } else if current_score >= 199_500_000 {
-                h_limit = 8;
-            }
-            let dh = rnd::gen_range_neg_wrapping(h_limit);
+            let dx = rnd::gen_range_neg_wrapping(10);
+            let dy = rnd::gen_range_neg_wrapping(10);
+            let dh = rnd::gen_range_neg_wrapping(20);
             let x = x0.wrapping_add(dx);
             let y = y0.wrapping_add(dy);
             let h = h0.wrapping_add(dh);
             if !state.is_legal_action(x, y, h) {
                 continue;
             }
+            let current_score = state.score;
             state.change(query[idx], (x, y, h));
             let new_score = state.get_score();
-
-            let T = start_temp + (end_temp - start_temp) * (time_keeper.get_time() / time_limit);
-            // current_score >= new_score => current_score - new_score >= 0 => good
-            let prob = ((new_score as f64 - current_score as f64) / T).exp();
-            // 0 <= rng.gen::<f64>() <= 1
-            if rnd::gen_float() < prob {
+            if new_score > current_score {
                 query[idx] = (x, y, h);
                 state.score = new_score;
                 cnt += 1;
@@ -268,9 +249,8 @@ impl Solver {
         eprintln!("Update count: {}", cnt);
         eprintln!("Score: {}", state.score);
 
-        let L = query.len();
-        println!("{}", L);
-        for i in 0..L {
+        println!("{}", MAX_Q);
+        for i in 0..MAX_Q {
             let (x, y, h) = query[i];
             println!("{} {} {}", x, y, h);
         }
