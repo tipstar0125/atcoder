@@ -154,8 +154,8 @@ impl State {
                 if is_redo {
                     add_h *= -1;
                 }
-                let a = A[i][j];
-                let mountain = self.mountain[i][j];
+                let a = A[j][i];
+                let mountain = self.mountain[j][i];
                 let mut before_diff = (a - mountain).abs();
                 if mountain >= a {
                     before_diff += penalty;
@@ -188,7 +188,7 @@ impl State {
                 if is_redo {
                     add_h *= -1;
                 }
-                self.mountain[i][j] += add_h;
+                self.mountain[j][i] += add_h;
                 let delta = -min!(bit.range_sum(i * N + j, i * N + j + 1), add_h);
                 bit.add(i * N + j, delta);
             }
@@ -234,8 +234,8 @@ impl Solver {
         while !state.isDone() && !time_keeper.isTimeOver() && cnt < 1000 {
             let r = rnd::gen_range(0, rnd_max);
             let pos = bit.upper_bound(r as isize);
-            let x = pos / N;
-            let y = pos % N;
+            let y = pos / N;
+            let x = pos % N;
             let h = rnd::gen_range(1, N + 1);
 
             let current_score = state.score;
@@ -259,8 +259,8 @@ impl Solver {
         while !state.isDone() && !time_keeper.isTimeOver() {
             let r = rnd::gen_range(0, rnd_max);
             let pos = bit.upper_bound(r as isize);
-            let x = pos / N;
-            let y = pos % N;
+            let y = pos / N;
+            let x = pos % N;
             let h = rnd::gen_range(1, N + 1);
 
             let current_score = state.score;
@@ -298,8 +298,8 @@ impl Solver {
                 for _ in 0..10 {
                     let r = rnd::gen_range(0, rnd_max);
                     let pos = bit.upper_bound(r as isize);
-                    let x = pos / N;
-                    let y = pos % N;
+                    let y = pos / N;
+                    let x = pos % N;
                     let h = rnd::gen_range(1, N + 1);
                     let new_score = state.get_score(x, y, h, false);
                     if new_score >= current_score {

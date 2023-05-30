@@ -154,8 +154,8 @@ impl State {
                 if is_redo {
                     add_h *= -1;
                 }
-                let a = A[i][j];
-                let mountain = self.mountain[i][j];
+                let a = A[j][i];
+                let mountain = self.mountain[j][i];
                 let mut before_diff = (a - mountain).abs();
                 if mountain >= a {
                     before_diff += penalty;
@@ -181,7 +181,7 @@ impl State {
                 if is_redo {
                     add_h *= -1;
                 }
-                self.mountain[i][j] += add_h;
+                self.mountain[j][i] += add_h;
             }
         }
         self.turn += 1;

@@ -138,8 +138,8 @@ impl State {
                     continue;
                 }
                 let add_h = h as isize - manhattan_dist;
-                let a = A[i][j];
-                let mountain = self.mountain[i][j];
+                let a = A[j][i];
+                let mountain = self.mountain[j][i];
                 let before_diff = if a <= mountain {
                     (mountain - a) * 2
                 } else {
@@ -150,8 +150,6 @@ impl State {
                 } else {
                     a - mountain - add_h
                 };
-                // let before_diff = (A[i][j] - self.mountain[i][j]).abs();
-                // let now_diff = (A[i][j] - (self.mountain[i][j] + add_h)).abs();
                 score += before_diff - now_diff;
             }
         }
@@ -166,7 +164,7 @@ impl State {
                     continue;
                 }
                 let add_h = h as isize - manhattan_dist;
-                self.mountain[i][j] += add_h;
+                self.mountain[j][i] += add_h;
                 let delta = -min!(bit.range_sum(i * N + j, i * N + j + 1), add_h);
                 bit.add(i * N + j, delta);
             }
@@ -196,9 +194,6 @@ impl Solver {
         let mut state = State::new();
         let mut query = vec![];
 
-        // let start_temp = 30.0;
-        // let end_temp = 2.0;
-
         let get_point_lower_start = 10000;
         let get_point_lower_end = 0;
 
@@ -212,31 +207,19 @@ impl Solver {
         let mut rnd_max = bit.sum(N * N) as usize;
 
         while !state.isDone() && !time_keeper.isTimeOver() {
-            // let x = rnd::gen_range(0, N);
-            // let y = rnd::gen_range(0, N);
-
             let r = rnd::gen_range(0, rnd_max);
             let pos = bit.upper_bound(r as isize);
-            let x = pos / N;
-            let y = pos % N;
-            // let h_upper = min!(N, max!(2, (state.mountain[x][y] - A[x][y]).abs()) as usize);
-            // let h = h_upper;
+            let y = pos / N;
+            let x = pos % N;
             let h = rnd::gen_range(1, N + 1);
 
             let current_score = state.score;
             let new_score = state.get_score(x, y, h);
 
-            // let T = start_temp + (end_temp - start_temp) * (state.turn as f64 / MAX_Q as f64);
-            // // new_score >= current_score => new_score - current_score >= 0 => good
-            // let prob = ((new_score as f64 - current_score as f64) / T).exp();
-            // // 0 <= rng.gen::<f64>() <= 1
-            // if rnd::gen_float() < prob {
-
             let get_point_lower = get_point_lower_start
                 - (get_point_lower_start - get_point_lower_end) * state.turn / MAX_Q;
 
             if new_score >= current_score + get_point_lower as isize {
-                // if new_score >= current_score {
                 state.advance(x, y, h, &mut bit);
                 state.score = new_score;
                 query.push((x, y, h));
