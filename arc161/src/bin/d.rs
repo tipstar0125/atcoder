@@ -7,9 +7,9 @@
 #![allow(clippy::neg_multiply)]
 #![allow(dead_code)]
 use itertools::Itertools;
-use superslice::Ext;
 use std::cmp::Reverse;
 use std::collections::{BTreeMap, BTreeSet, BinaryHeap, VecDeque};
+use superslice::Ext;
 
 use proconio::{
     fastout, input,
@@ -21,7 +21,33 @@ struct Solver {}
 impl Solver {
     #[fastout]
     fn solve(&mut self) {
-        input! {}
+        input! {
+            N: usize,
+            D: usize
+        }
+
+        if N * (N - 1) / 2 < N * D {
+            println!("No");
+            return;
+        }
+
+        let mut ans = vec![];
+        let mut cnt = 0_usize;
+        let mut now = 0_usize;
+        let mut delta = 1_usize;
+        while cnt < N * D {
+            ans.push((now, (now + delta) % N));
+            now += 1;
+            if now >= N {
+                now = 0;
+                delta += 1;
+            }
+            cnt += 1;
+        }
+        println!("Yes");
+        for &(l, r) in &ans {
+            println!("{} {}", l + 1, r + 1);
+        }
     }
 }
 

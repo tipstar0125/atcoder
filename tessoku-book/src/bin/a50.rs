@@ -71,6 +71,22 @@ mod rnd {
         gen() & 1 == 1
     }
     #[inline]
+    pub fn gen_range_isize(a: usize) -> isize {
+        let mut x = (gen() % a) as isize;
+        if gen_bool() {
+            x *= -1;
+        }
+        x
+    }
+    #[inline]
+    pub fn gen_range_neg_wrapping(a: usize) -> usize {
+        let mut x = gen() % a;
+        if gen_bool() {
+            x = x.wrapping_neg();
+        }
+        x
+    }
+    #[inline]
     pub fn gen_float() -> f64 {
         ((gen() % MAX) as f64) / MAX as f64
     }
@@ -117,84 +133,69 @@ impl TimeKeeper {
 
 #[derive(Debug, Clone)]
 struct State {
-    mountain: Vec<Vec<isize>>,
+    B: Vec<Vec<isize>>,
     turn: usize,
     score: isize,
 }
 
 impl State {
     fn new() -> Self {
+        State {
+            B: vec![vec![0; N]; N],
+            turn: 0,
+            score: 0,
+        }
+    }
+    fn is_legal_action(&self, x: usize, y: usize, h: usize) -> bool {
+        x < N && y < N && (1..=N).contains(&h)
+    }
+    fn get_score(&self) -> isize {
         let mut score = MAX_SCORE;
         for i in 0..N {
             for j in 0..N {
-                score -= A[i][j];
-            }
-        }
-
-        State {
-            mountain: vec![vec![0; N]; N],
-            turn: 0,
-            score,
-        }
-    }
-    fn isDone(&self) -> bool {
-        self.turn == MAX_Q
-    }
-    fn get_score(&self, x: usize, y: usize, h: usize, is_redo: bool) -> isize {
-        let mut score = self.score;
-        let penalty = 100;
-        for i in 0..N {
-            for j in 0..N {
-                let manhattan_dist =
-                    (i as isize - x as isize).abs() + (j as isize - y as isize).abs();
-                if manhattan_dist >= h as isize {
-                    continue;
-                }
-                let mut add_h = h as isize - manhattan_dist;
-                if is_redo {
-                    add_h *= -1;
-                }
-                let a = A[i][j];
-                let mountain = self.mountain[i][j];
-                let mut before_diff = (a - mountain).abs();
-                if mountain >= a {
-                    before_diff += penalty;
-                }
-                let mut now_diff = (a - (mountain + add_h)).abs();
-                if mountain + add_h >= a {
-                    now_diff += penalty;
-                }
-                score += before_diff - now_diff;
+                score -= (A[i][j] - self.B[i][j]).abs();
             }
         }
         score
     }
-    fn advance(
-        &mut self,
-        x: usize,
-        y: usize,
-        h: usize,
-        bit: &mut BinaryIndexedTree,
-        is_redo: bool,
-    ) {
+    fn change(&mut self, query0: (usize, usize, usize), query1: (usize, usize, usize)) {
+        let (x0, y0, h0) = query0;
+        let (x1, y1, h1) = query1;
+
         for i in 0..N {
             for j in 0..N {
-                let manhattan_dist =
-                    (i as isize - x as isize).abs() + (j as isize - y as isize).abs();
-                if manhattan_dist >= h as isize {
-                    continue;
+                let manhattan_dist0 =
+                    (i as isize - x0 as isize).abs() + (j as isize - y0 as isize).abs();
+                if manhattan_dist0 < h0 as isize {
+                    let sub_h = h0 as isize - manhattan_dist0;
+                    self.B[j][i] -= sub_h;
                 }
-                let mut add_h = h as isize - manhattan_dist;
-                if is_redo {
-                    add_h *= -1;
-                }
-                self.mountain[i][j] += add_h;
-                let delta = -min!(bit.range_sum(i * N + j, i * N + j + 1), add_h);
-                bit.add(i * N + j, delta);
             }
         }
-        self.turn += 1;
+
+        for i in 0..N {
+            for j in 0..N {
+                let manhattan_dist1 =
+                    (i as isize - x1 as isize).abs() + (j as isize - y1 as isize).abs();
+                if manhattan_dist1 < h1 as isize {
+                    let add_h = h1 as isize - manhattan_dist1;
+                    self.B[j][i] += add_h;
+                }
+            }
+        }
     }
+}
+
+fn init(state: &mut State, query: &mut [(usize, usize, usize)]) {
+    for i in 0..MAX_Q {
+        let x = rnd::gen_range(0, N);
+        let y = rnd::gen_range(0, N);
+        let h = 1;
+        assert!(state.is_legal_action(x, y, h));
+        state.change(query[i], (x, y, h));
+        query[i] = (x, y, h);
+    }
+    state.score = state.get_score();
 }
 
 #[derive(Default)]
@@ -216,115 +217,40 @@ impl Solver {
         let start = std::time::Instant::now();
         let time_keeper = TimeKeeper::new(5.98);
         let mut state = State::new();
-        let mut query = vec![];
+        let mut query = vec![(0, 0, 0); MAX_Q];
 
-        let get_point_lower_start = 300000;
-        let get_point_lower_end = 0;
+        init(&mut state, &mut query);
         let mut cnt = 0;
 
-        let mut bit = BinaryIndexedTree::new(N * N);
-        for i in 0..N {
-            for j in 0..N {
-                let pos = i * N + j;
-                bit.add(pos, A[i][j]);
-            }
-        }
-        let mut rnd_max = bit.sum(N * N) as usize;
-
-        while !state.isDone() && !time_keeper.isTimeOver() && cnt < 1000 {
-            let r = rnd::gen_range(0, rnd_max);
-            let pos = bit.upper_bound(r as isize);
-            let x = pos / N;
-            let y = pos % N;
-            let h = rnd::gen_range(1, N + 1);
-
-            let current_score = state.score;
-            let new_score = state.get_score(x, y, h, false);
-
-            let get_point_lower = get_point_lower_start
-                - (get_point_lower_start - get_point_lower_end) * state.turn / MAX_Q;
-
-            if new_score >= current_score + get_point_lower as isize {
-                state.advance(x, y, h, &mut bit, false);
-                state.score = new_score;
-                query.push((x, y, h));
-                rnd_max = bit.sum(N * N) as usize;
-            }
-            cnt += 1;
-        }
-
-        let greedy_len = query.len();
-        eprintln!("{}", greedy_len);
-
-        while !state.isDone() && !time_keeper.isTimeOver() {
-            let r = rnd::gen_range(0, rnd_max);
-            let pos = bit.upper_bound(r as isize);
-            let x = pos / N;
-            let y = pos % N;
-            let h = rnd::gen_range(1, N + 1);
-
-            let current_score = state.score;
-            let new_score = state.get_score(x, y, h, false);
-
-            if new_score >= current_score {
-                state.advance(x, y, h, &mut bit, false);
-                state.score = new_score;
-                query.push((x, y, h));
-                rnd_max = bit.sum(N * N) as usize;
-            }
-        }
-
-        let L = query.len();
-        eprintln!("{}", L);
-        let mut is_removed = false;
-        let mut removed_idx = L;
-        cnt = 0;
         while !time_keeper.isTimeOver() {
-            if !is_removed {
-                let idx = rnd::gen_range(0, L);
-                let (x, y, h) = query[idx];
-                let current_score = state.score;
-                let new_score = state.get_score(x, y, h, true);
-                if new_score >= current_score {
-                    state.advance(x, y, h, &mut bit, true);
-                    state.score = new_score;
-                    rnd_max = bit.sum(N * N) as usize;
-                    removed_idx = idx;
-                    is_removed = true;
-                }
-            } else {
-                let mut beam = BinaryHeap::new();
-                let current_score = state.score;
-                for _ in 0..10 {
-                    let r = rnd::gen_range(0, rnd_max);
-                    let pos = bit.upper_bound(r as isize);
-                    let x = pos / N;
-                    let y = pos % N;
-                    let h = rnd::gen_range(1, N + 1);
-                    let new_score = state.get_score(x, y, h, false);
-                    if new_score >= current_score {
-                        beam.push((new_score, x, y, h));
-                    }
-                }
-
-                if beam.is_empty() {
-                    continue;
-                }
-
-                let (best_score, x, y, h) = beam.pop().unwrap();
-                state.advance(x, y, h, &mut bit, false);
-                state.score = best_score;
-                rnd_max = bit.sum(N * N) as usize;
-                query[removed_idx] = (x, y, h);
-                is_removed = false;
+            let idx = rnd::gen_range(0, MAX_Q);
+            let (x0, y0, h0) = query[idx];
+            let dx = rnd::gen_range_neg_wrapping(10);
+            let dy = rnd::gen_range_neg_wrapping(10);
+            let dh = rnd::gen_range_neg_wrapping(20);
+            let x = x0.wrapping_add(dx);
+            let y = y0.wrapping_add(dy);
+            let h = h0.wrapping_add(dh);
+            if !state.is_legal_action(x, y, h) {
+                continue;
+            }
+            let current_score = state.score;
+            state.change(query[idx], (x, y, h));
+            let new_score = state.get_score();
+            if new_score > current_score {
+                query[idx] = (x, y, h);
+                state.score = new_score;
                 cnt += 1;
+            } else {
+                state.change((x, y, h), query[idx]);
             }
         }
-        eprintln!("update cnt: {}", cnt);
+
+        eprintln!("Update count: {}", cnt);
         eprintln!("Score: {}", state.score);
 
-        println!("{}", L);
-        for i in 0..L {
+        println!("{}", MAX_Q);
+        for i in 0..MAX_Q {
             let (x, y, h) = query[i];
             println!("{} {} {}", x, y, h);
         }
@@ -352,105 +278,6 @@ macro_rules! min {
     ($x: expr) => ($x);
     ($x: expr, $( $y: expr ),+) => {
         std::cmp::min($x, min!($( $y ),+))
-    }
-}
-
-#[derive(Debug, Clone)]
-struct BinaryIndexedTree {
-    size: usize,
-    data: Vec<isize>,
-}
-
-impl BinaryIndexedTree {
-    fn new(n: usize) -> Self {
-        BinaryIndexedTree {
-            size: n,
-            data: vec![0; n],
-        }
-    }
-    fn lsb(&self, i: usize) -> usize {
-        i & i.wrapping_neg()
-    }
-    fn build(&mut self, v: &[isize]) {
-        assert_eq!(self.size, v.len(), "size not correct!");
-        self.data = v.to_vec();
-        for i in 1..=self.size {
-            let lsb = self.lsb(i);
-            if i + lsb <= self.size {
-                self.data[i + lsb - 1] += self.data[i - 1];
-            }
-        }
-    }
-    fn push(&mut self, mut x: isize) {
-        self.size += 1;
-        let mut d = 1;
-        let k = self.lsb(self.size);
-        while d != k {
-            x += self.data[self.size - d - 1];
-            d <<= 1;
-        }
-        self.data.push(x);
-    }
-    fn add(&mut self, i: usize, x: isize) {
-        let mut idx = i + 1;
-        while idx <= self.size {
-            self.data[idx - 1] += x;
-            idx += self.lsb(idx);
-        }
-    }
-    //  [0, r)
-    fn sum(&self, i: usize) -> isize {
-        let mut ret = 0;
-        let mut idx = i;
-        while idx > 0 {
-            ret += self.data[idx - 1];
-            idx -= self.lsb(idx);
-        }
-        ret
-    }
-    // [l, r)
-    fn range_sum(&self, l: usize, r: usize) -> isize {
-        self.sum(r) - self.sum(l)
-    }
-    fn lower_bound(&self, x: isize) -> usize {
-        let mut i = 0;
-        let mut k = 1;
-        let mut x = x;
-        while k <= self.size {
-            k <<= 1;
-        }
-        while k > 0 {
-            if i + k <= self.size && self.data[i + k - 1] < x {
-                x -= self.data[i + k - 1];
-                i += k;
-            }
-            k >>= 1;
-        }
-        if x > 0 {
-            i
-        } else {
-            0
-        }
-    }
-    fn upper_bound(&self, x: isize) -> usize {
-        let mut i = 0;
-        let mut k = 1;
-        let mut x = x;
-        while k <= self.size {
-            k <<= 1;
-        }
-        while k > 0 {
-            if i + k <= self.size && self.data[i + k - 1] <= x {
-                x -= self.data[i + k - 1];
-                i += k;
-            }
-            k >>= 1;
-        }
-        if i < self.size {
-            i
-        } else {
-            self.size
-        }
     }
 }
 
