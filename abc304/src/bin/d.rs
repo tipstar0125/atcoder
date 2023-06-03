@@ -27,23 +27,19 @@ impl Solver {
             N: usize,
             PQ: [(usize, usize); N],
             a: usize,
-            A: [usize; a],
+            mut A: [usize; a],
             b: usize,
-            B: [usize; b]
+            mut B: [usize; b]
         }
 
-        let mut AA = vec![0];
-        AA.extend(A);
-        AA.push(W);
-        let mut BB = vec![0];
-        BB.extend(B);
-        BB.push(H);
+        A.push(W);
+        B.push(H);
         let MAX = (a + 1) * (b + 1);
 
         let mut mp: BTreeMap<(usize, usize), usize> = BTreeMap::new();
         for &(p, q) in &PQ {
-            let pos_x = AA.lower_bound(&p);
-            let pos_y = BB.lower_bound(&q);
+            let pos_x = A.lower_bound(&p);
+            let pos_y = B.lower_bound(&q);
             *mp.entry((pos_x, pos_y)).or_default() += 1;
         }
         let INF = 1_usize << 60;

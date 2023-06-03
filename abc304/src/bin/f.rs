@@ -35,19 +35,18 @@ impl Solver {
         for i in 0..L {
             let n = e[i];
             let mut pos = 0_usize;
-            let mut v = vec![false; n];
+            let mut v = vec![true; n];
             while pos < N {
                 let s = &S[pos..pos + n];
                 for (i, si) in s.iter().enumerate() {
                     if *si == '.' {
-                        v[i] = true;
+                        v[i] = false;
                     }
                 }
                 pos += n;
             }
-            let c = n - v.iter().filter(|&&x| x).count();
-            let cnt = Mod::new(2);
-            dp[i] = cnt.pow(c);
+            let c = v.iter().filter(|&&x| x).count();
+            dp[i] = Mod::new(2).pow(c);
             for j in 0..i {
                 let nb = e[j];
                 if n % nb == 0 {
