@@ -184,10 +184,9 @@ impl State {
         }
         score
     }
-    fn change(&mut self, query0: (usize, usize, usize), query1: (usize, usize, usize)) -> isize {
+    fn change(&mut self, query0: (usize, usize, usize), query1: (usize, usize, usize)) {
         let (x0, y0, h0) = query0;
         let (x1, y1, h1) = query1;
-        let mut score = MAX_SCORE;
 
         for i in 0..N {
             for j in 0..N {
@@ -197,16 +196,19 @@ impl State {
                     let sub_h = h0 as isize - manhattan_dist0;
                     self.B[j][i] -= sub_h;
                 }
+            }
+        }
+
+        for i in 0..N {
+            for j in 0..N {
                 let manhattan_dist1 =
                     (i as isize - x1 as isize).abs() + (j as isize - y1 as isize).abs();
                 if manhattan_dist1 < h1 as isize {
                     let add_h = h1 as isize - manhattan_dist1;
                     self.B[j][i] += add_h;
                 }
-                score -= (A[j][i] - self.B[j][i]).abs();
             }
         }
-        score
     }
 }
 
@@ -271,23 +273,21 @@ impl Solver {
         let end_temp = 1.0;
 
         let mut h_limit = 20;
-        let mut d_limit = 3;
 
         while !time_keeper.isTimeOver() {
             let idx = rnd::gen_range(0, MAX_Q);
             let current_score = state.score;
             let (x0, y0, h0) = query[idx];
+            let dx = rnd::gen_range_neg_wrapping(3);
+            let dy = rnd::gen_range_neg_wrapping(3);
             if time_keeper.get_time() > 1.0 {
                 h_limit = 8;
             }
             if current_score >= 199_900_000 {
                 h_limit = 2;
             } else if current_score >= 199_500_000 {
-                d_limit = 2;
                 h_limit = 5;
             }
-            let dx = rnd::gen_range_neg_wrapping(d_limit);
-            let dy = rnd::gen_range_neg_wrapping(d_limit);
             let dh = rnd::gen_range_neg_wrapping(h_limit);
             let x = x0.wrapping_add(dx);
             let y = y0.wrapping_add(dy);
@@ -295,7 +295,8 @@ impl Solver {
             if !state.is_legal_action(x, y, h) {
                 continue;
             }
-            let new_score = state.change(query[idx], (x, y, h));
+            state.change(query[idx], (x, y, h));
+            let new_score = state.get_score();
 
             let T = start_temp + (end_temp - start_temp) * (time_keeper.get_time() / time_limit);
             // current_score >= new_score => current_score - new_score >= 0 => good
