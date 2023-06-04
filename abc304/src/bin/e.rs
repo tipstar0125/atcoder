@@ -56,13 +56,19 @@ impl Solver {
 #[derive(Debug, Clone)]
 struct UnionFind {
     parent: Vec<isize>,
+    roots: BTreeSet<usize>,
     size: usize,
 }
 
 impl UnionFind {
     fn new(n: usize) -> Self {
+        let mut roots = BTreeSet::new();
+        for i in 0..n {
+            roots.insert(i);
+        }
         UnionFind {
             parent: vec![-1; n],
+            roots,
             size: n,
         }
     }
@@ -86,10 +92,12 @@ impl UnionFind {
         if size_x >= size_y {
             self.parent[root_x] -= size_y;
             self.parent[root_y] = root_x as isize;
+            self.roots.remove(&root_y);
             Some((root_x, root_y))
         } else {
             self.parent[root_y] -= size_x;
             self.parent[root_x] = root_y as isize;
+            self.roots.remove(&root_x);
             Some((root_y, root_x))
         }
     }
@@ -105,11 +113,6 @@ impl UnionFind {
     }
     fn get_size(&self) -> usize {
         self.size
-    }
-    fn roots(&self) -> Vec<usize> {
-        (0..self.parent.len())
-            .filter(|i| self.parent[*i] < 0)
-            .collect::<Vec<usize>>()
     }
     fn members(&mut self, x: usize) -> Vec<usize> {
         let root = self.find(x);
