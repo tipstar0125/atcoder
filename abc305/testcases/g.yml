@@ -1,0 +1,59 @@
+---
+type: Batch
+timelimit: 2s
+match: Lines
+
+cases:
+  - name: sample1
+    in: |
+      4 3
+      aab
+      bbab
+      abab
+    out: |
+      10
+  - name: sample2
+    in: |
+      20 1
+      aa
+    out: |
+      17711
+  - name: sample3
+    in: |
+      1000000007 28
+      bbabba
+      bbbbaa
+      aabbab
+      bbbaba
+      baaabb
+      babaab
+      bbaaba
+      aabaaa
+      aaaaaa
+      aabbaa
+      bbaaaa
+      bbaabb
+      bbabab
+      aababa
+      baaaba
+      ababab
+      abbaba
+      aabaab
+      ababaa
+      abbbba
+      baabaa
+      aabbbb
+      abbbab
+      baaaab
+      baabbb
+      ababbb
+      baabba
+      abaaaa
+    out: |
+      566756841
+
+extend:
+  - type: Text
+    path: "./g"
+    in: /in/*.txt
+    out: /out/*.txt
