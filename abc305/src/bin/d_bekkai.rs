@@ -37,18 +37,17 @@ impl Solver {
             }
         }
 
-        let f = |x: usize| -> usize {
-            let pos = A.lower_bound(&x);
-            if pos == 0 {
-                return 0;
-            }
-            let mut ret = S[pos - 1];
-            ret += (S[pos] - S[pos - 1]) * (x - A[pos - 1]) / (A[pos] - A[pos - 1]);
-            ret
-        };
-
         for &(l, r) in &LR {
-            println!("{}", f(r) - f(l));
+            let pos0 = A.upper_bound(&l);
+            let pos1 = A.lower_bound(&r);
+            let mut ans = S[pos1] - S[pos0 - 1];
+            if pos0 % 2 == 0 {
+                ans -= l - A[pos0 - 1];
+            }
+            if pos1 % 2 == 0 {
+                ans -= A[pos1] - r;
+            }
+            println!("{}", ans);
         }
     }
 }
