@@ -42,7 +42,7 @@ impl Solver {
 
         let mut now = X;
         let mut ans = 0;
-        for i in (0..60).rev() {
+        for i in (0..34).rev() {
             if (N >> i) & 1 == 1 {
                 ans += dp[i][now].1;
                 now = dp[i][now].0;
