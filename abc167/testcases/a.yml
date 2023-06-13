@@ -1,0 +1,30 @@
+---
+type: Batch
+timelimit: 2s
+match: Lines
+
+cases:
+  - name: sample1
+    in: |
+      chokudai
+      chokudaiz
+    out: |
+      Yes
+  - name: sample2
+    in: |
+      snuke
+      snekee
+    out: |
+      No
+  - name: sample3
+    in: |
+      a
+      aa
+    out: |
+      Yes
+
+extend:
+  - type: Text
+    path: "./a"
+    in: /in/*.txt
+    out: /out/*.txt
