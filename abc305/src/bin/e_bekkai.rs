@@ -25,36 +25,38 @@ impl Solver {
             M: usize,
             K: usize,
             AB: [(Usize1, Usize1); M],
-            PH: [(Usize1, isize); K]
+            PH: [(Usize1, usize); K]
         }
 
-        let mut G = vec![vec![]; N];
+        let h_max = PH.iter().map(|(_, b)| b).max().unwrap();
+        let mut G = vec![vec![]; N + 1];
         for &(a, b) in &AB {
-            G[a].push(b);
-            G[b].push(a);
+            G[a].push((b, 1));
+            G[b].push((a, 1));
         }
-
-        let mut power = vec![-1; N + 1];
-        let mut Q = BinaryHeap::new();
-
         for &(p, h) in &PH {
-            power[p] = h;
-            Q.push((power[p], p));
+            G[N].push((p, h_max - h));
         }
+
+        let INF = 1_usize << 60;
+        let mut dist = vec![INF; N + 1];
+        let mut Q = BinaryHeap::new();
+        dist[N] = 0;
+        Q.push(Reverse((0, N)));
 
         while !Q.is_empty() {
-            let (_, pos) = Q.pop().unwrap();
-            for &next in &G[pos] {
-                if power[next] < power[pos] - 1 {
-                    power[next] = power[pos] - 1;
-                    Q.push((power[next], next));
+            let Reverse((_, pos)) = Q.pop().unwrap();
+            for &(next, w) in &G[pos] {
+                if dist[pos] + w < dist[next] {
+                    dist[next] = dist[pos] + w;
+                    Q.push(Reverse((dist[next], next)));
                 }
             }
         }
 
         let mut ans = vec![];
         for i in 0..N {
-            if power[i] >= 0 {
+            if dist[i] <= *h_max {
                 ans.push(i + 1);
             }
         }
