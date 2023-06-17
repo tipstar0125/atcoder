@@ -8,7 +8,7 @@
 #![allow(dead_code)]
 use itertools::Itertools;
 use std::cmp::Reverse;
-use std::collections::{BTreeMap, BTreeSet, BinaryHeap, VecDeque};
+use std::collections::{BTreeMap, BTreeSet, BinaryHeap, HashMap, VecDeque};
 use superslice::Ext;
 
 use proconio::{
@@ -24,20 +24,24 @@ impl Solver {
         input! {
             N: usize,
             K: usize,
-            A: [usize; N]
+            Q: usize,
+            XY: [(Usize1, usize); Q]
         }
+    }
+}
 
-        let mut x = vec![vec![0; N]; 40];
-        let mut s = vec![vec![0; N]; 40];
-        for j in 0..N {}
-        for i in 1..40 {
-            for j in 0..N {}
-        }
-        let mut ans = 0;
-        for i in (0..40).rev() {
-            if (K >> i) & 1 == 1 {}
-        }
-        println!("{}", ans);
+#[macro_export]
+macro_rules! max {
+    ($x: expr) => ($x);
+    ($x: expr, $( $y: expr ),+) => {
+        std::cmp::max($x, max!($( $y ),+))
+    }
+}
+#[macro_export]
+macro_rules! min {
+    ($x: expr) => ($x);
+    ($x: expr, $( $y: expr ),+) => {
+        std::cmp::min($x, min!($( $y ),+))
     }
 }
 

@@ -22,22 +22,13 @@ impl Solver {
     #[fastout]
     fn solve(&mut self) {
         input! {
-            N: usize,
-            K: usize,
-            A: [usize; N]
+            _N: usize,
+            S: Chars
         }
-
-        let mut x = vec![vec![0; N]; 40];
-        let mut s = vec![vec![0; N]; 40];
-        for j in 0..N {}
-        for i in 1..40 {
-            for j in 0..N {}
+        for s in S {
+            print!("{}{}", s, s);
         }
-        let mut ans = 0;
-        for i in (0..40).rev() {
-            if (K >> i) & 1 == 1 {}
-        }
-        println!("{}", ans);
+        println!();
     }
 }
 

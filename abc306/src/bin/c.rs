@@ -23,21 +23,19 @@ impl Solver {
     fn solve(&mut self) {
         input! {
             N: usize,
-            K: usize,
-            A: [usize; N]
+            A: [Usize1; 3*N]
         }
 
-        let mut x = vec![vec![0; N]; 40];
-        let mut s = vec![vec![0; N]; 40];
-        for j in 0..N {}
-        for i in 1..40 {
-            for j in 0..N {}
+        let mut v = vec![vec![]; N];
+        for (i, &a) in A.iter().enumerate() {
+            v[a].push(i);
         }
-        let mut ans = 0;
-        for i in (0..40).rev() {
-            if (K >> i) & 1 == 1 {}
+        let mut ans = vec![];
+        for i in 0..N {
+            ans.push((v[i][1], i));
         }
-        println!("{}", ans);
+        ans.sort();
+        println!("{}", ans.iter().map(|(_, x)| x + 1).join(" "));
     }
 }
 

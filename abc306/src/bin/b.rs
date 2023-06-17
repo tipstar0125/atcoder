@@ -22,20 +22,15 @@ impl Solver {
     #[fastout]
     fn solve(&mut self) {
         input! {
-            N: usize,
-            K: usize,
-            A: [usize; N]
+            A: [usize; 64]
         }
-
-        let mut x = vec![vec![0; N]; 40];
-        let mut s = vec![vec![0; N]; 40];
-        for j in 0..N {}
-        for i in 1..40 {
-            for j in 0..N {}
-        }
+        let mut p = 1_usize;
         let mut ans = 0;
-        for i in (0..40).rev() {
-            if (K >> i) & 1 == 1 {}
+        for (i, &a) in A.iter().enumerate() {
+            ans += a * p;
+            if i < 63 {
+                p *= 2;
+            }
         }
         println!("{}", ans);
     }
