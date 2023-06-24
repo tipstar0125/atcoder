@@ -37,82 +37,75 @@ impl Solver {
         for _ in 0..N - K {
             *mp2.entry(0).or_default() += 1;
         }
+        if N == K {
+            *mp2.entry(0).or_default() += 1;
+        }
 
         let mut ans = 0;
 
         for &(x, y) in &XY {
             let before = A[x];
             A[x] = y;
-            let min = get_min(&mut mp1);
-            let max = get_max(&mut mp2);
+            let (&min, _) = mp1.iter().next().unwrap();
+            let (&max, _) = mp2.iter().next_back().unwrap();
             if before <= max && y <= max {
                 *mp2.entry(y).or_default() += 1;
                 *mp2.entry(before).or_default() -= 1;
+                if mp2[&before] == 0 {
+                    mp2.remove(&before);
+                }
             } else if before >= min && y >= min {
                 *mp1.entry(y).or_default() += 1;
                 *mp1.entry(before).or_default() -= 1;
+                if mp1[&before] == 0 {
+                    mp1.remove(&before);
+                }
                 ans += y;
                 ans -= before;
             } else if before >= min && y <= max {
-                *mp2.entry(y).or_default() += 1;
                 *mp1.entry(max).or_default() += 1;
+                *mp2.entry(y).or_default() += 1;
                 *mp1.entry(before).or_default() -= 1;
                 *mp2.entry(max).or_default() -= 1;
+                if mp1[&before] == 0 {
+                    mp1.remove(&before);
+                }
+                if mp2[&max] == 0 {
+                    mp2.remove(&max);
+                }
                 ans += max;
                 ans -= before;
             } else if before <= max && y >= min {
                 *mp1.entry(y).or_default() += 1;
                 *mp2.entry(min).or_default() += 1;
-                *mp2.entry(before).or_default() -= 1;
                 *mp1.entry(min).or_default() -= 1;
+                *mp2.entry(before).or_default() -= 1;
+                if mp1[&min] == 0 {
+                    mp1.remove(&min);
+                }
+                if mp2[&before] == 0 {
+                    mp2.remove(&before);
+                }
                 ans += y;
                 ans -= min;
             } else if before >= min && y < min {
                 *mp1.entry(y).or_default() += 1;
                 *mp1.entry(before).or_default() -= 1;
+                if mp1[&before] == 0 {
+                    mp1.remove(&before);
+                }
                 ans += y;
                 ans -= before;
             } else if before <= max && y > max {
                 *mp2.entry(y).or_default() += 1;
                 *mp2.entry(before).or_default() -= 1;
+                if mp2[&before] == 0 {
+                    mp2.remove(&before);
+                }
             }
             println!("{}", ans);
         }
     }
-}
-
-fn get_min(mp: &mut BTreeMap<usize, usize>) -> usize {
-    let mut res = 0;
-    let mut zeros = vec![];
-    for (k, v) in mp.iter() {
-        if *v == 0 {
-            zeros.push(*k);
-        } else {
-            res = *k;
-            break;
-        }
-    }
-    for x in zeros {
-        mp.remove(&x);
-    }
-    res
-}
-
-fn get_max(mp: &mut BTreeMap<usize, usize>) -> usize {
-    let mut res = 0;
-    let mut zeros = vec![];
-    for (k, v) in mp.iter().rev() {
-        if *v == 0 {
-            zeros.push(*k);
-        } else {
-            res = *k;
-            break;
-        }
-    }
-    for x in zeros {
-        mp.remove(&x);
-    }
-    res
 }
 
 #[macro_export]
