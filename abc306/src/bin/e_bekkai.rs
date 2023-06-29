@@ -29,16 +29,13 @@ impl Solver {
         }
 
         let mut A = vec![0; N];
-        let mut mp1: BTreeMap<usize, usize> = BTreeMap::new();
-        let mut mp2: BTreeMap<usize, usize> = BTreeMap::new();
-        for _ in 0..K {
-            *mp1.entry(0).or_default() += 1;
+        let mut X = BTreeSet::new();
+        let mut Y = BTreeSet::new();
+        for i in 0..K {
+            X.insert((0, i));
         }
-        for _ in 0..N - K {
-            *mp2.entry(0).or_default() += 1;
-        }
-        if N == K {
-            *mp2.entry(0).or_default() += 1;
+        for i in K..N {
+            Y.insert((0, i));
         }
 
         let mut ans = 0;
@@ -46,61 +43,32 @@ impl Solver {
         for &(x, y) in &XY {
             let before = A[x];
             A[x] = y;
-            let (&min, _) = mp1.iter().next().unwrap();
-            let (&max, _) = mp2.iter().next_back().unwrap();
-            if before <= max && y <= max {
-                *mp2.entry(y).or_default() += 1;
-                *mp2.entry(before).or_default() -= 1;
-                if mp2[&before] == 0 {
-                    mp2.remove(&before);
-                }
-            } else if before >= min && y >= min {
-                *mp1.entry(y).or_default() += 1;
-                *mp1.entry(before).or_default() -= 1;
-                if mp1[&before] == 0 {
-                    mp1.remove(&before);
-                }
-                ans += y;
-                ans -= before;
-            } else if before >= min && y <= max {
-                *mp1.entry(max).or_default() += 1;
-                *mp2.entry(y).or_default() += 1;
-                *mp1.entry(before).or_default() -= 1;
-                *mp2.entry(max).or_default() -= 1;
-                if mp1[&before] == 0 {
-                    mp1.remove(&before);
-                }
-                if mp2[&max] == 0 {
-                    mp2.remove(&max);
-                }
-                ans += max;
-                ans -= before;
-            } else if before <= max && y >= min {
-                *mp1.entry(y).or_default() += 1;
-                *mp2.entry(min).or_default() += 1;
-                *mp1.entry(min).or_default() -= 1;
-                *mp2.entry(before).or_default() -= 1;
-                if mp1[&min] == 0 {
-                    mp1.remove(&min);
-                }
-                if mp2[&before] == 0 {
-                    mp2.remove(&before);
-                }
-                ans += y;
-                ans -= min;
-            } else if before >= min && y < min {
-                *mp1.entry(y).or_default() += 1;
-                *mp1.entry(before).or_default() -= 1;
-                if mp1[&before] == 0 {
-                    mp1.remove(&before);
-                }
-                ans += y;
-                ans -= before;
-            } else if before <= max && y > max {
-                *mp2.entry(y).or_default() += 1;
-                *mp2.entry(before).or_default() -= 1;
-                if mp2[&before] == 0 {
-                    mp2.remove(&before);
+            if before != y {
+                if X.contains(&(before, x)) {
+                    if Y.is_empty() || y > Y.iter().next_back().unwrap().0 {
+                        X.insert((y, x));
+                        ans += y;
+                    } else {
+                        let Y_max = *Y.iter().next_back().unwrap();
+                        X.insert(Y_max);
+                        Y.insert((y, x));
+                        Y.remove(&Y_max);
+                        ans += Y_max.0;
+                    }
+                    X.remove(&(before, x));
+                    ans -= before;
+                } else {
+                    if y < X.iter().next().unwrap().0 {
+                        Y.insert((y, x));
+                    } else {
+                        let X_min = *X.iter().next().unwrap();
+                        Y.insert(X_min);
+                        X.insert((y, x));
+                        X.remove(&X_min);
+                        ans += y;
+                        ans -= X_min.0;
+                    }
+                    Y.remove(&(before, x));
                 }
             }
             println!("{}", ans);
