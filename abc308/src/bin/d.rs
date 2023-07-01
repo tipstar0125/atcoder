@@ -59,11 +59,11 @@ fn dfs(
         return;
     }
     let mut mp: BTreeMap<char, char> = BTreeMap::new();
-    *mp.entry('s').or_default() = 'n';
-    *mp.entry('n').or_default() = 'u';
-    *mp.entry('u').or_default() = 'k';
-    *mp.entry('k').or_default() = 'e';
-    *mp.entry('e').or_default() = 's';
+    mp.insert('s', 'n');
+    mp.insert('n', 'u');
+    mp.insert('u', 'k');
+    mp.insert('k', 'e');
+    mp.insert('e', 's');
 
     for &(dx, dy) in &DIJ4 {
         let x1 = x.wrapping_add(dx);
