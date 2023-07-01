@@ -1,0 +1,28 @@
+---
+type: Batch
+timelimit: 2s
+match: Lines
+
+cases:
+  - name: sample1
+    in: |
+      3 2
+      red green blue
+      blue red
+      800 1600 2800
+    out: |
+      5200
+  - name: sample2
+    in: |
+      3 2
+      code queen atcoder
+      king queen
+      10 1 1
+    out: |
+      21
+
+extend:
+  - type: Text
+    path: "./b"
+    in: /in/*.txt
+    out: /out/*.txt
