@@ -22,34 +22,29 @@ impl Solver {
     #[fastout]
     fn solve(&mut self) {
         input! {
-            N: usize,
-            M: usize,
-            P: [usize; N],
-            L: [usize; M],
-            D: [usize; M],
+            T: usize
         }
 
-        let mut DL = vec![];
-        for i in 0..M {
-            DL.push((D[i], L[i]));
-        }
-        DL.sort();
-        DL.reverse();
+        for _ in 0..T {
+            input! {
+                N: usize,
+                S: Chars
+            }
 
-        let mut set = BTreeSet::new();
-        for i in 0..N {
-            set.insert((P[i], i));
-        }
-        let mut ans: usize = P.iter().sum();
-        for &(d, l) in &DL {
-            let p = set.range((l, 0)..).next();
-            if p.is_some() {
-                let pp = *p.unwrap();
-                set.remove(&pp);
-                ans -= d;
+            let mut ok = false;
+            for i in 1..N {
+                let T = &S[..i];
+                let U = &S[i..];
+                if T < U {
+                    ok = true
+                }
+            }
+            if ok {
+                println!("Yes");
+            } else {
+                println!("No");
             }
         }
-        println!("{}", ans);
     }
 }
 
