@@ -43,39 +43,32 @@ impl Solver {
             res
         };
 
-        let mut S_m = vec![vec![0; 3]; N];
-        for i in 0..N {
-            if i != 0 {
-                for j in 0..3 {
-                    S_m[i][j] = S_m[i - 1][j];
-                }
-            }
-            if S[i] == 'M' {
-                S_m[i][A[i]] += 1;
-            }
-        }
-        let mut S_x = vec![vec![0; 3]; N];
-        for i in (0..N).rev() {
-            if i != N - 1 {
-                for j in 0..3 {
-                    S_x[i][j] = S_x[i + 1][j];
-                }
-            }
-            if S[i] == 'X' {
-                S_x[i][A[i]] += 1;
-            }
-        }
-
         let mut ans = 0_usize;
-        for i in 0..N {
-            if S[i] != 'E' {
-                continue;
-            }
-            let y = A[i];
-            for x in 0..3 {
-                for z in 0..3 {
-                    let m = mex(x, y, z);
-                    ans += m * S_m[i][x] * S_x[i][z];
+        for i in 0..3 {
+            for j in 0..3 {
+                for k in 0..3 {
+                    let m = mex(i, j, k);
+                    if m == 0 {
+                        continue;
+                    }
+                    let mut dp = vec![vec![0; 3]; N + 1];
+                    for l in 1..=N {
+                        let a = A[l - 1];
+                        let s = S[l - 1];
+                        dp[l][0] = dp[l - 1][0];
+                        dp[l][1] = dp[l - 1][1];
+                        dp[l][2] = dp[l - 1][2];
+                        if s == 'M' && a == i {
+                            dp[l][0] += 1;
+                        }
+                        if s == 'E' && a == j {
+                            dp[l][1] += dp[l][0];
+                        }
+                        if s == 'X' && a == k {
+                            dp[l][2] += dp[l][1];
+                        }
+                    }
+                    ans += m * dp[N][2];
                 }
             }
         }
