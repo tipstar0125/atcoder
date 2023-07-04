@@ -24,31 +24,29 @@ impl Solver {
         input! {
             N: usize,
             M: usize,
-            mut P: [usize; N],
+            P: [usize; N],
             L: [usize; M],
             D: [usize; M],
         }
 
-        let mut heap = BinaryHeap::new();
-        for (&l, &d) in L.iter().zip(D.iter()) {
-            heap.push(Reverse((l, d)));
+        let mut DL = vec![];
+        for i in 0..M {
+            DL.push((D[i], L[i]));
         }
+        DL.sort();
+        DL.reverse();
 
-        P.sort();
-        let mut ans = 0_usize;
-        let mut heap_max = BinaryHeap::new();
-        for &p in &P {
-            ans += p;
-            while let Some(Reverse((l, d))) = heap.pop() {
-                if p >= l {
-                    heap_max.push(d);
-                } else {
-                    heap.push(Reverse((l, d)));
-                    break;
-                }
-            }
-            if let Some(x) = heap_max.pop() {
-                ans -= x;
+        let mut set = BTreeSet::new();
+        for i in 0..N {
+            set.insert((P[i], i));
+        }
+        let mut ans: usize = P.iter().sum();
+        for &(d, l) in &DL {
+            let p = set.range((l, 0)..).next();
+            if p.is_some() {
+                let pp = *p.unwrap();
+                set.remove(&pp);
+                ans -= d;
             }
         }
         println!("{}", ans);
