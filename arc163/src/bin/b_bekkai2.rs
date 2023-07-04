@@ -7,7 +7,7 @@
 #![allow(clippy::neg_multiply)]
 #![allow(dead_code)]
 use itertools::Itertools;
-use std::cmp::{min, Reverse};
+use std::cmp::{Reverse, min};
 use std::collections::{BTreeMap, BTreeSet, BinaryHeap, VecDeque};
 use superslice::Ext;
 
@@ -23,29 +23,43 @@ impl Solver {
     fn solve(&mut self) {
         input! {
             N: usize,
-            M: usize,
-            x: usize,
-            y: usize,
-            mut A: [usize; N - 2]
+            mut M: usize,
+            A: [usize; N]
         }
 
-        let N = N - 2;
-        A.sort();
+        let mut B = A[2..].iter().collect_vec();
+        B.sort();
+        let a0 = A[0];
+        let a1 = A[1];
+
+        let mut mp: BTreeMap<usize, usize> = BTreeMap::new();
+        for &b in &B {
+            *mp.entry(*b).or_default() += 1;
+        }
+        B.dedup();
+
         let mut ans = 1_usize << 60;
-
-        for i in 0..N - M + 1 {
-            let l = A[i];
-            let r = A[i + M - 1];
-            let mut d = 0;
-            if x > l {
-                d += x - l;
+        let mut s = mp[B[0]];
+        let mut r = 0_usize;
+        for l in 0..B.len() {
+            while r < B.len() - 1 && s < M {
+                r += 1;
+                s += mp[B[r]];
             }
-            if y < r {
-                d += r - y;
+            let b0 = B[l];
+            let b1 = B[r];
+            if s >= M {
+                let mut d = 0;
+                if a0 > *b0 {
+                    d += a0 - b0;
+                }
+                if a1 < *b1 {
+                    d += b1 - a1;
+                }
+                ans = min!(ans, d);
             }
-            ans = min!(ans, d);
+            s -= mp[B[l]];
         }
-
         println!("{}", ans);
     }
 }
