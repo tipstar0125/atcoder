@@ -23,51 +23,37 @@ impl Solver {
     fn solve(&mut self) {
         input! {
             N: usize,
-            Q: usize,
+            A: [isize; N]
         }
 
-        let mut seg = SegmentTree::new(N);
+        let mut seg = SegmentTree::new(N + 1);
+        let mut ans = 0_usize;
 
-        for _ in 0..Q {
-            input! {
-                t: usize
-            }
-
-            if t == 1 {
-                input! {
-                    pos: Usize1,
-                    x: isize
-                }
-                seg.update(pos, x);
-            } else {
-                input! {
-                    l: usize,
-                    r: usize
-                }
-                let ans = seg.query(l, r, 1, seg.offset + 1, 1);
-                println!("{}", ans);
-            }
+        for (i, &a) in A.iter().enumerate() {
+            ans += i - seg.query(1, a as usize, 1, seg.size + 1, 1) as usize;
+            seg.update(a as usize - 1, 1);
         }
+        println!("{}", ans);
     }
 }
 
 #[derive(Debug, Clone)]
 struct SegmentTree {
-    offset: usize,
+    size: usize,
     data: Vec<isize>,
 }
 
 impl SegmentTree {
     fn new(n: usize) -> Self {
-        let mut offset = 1;
-        while offset < n {
-            offset *= 2;
+        let mut size = 1;
+        while size < n {
+            size *= 2;
         }
-        let data = vec![0; offset * 2];
-        SegmentTree { offset, data }
+        let data = vec![0; size * 2];
+        SegmentTree { size, data }
     }
     fn update(&mut self, pos: usize, x: isize) {
-        let mut pos = pos + self.offset;
+        let mut pos = pos + self.size;
         self.data[pos] = x;
         while pos > 1 {
             pos /= 2;
