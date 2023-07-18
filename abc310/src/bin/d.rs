@@ -27,7 +27,54 @@ impl Solver {
             M: usize,
             AB: [(Usize1, Usize1); M]
         }
+
+        let teams = vec![vec![0]];
+        let mut ans = 0_usize;
+        dfs(0, teams, N, T, &AB, &mut ans);
+        println!("{}", ans);
     }
+}
+
+fn dfs(
+    pos: usize,
+    teams: Vec<Vec<usize>>,
+    N: usize,
+    T: usize,
+    AB: &Vec<(usize, usize)>,
+    ans: &mut usize,
+) {
+    if teams.len() == T && pos + 1 == N {
+        let mut ok = true;
+        for t in teams.iter() {
+            if t.len() >= 2 {
+                for v in t.iter().combinations(2) {
+                    let a = *v[0];
+                    let b = *v[1];
+                    if AB.contains(&(a, b)) || AB.contains(&(b, a)) {
+                        ok = false;
+                    }
+                }
+            }
+        }
+        if ok {
+            *ans += 1;
+        }
+    }
+
+    if pos + 1 == N {
+        return;
+    }
+    for i in 0..teams.len() {
+        let mut next_teams = teams.clone();
+        next_teams[i].push(pos + 1);
+        dfs(pos + 1, next_teams, N, T, AB, ans);
+    }
+    if teams.len() + 1 > T {
+        return;
+    }
+    let mut next_teams = teams;
+    next_teams.push(vec![pos + 1]);
+    dfs(pos + 1, next_teams, N, T, AB, ans);
 }
 
 fn main() {
