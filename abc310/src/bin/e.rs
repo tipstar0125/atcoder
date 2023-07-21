@@ -7,9 +7,9 @@
 #![allow(clippy::neg_multiply)]
 #![allow(dead_code)]
 use itertools::Itertools;
-use superslice::Ext;
 use std::cmp::Reverse;
 use std::collections::{BTreeMap, BTreeSet, BinaryHeap, VecDeque};
+use superslice::Ext;
 
 use proconio::{
     fastout, input,
@@ -21,7 +21,27 @@ struct Solver {}
 impl Solver {
     #[fastout]
     fn solve(&mut self) {
-        input! {}
+        input! {
+            N: usize,
+            S: Chars
+        }
+
+        let mut ans = 0;
+        let mut dp = vec![vec![0_usize; 2]; N + 1];
+
+        for i in 1..=N {
+            let s = S[i - 1];
+            if s == '0' {
+                dp[i][0] = 1;
+                dp[i][1] = dp[i - 1][0] + dp[i - 1][1];
+            } else {
+                dp[i][0] = dp[i - 1][1];
+                dp[i][1] = dp[i - 1][0];
+                dp[i][1] += 1;
+            }
+            ans += dp[i][1];
+        }
+        println!("{}", ans);
     }
 }
 
