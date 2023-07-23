@@ -22,39 +22,32 @@ impl Solver {
     #[fastout]
     fn solve(&mut self) {
         input! {
+            H: usize,
+            W: usize,
             N: usize,
-            HWD: [[usize; 3]; N]
+            AB: [(usize, usize); N]
         }
 
-        let mut XYZ = HWD;
-
-        for i in 0..N {
-            XYZ[i].sort();
+        let mut S = vec![vec![0; W + 1]; H + 1];
+        for &(a, b) in &AB {
+            S[a][b] = 1;
         }
-        XYZ.sort();
-        XYZ.reverse();
-        let mut mp: BTreeMap<usize, usize> = BTreeMap::new();
-        mp.insert(XYZ[0][1], XYZ[0][2]);
 
-        for i in 1..N {
-            let x0 = XYZ[i - 1][0];
-            let x1 = XYZ[i][0];
-            let y1 = XYZ[i][1];
-            let z1 = XYZ[i][2];
+        let mut dp = vec![vec![0_usize; W + 1]; H + 1];
+        let mut ans = 0_usize;
 
-            if let Some(y) = mp.range(y1 + 1..).next() {
-                if x0 > x1 && mp[y.0] > z1 {
-                    println!("Yes");
-                    return;
+        for i in 1..=H {
+            for j in 1..=W {
+                if S[i][j] == 1 {
+                    continue;
                 }
-            }
-            if mp.contains_key(&y1) {
-                *mp.entry(y1).or_default() = max!(mp[&y1], z1);
-            } else {
-                mp.insert(y1, z1);
+                let mut min = min!(dp[i - 1][j], dp[i][j - 1]);
+                min = min!(min, dp[i - 1][j - 1]);
+                dp[i][j] = min + 1;
+                ans += dp[i][j];
             }
         }
-        println!("No");
+        println!("{}", ans);
     }
 }
 

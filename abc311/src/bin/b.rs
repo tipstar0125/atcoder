@@ -23,39 +23,41 @@ impl Solver {
     fn solve(&mut self) {
         input! {
             N: usize,
-            HWD: [[usize; 3]; N]
+            D: usize,
+            S: [Chars; N]
         }
 
-        let mut XYZ = HWD;
-
-        for i in 0..N {
-            XYZ[i].sort();
-        }
-        XYZ.sort();
-        XYZ.reverse();
-        let mut mp: BTreeMap<usize, usize> = BTreeMap::new();
-        mp.insert(XYZ[0][1], XYZ[0][2]);
-
-        for i in 1..N {
-            let x0 = XYZ[i - 1][0];
-            let x1 = XYZ[i][0];
-            let y1 = XYZ[i][1];
-            let z1 = XYZ[i][2];
-
-            if let Some(y) = mp.range(y1 + 1..).next() {
-                if x0 > x1 && mp[y.0] > z1 {
-                    println!("Yes");
-                    return;
+        let mut ans = 0_usize;
+        let mut v = vec![];
+        for i in 0..D {
+            let mut ok = 1;
+            for j in 0..N {
+                if S[j][i] == 'x' {
+                    ok = 0;
                 }
             }
-            if mp.contains_key(&y1) {
-                *mp.entry(y1).or_default() = max!(mp[&y1], z1);
-            } else {
-                mp.insert(y1, z1);
+            v.push(ok);
+        }
+
+        let rle = run_length_encoding(v);
+        for &(k, v) in &rle {
+            if k == 1 {
+                ans = max!(ans, v);
             }
         }
-        println!("No");
+        println!("{}", ans);
     }
+}
+
+fn run_length_encoding<T: Eq>(v: Vec<T>) -> Vec<(T, usize)> {
+    let mut v = v.into_iter().map(|v| (v, 1)).collect::<Vec<_>>();
+    v.dedup_by(|a, b| {
+        a.0 == b.0 && {
+            b.1 += a.1;
+            true
+        }
+    });
+    v
 }
 
 #[macro_export]
