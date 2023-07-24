@@ -46,7 +46,7 @@ impl Solver {
             for &(y1, z1) in &XYZ[x] {
                 if y1 + 1 < L {
                     let y = y1 + 1;
-                    let z = seg.query(y + 1, L + 1, 1, seg.offset + 1, 1) as usize;
+                    let z = seg.query(y + 1, seg.offset + 1, 1, seg.offset + 1, 1) as usize;
                     if z > z1 {
                         println!("Yes");
                         return;
