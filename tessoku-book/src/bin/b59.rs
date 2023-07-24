@@ -31,7 +31,7 @@ impl Solver {
 
         for &a in &A {
             ans += seg.query(a as usize, N + 1, 1, seg.offset + 1, 1) as usize;
-            seg.update(a as usize - 1, 1);
+            seg.set(a as usize - 1, 1);
         }
         println!("{}", ans);
     }
@@ -52,7 +52,8 @@ impl SegmentTree {
         let data = vec![0; offset * 2];
         SegmentTree { offset, data }
     }
-    fn update(&mut self, pos: usize, x: isize) {
+    // pos: 0-indexed!!
+    fn set(&mut self, pos: usize, x: isize) {
         let mut pos = pos + self.offset;
         self.data[pos] = x;
         while pos > 1 {
@@ -60,8 +61,11 @@ impl SegmentTree {
             self.data[pos] = self.data[pos * 2] + self.data[pos * 2 + 1];
         }
     }
+    fn get(&self, pos: usize) -> isize {
+        self.data[self.offset + pos]
+    }
     // u: current cell number
-    // (a, b], (l, r]
+    // 1-indexed!!, [l, r), [a, b)
     fn query(&self, l: usize, r: usize, a: usize, b: usize, u: usize) -> isize {
         if r <= a || b <= l {
             return 0;

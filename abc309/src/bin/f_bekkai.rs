@@ -33,31 +33,29 @@ impl Solver {
             }
         }
         let mp = coordinate_compression(v);
-        let L = mp.len();
-        let mut XYZ = vec![vec![]; L];
+        let mut XYZ = vec![];
         for i in 0..N {
             HWD[i].sort();
-            XYZ[mp[&HWD[i][0]]].push((mp[&HWD[i][1]], mp[&HWD[i][2]]));
+            XYZ.push((mp[&HWD[i][0]], mp[&HWD[i][1]], mp[&HWD[i][2]]));
         }
+        XYZ.sort_by(|a, b| (b.0, a.1).cmp(&(a.0, b.1)));
 
+        let L = mp.len();
         let mut seg = SegmentTree::new(L);
 
-        for x in (0..L).rev() {
-            for &(y1, z1) in &XYZ[x] {
-                if y1 + 1 < L {
-                    let y = y1 + 1;
-                    let z = seg.query(y + 1, L + 1, 1, seg.offset + 1, 1) as usize;
-                    if z > z1 {
-                        println!("Yes");
-                        return;
-                    }
+        for i in 0..N {
+            let (_, y1, z1) = XYZ[i];
+            if y1 + 1 < L {
+                let y = y1 + 1;
+                let z = seg.query(y + 1, L + 1, 1, seg.offset + 1, 1) as usize;
+                if z > z1 {
+                    println!("Yes");
+                    return;
                 }
             }
-            for &(y1, z1) in &XYZ[x] {
-                let now = seg.get(y1) as usize;
-                if now < z1 {
-                    seg.set(y1, z1 as isize);
-                }
+            let now = seg.get(y1) as usize;
+            if now < z1 {
+                seg.set(y1, z1 as isize);
             }
         }
         println!("No");
