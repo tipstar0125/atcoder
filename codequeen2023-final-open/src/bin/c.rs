@@ -73,7 +73,7 @@ impl Solver {
                 }
             }
         }
-        println!("{}", ans.iter().join(" "));
+        println!("{}", ans.iter().join("\n"));
     }
 }
 
