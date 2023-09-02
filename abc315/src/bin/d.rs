@@ -6,8 +6,6 @@
 #![allow(clippy::nonminimal_bool)]
 #![allow(clippy::neg_multiply)]
 #![allow(dead_code)]
-use fixedbitset::Union;
-use itertools::Itertools;
 use std::cmp::Reverse;
 use std::collections::{BTreeMap, BTreeSet, BinaryHeap, VecDeque};
 use superslice::Ext;
@@ -28,57 +26,72 @@ impl Solver {
             C: [Chars; H]
         }
 
-        let mut row_same = vec![];
+        let mut rows = vec![vec![0; 26]; H];
         for i in 0..H {
-            let mut row = BTreeSet::new();
             for j in 0..W {
-                row.insert(C[i][j]);
-            }
-            if row.len() == 1 {
-                row_same.push(i);
+                let n = C[i][j] as u8 - b'a';
+                rows[i][n as usize] += 1;
             }
         }
-        let mut col_same = vec![];
+        let mut cols = vec![vec![0; 26]; W];
         for j in 0..W {
-            let mut col = BTreeSet::new();
             for i in 0..H {
-                col.insert(C[i][j]);
-            }
-            if col.len() == 1 {
-                col_same.push(j);
+                let n = C[i][j] as u8 - b'a';
+                cols[j][n as usize] += 1;
             }
         }
 
-        let mut uf = UnionFind::new(H * W);
-        for i in 0..H {
-            for j in 1..W {
-                if C[i][j - 1] == C[i][j] {
-                    uf.unite(i * W + j, i * W + j - 1);
+        let mut HH = H;
+        let mut WW = W;
+        let mut removed_H = vec![false; H];
+        let mut removed_W = vec![false; W];
+        for _ in 0..H + W {
+            let mut cnt_h = 0;
+            let mut removed_rows = vec![];
+            for i in 0..H {
+                if removed_H[i] {
+                    continue;
+                }
+                for n in 0..26 {
+                    if rows[i][n] == WW && WW >= 2 {
+                        cnt_h += 1;
+                        removed_H[i] = true;
+                        removed_rows.push((n, i));
+                    }
                 }
             }
-        }
-        for i in 1..H {
+            let mut cnt_w = 0;
+            let mut removed_cols = vec![];
             for j in 0..W {
-                if C[i - 1][j] == C[i][j] {
-                    uf.unite(i * W + j, (i - 1) * W + j);
+                if removed_W[j] {
+                    continue;
+                }
+                for n in 0..26 {
+                    if cols[j][n] == HH && HH >= 2 {
+                        cnt_w += 1;
+                        removed_W[j] = true;
+                        removed_cols.push((n, j));
+                    }
+                }
+            }
+            HH -= cnt_h;
+            WW -= cnt_w;
+            for &(n, _) in &removed_rows {
+                for j in 0..W {
+                    if cols[j][n] > 0 {
+                        cols[j][n] -= 1;
+                    }
+                }
+            }
+            for &(n, _) in &removed_cols {
+                for i in 0..H {
+                    if rows[i][n] > 0 {
+                        rows[i][n] -= 1;
+                    }
                 }
             }
         }
-        let mut ans = 0;
-        for (_, group) in uf.all_group_members() {
-            let mut ok = true;
-            for x in group {
-                let r = x / W;
-                let c = x % W;
-                if row_same.contains(&r) || col_same.contains(&c) {
-                    ok = false;
-                }
-            }
-            if ok {
-                ans += 1;
-            }
-        }
-        println!("{}", ans);
+        println!("{}", HH * WW);
     }
 }
 
