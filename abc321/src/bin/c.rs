@@ -26,11 +26,12 @@ impl Solver {
         }
         let mut v = vec![];
         for i in 1..=10 {
-            for nn in (0..=9).combinations(i) {
-                let mut s = 0;
-                for (j, &n) in nn.iter().enumerate() {
-                    s += n * 10_usize.pow(j as u32);
-                }
+            for comb in (0..=9).combinations(i) {
+                let s = comb
+                    .iter()
+                    .enumerate()
+                    .map(|(j, n)| n * 10_usize.pow(j as u32))
+                    .sum::<usize>();
                 v.push(s);
             }
         }
