@@ -31,14 +31,12 @@ impl Solver {
                 for (j, &n) in nn.iter().enumerate() {
                     s += n * 10_usize.pow(j as u32);
                 }
-                if s != 0 {
-                    v.push(s);
-                }
+                v.push(s);
             }
         }
         v.sort();
         v.dedup();
-        println!("{}", v[K - 1]);
+        println!("{}", v[K]);
     }
 }
 
