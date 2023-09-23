@@ -24,16 +24,57 @@ impl Solver {
         input! {
             N: usize
         }
-        let mut D = vec![vec![]; N];
+        let mut D = vec![vec![0; N]; N];
         for i in 0..N - 1 {
             input! {
                 d: [usize; N-i-1]
             }
             for (j, &w) in d.iter().enumerate() {
-                D[i].push((i + j + 1, w));
-                D[i + j + 1].push((i, w));
+                D[i][i + j + 1] = w;
+                D[i + j + 1][i] = w;
             }
         }
+
+        let MAX = 1_usize << N;
+        let mut dp = vec![0; MAX];
+        for s in 0..MAX {
+            let one_cnt = s.count_ones();
+            if one_cnt % 2 != 0 {
+                continue;
+            }
+            let mut zero_vec = vec![];
+            for i in 0..N {
+                if (s >> i) & 1 == 0 {
+                    zero_vec.push(i);
+                }
+            }
+            if zero_vec.len() < 2 {
+                continue;
+            }
+            for comb in zero_vec.iter().combinations(2) {
+                let i = *comb[0];
+                let j = *comb[1];
+                let next = s | 1 << i | 1 << j;
+                dp[next] = max!(dp[next], dp[s] + D[i][j]);
+            }
+        }
+        let ans = dp.iter().max().unwrap();
+        println!("{}", ans);
+    }
+}
+
+#[macro_export]
+macro_rules! max {
+    ($x: expr) => ($x);
+    ($x: expr, $( $y: expr ),+) => {
+        std::cmp::max($x, max!($( $y ),+))
+    }
+}
+#[macro_export]
+macro_rules! min {
+    ($x: expr) => ($x);
+    ($x: expr, $( $y: expr ),+) => {
+        std::cmp::min($x, min!($( $y ),+))
     }
 }
 
