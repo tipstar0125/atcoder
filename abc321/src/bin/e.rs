@@ -38,10 +38,7 @@ impl Solver {
 
             let mut ans = count(X, K, N);
 
-            loop {
-                if X == 1 || K == 1 {
-                    break;
-                }
+            while X != 1 && K != 1 {
                 ans += count(X ^ 1, K - 2, N);
                 X >>= 1;
                 K -= 1;
