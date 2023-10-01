@@ -34,9 +34,9 @@ impl Solver {
         }
 
         let INF = 1_usize << 60;
-        let mut cost = vec![vec![INF; W]; H];
+        let mut cost = vec![vec![vec![INF; 5]; W]; H];
         let mut Q = VecDeque::new();
-        cost[rs][cs] = 0;
+        cost[rs][cs][4] = 0;
         Q.push_back((rs, cs, 4));
         while let Some((r, c, dir)) = Q.pop_front() {
             for (i, &(dr, dc)) in DIJ4.iter().enumerate() {
@@ -49,21 +49,36 @@ impl Solver {
                     continue;
                 }
                 if dir == 4 || i == dir {
-                    if cost[nr][nc] > cost[r][c] {
-                        cost[nr][nc] = cost[r][c];
+                    if cost[nr][nc][i] > cost[r][c][dir] {
+                        cost[nr][nc][i] = cost[r][c][dir];
                         Q.push_front((nr, nc, i));
                     }
-                } else if cost[nr][nc] > cost[r][c] + 1 {
-                    cost[nr][nc] = cost[r][c] + 1;
+                } else if cost[nr][nc][i] > cost[r][c][dir] + 1 {
+                    cost[nr][nc][i] = cost[r][c][dir] + 1;
                     Q.push_back((nr, nc, i));
                 }
             }
         }
-
-        for row in &cost {
-            println!("{:?}", row);
+        let mut ans = INF;
+        for dir in 0..4 {
+            ans = min!(ans, cost[rt][ct][dir]);
         }
-        println!("{}", cost[rt][ct]);
+        println!("{}", ans);
+    }
+}
+
+#[macro_export]
+macro_rules! max {
+    ($x: expr) => ($x);
+    ($x: expr, $( $y: expr ),+) => {
+        std::cmp::max($x, max!($( $y ),+))
+    }
+}
+#[macro_export]
+macro_rules! min {
+    ($x: expr) => ($x);
+    ($x: expr, $( $y: expr ),+) => {
+        std::cmp::min($x, min!($( $y ),+))
     }
 }
 
