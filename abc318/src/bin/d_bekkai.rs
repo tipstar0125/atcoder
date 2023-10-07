@@ -35,54 +35,30 @@ impl Solver {
             }
         }
 
-        let mut pairs = vec![];
-        let mut used = vec![false; N];
-
-        fn dfs(
-            pairs: &mut Vec<(usize, usize)>,
-            used: &mut Vec<bool>,
-            N: usize,
-            D: &Vec<Vec<usize>>,
-        ) -> usize {
-            if pairs.len() == N / 2 {
-                let mut ret = 0;
-                for (i, j) in pairs {
-                    ret += D[*i][*j];
-                }
-                return ret;
+        let MAX = 1_usize << N;
+        let mut dp = vec![0; MAX];
+        for s in 0..MAX {
+            let one_cnt = s.count_ones();
+            if one_cnt % 2 != 0 {
+                continue;
             }
-            let mut ret = 0;
-            let mut p = 0;
+            let mut zero_vec = vec![];
             for i in 0..N {
-                if !used[i] {
-                    p = i;
-                    break;
+                if (s >> i) & 1 == 0 {
+                    zero_vec.push(i);
                 }
             }
-            used[p] = true;
-            for i in 0..N {
-                if !used[i] {
-                    pairs.push((p, i));
-                    used[i] = true;
-                    ret = max!(ret, dfs(pairs, used, N, D));
-                    pairs.pop();
-                    used[i] = false;
-                }
+            if zero_vec.len() < 2 {
+                continue;
             }
-            used[p] = false;
-            ret
-        }
-
-        let mut ans = 0;
-        if N % 2 == 0 {
-            ans = dfs(&mut pairs, &mut used, N, &D);
-        } else {
-            for i in 0..N {
-                used[i] = true;
-                ans = max!(ans, dfs(&mut pairs, &mut used, N, &D));
-                used[i] = false;
+            for comb in zero_vec.iter().combinations(2) {
+                let i = *comb[0];
+                let j = *comb[1];
+                let next = s | 1 << i | 1 << j;
+                dp[next] = max!(dp[next], dp[s] + D[i][j]);
             }
         }
+        let ans = dp.iter().max().unwrap();
         println!("{}", ans);
     }
 }
