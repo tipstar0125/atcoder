@@ -32,66 +32,64 @@ impl Solver {
                     a: usize
                 }
                 A[i][j] = a;
+                A[j][i] = a;
             }
         }
 
-        let MAX = 1_usize << (2 * N);
-        let mut dp = vec![BTreeSet::new(); MAX];
-        for bit in 0..MAX {
-            if bit.count_ones() == 2 {
-                let mut pair = vec![];
-                for j in 0..2 * N {
-                    if (bit >> j) & 1 == 1 {
-                        pair.push(j);
-                    }
+        let mut pairs = vec![];
+        let mut used = vec![false; 2 * N];
+
+        fn dfs(
+            pairs: &mut Vec<(usize, usize)>,
+            N: usize,
+            A: &Vec<Vec<usize>>,
+            used: &mut Vec<bool>,
+        ) -> usize {
+            if pairs.len() == N {
+                let mut ret = 0;
+                for (i, j) in pairs {
+                    ret ^= A[*i][*j];
                 }
-                dp[bit].insert(A[pair[0]][pair[1]]);
+                return ret;
             }
-        }
-
-        for s in 0..MAX {
-            let one_cnt = s.count_ones();
-            if one_cnt > 2 && one_cnt % 2 == 0 {
-                let mut ones = vec![];
-                for j in 0..2 * N {
-                    if (s >> j) & 1 == 1 {
-                        ones.push(j);
-                    }
-                }
-
-                for v in ones.iter().combinations(2) {
-                    let mut before_s = 1_usize << v[0];
-                    before_s += 1_usize << v[1];
-                    let x = *dp[before_s].iter().next().unwrap();
-                    for y in dp[s ^ before_s].clone().iter() {
-                        dp[s].insert(x ^ y);
-                    }
+            let mut ret = 0;
+            let mut p = 0;
+            for i in 0..2 * N {
+                if !used[i] {
+                    p = i;
+                    break;
                 }
             }
+            used[p] = true;
+            for i in 0..2 * N {
+                if !used[i] {
+                    pairs.push((p, i));
+                    used[i] = true;
+                    ret = max!(ret, dfs(pairs, N, A, used));
+                    pairs.pop();
+                    used[i] = false;
+                }
+            }
+            used[p] = false;
+            ret
         }
 
-        let ans = dp[MAX - 1].iter().max().unwrap();
-        println!("{}", ans);
+        println!("{}", dfs(&mut pairs, N, &A, &mut used));
     }
 }
 
-pub trait ChangeMinMax {
-    fn chmin(&mut self, x: Self) -> bool;
-    fn chmax(&mut self, x: Self) -> bool;
-}
-
-impl<T: PartialOrd> ChangeMinMax for T {
-    fn chmin(&mut self, x: Self) -> bool {
-        *self > x && {
-            *self = x;
-            true
-        }
+#[macro_export]
+macro_rules! max {
+    ($x: expr) => ($x);
+    ($x: expr, $( $y: expr ),+) => {
+        std::cmp::max($x, max!($( $y ),+))
     }
-    fn chmax(&mut self, x: Self) -> bool {
-        *self < x && {
-            *self = x;
-            true
-        }
+}
+#[macro_export]
+macro_rules! min {
+    ($x: expr) => ($x);
+    ($x: expr, $( $y: expr ),+) => {
+        std::cmp::min($x, min!($( $y ),+))
     }
 }
 
