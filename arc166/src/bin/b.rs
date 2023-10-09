@@ -33,46 +33,86 @@ impl Solver {
         let lcm_ca = lcm(c, a);
         let lcm_abc = lcm(lcm_ab, c);
 
-        let INF = 1_usize << 60;
-        let mut dp = vec![vec![INF; 8]; N + 1];
-        dp[0][0] = 0;
-        for i in 1..=N {
-            let d = D[i - 1];
-            let cost_a = a * ((d + a - 1) / a) - d;
-            let cost_b = b * ((d + b - 1) / b) - d;
-            let cost_c = c * ((d + c - 1) / c) - d;
-            let cost_lcm_ab = lcm_ab * ((d + lcm_ab - 1) / lcm_ab) - d;
-            let cost_lcm_bc = lcm_bc * ((d + lcm_bc - 1) / lcm_bc) - d;
-            let cost_lcm_ca = lcm_ca * ((d + lcm_ca - 1) / lcm_ca) - d;
-            let cost_lcm_abc = lcm_abc * ((d + lcm_abc - 1) / lcm_abc) - d;
-            for j in 0..8 {
-                dp[i][j] = dp[i - 1][j];
-            }
-            dp[i][1] = min!(dp[i][1], dp[i - 1][0] + cost_a);
-            dp[i][2] = min!(dp[i][2], dp[i - 1][0] + cost_b);
-            dp[i][3] = min!(dp[i][3], dp[i - 1][0] + cost_c);
-
-            dp[i][4] = min!(dp[i][4], dp[i - 1][0] + cost_lcm_ab);
-            dp[i][4] = min!(dp[i][4], dp[i - 1][1] + cost_b);
-            dp[i][4] = min!(dp[i][4], dp[i - 1][2] + cost_a);
-
-            dp[i][5] = min!(dp[i][5], dp[i - 1][0] + cost_lcm_bc);
-            dp[i][5] = min!(dp[i][5], dp[i - 1][2] + cost_c);
-            dp[i][5] = min!(dp[i][5], dp[i - 1][3] + cost_b);
-
-            dp[i][6] = min!(dp[i][6], dp[i - 1][0] + cost_lcm_ca);
-            dp[i][6] = min!(dp[i][6], dp[i - 1][1] + cost_c);
-            dp[i][6] = min!(dp[i][6], dp[i - 1][3] + cost_a);
-
-            dp[i][7] = min!(dp[i][7], dp[i - 1][0] + cost_lcm_abc);
-            dp[i][7] = min!(dp[i][7], dp[i - 1][5] + cost_a);
-            dp[i][7] = min!(dp[i][7], dp[i - 1][6] + cost_b);
-            dp[i][7] = min!(dp[i][7], dp[i - 1][4] + cost_c);
-            dp[i][7] = min!(dp[i][7], dp[i - 1][3] + cost_lcm_ab);
-            dp[i][7] = min!(dp[i][7], dp[i - 1][1] + cost_lcm_bc);
-            dp[i][7] = min!(dp[i][7], dp[i - 1][2] + cost_lcm_ca);
+        fn calc_cost(x: usize, y: usize) -> usize {
+            x * ((y + x - 1) / x) - y
         }
-        let ans = dp[N][7];
+
+        let mut cost_a = vec![];
+        let mut cost_b = vec![];
+        let mut cost_c = vec![];
+        let mut cost_ab = vec![];
+        let mut cost_bc = vec![];
+        let mut cost_ca = vec![];
+        let mut cost_abc = vec![];
+        for (i, &d) in D.iter().enumerate() {
+            cost_a.push((calc_cost(a, d), i));
+            cost_b.push((calc_cost(b, d), i));
+            cost_c.push((calc_cost(c, d), i));
+            cost_ab.push((calc_cost(lcm_ab, d), i));
+            cost_bc.push((calc_cost(lcm_bc, d), i));
+            cost_ca.push((calc_cost(lcm_ca, d), i));
+            cost_abc.push((calc_cost(lcm_abc, d), i));
+        }
+        let INF = 1_usize << 60;
+        let mut ans = INF;
+
+        cost_a.sort();
+        cost_b.sort();
+        cost_c.sort();
+        cost_ab.sort();
+        cost_bc.sort();
+        cost_ca.sort();
+        cost_abc.sort();
+
+        let r = min!(N, 3);
+        let cost_a_top = cost_a[0..r].iter().collect_vec();
+        let cost_b_top = cost_b[0..r].iter().collect_vec();
+        let cost_c_top = cost_c[0..r].iter().collect_vec();
+        let cost_ab_top = cost_ab[0..r].iter().collect_vec();
+        let cost_bc_top = cost_bc[0..r].iter().collect_vec();
+        let cost_ca_top = cost_ca[0..r].iter().collect_vec();
+        let cost_abc_top = cost_abc[0..r].iter().collect_vec();
+
+        for i in 0..r {
+            for j in 0..r {
+                for k in 0..r {
+                    let (ca, idx_a) = cost_a_top[i];
+                    let (cb, idx_b) = cost_b_top[j];
+                    let (cc, idx_c) = cost_c_top[k];
+                    if idx_a != idx_b && idx_b != idx_c && idx_c != idx_a {
+                        ans = min!(ans, ca + cb + cc);
+                    }
+                }
+            }
+        }
+        for i in 0..r {
+            for j in 0..r {
+                let (ca, idx_a) = cost_a_top[i];
+                let (cbc, idx_bc) = cost_bc_top[j];
+                if idx_a != idx_bc {
+                    ans = min!(ans, ca + cbc);
+                }
+            }
+        }
+        for i in 0..r {
+            for j in 0..r {
+                let (cb, idx_b) = cost_b_top[i];
+                let (cca, idx_ca) = cost_ca_top[j];
+                if idx_b != idx_ca {
+                    ans = min!(ans, cb + cca);
+                }
+            }
+        }
+        for i in 0..r {
+            for j in 0..r {
+                let (cc, idx_c) = cost_c_top[i];
+                let (cab, idx_ab) = cost_ab_top[j];
+                if idx_c != idx_ab {
+                    ans = min!(ans, cc + cab);
+                }
+            }
+        }
+        ans = min!(ans, cost_abc_top[0].0);
         println!("{}", ans);
     }
 }
