@@ -43,10 +43,6 @@ impl Solver {
         }
 
         while let Some(pos) = Q.pop_front() {
-            if !Q.is_empty() {
-                println!("No");
-                return;
-            }
             for &next in &G[pos] {
                 indegs[next] -= 1;
                 if indegs[next] == 0 {
@@ -61,6 +57,12 @@ impl Solver {
         }
 
         let mut ans = vec![0; N];
+        for i in 1..N {
+            if !G[v[i - 1]].contains(&v[i]) {
+                println!("No");
+                return;
+            }
+        }
         for i in 0..N {
             ans[v[i]] = i + 1;
         }
