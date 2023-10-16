@@ -25,9 +25,43 @@ impl Solver {
     fn solve(&mut self) {
         input! {
             A: usize,
-            B: usize
+            B: usize,
         }
+
+        let pf = prime_factorize(A);
+        let mut enum_num = Mod::one();
+        for (_, e) in pf.iter() {
+            enum_num *= Mod::new(*e) * Mod::new(B) + Mod::one();
+        }
+
+        let mut ans = Mod::new(B) * enum_num;
+        let mut is_even = B % 2 == 0;
+        for (_, e) in pf.iter() {
+            is_even |= e % 2 == 1;
+        }
+        if !is_even {
+            ans -= Mod::one();
+        }
+        ans /= Mod::new(2);
+        println!("{}", ans.value());
     }
+}
+
+fn prime_factorize(n: usize) -> BTreeMap<usize, usize> {
+    let mut nn = n;
+    let mut i = 2;
+    let mut pf: BTreeMap<usize, usize> = BTreeMap::new();
+    while i * i <= n {
+        while nn % i == 0 {
+            *pf.entry(i).or_default() += 1;
+            nn /= i;
+        }
+        i += 1;
+    }
+    if nn != 1 {
+        *pf.entry(nn).or_default() += 1;
+    }
+    pf
 }
 
 type Mod = ModInt;
@@ -63,15 +97,15 @@ impl ModInt {
         ret
     }
     fn inv(&self) -> Self {
-        fn ext_gcd(a: usize, b: usize) -> (isize, isize, usize) {
+        fn ext_gcd(a: usize, b: usize) -> (i128, i128, usize) {
             if a == 0 {
                 return (0, 1, b);
             }
             let (x, y, g) = ext_gcd(b % a, a);
-            (y - b as isize / a as isize * x, x, g)
+            (y - b as i128 / a as i128 * x, x, g)
         }
-        
-        ModInt::new((ext_gcd(self.value, MOD).0 + MOD as isize) as usize)
+
+        ModInt::new((ext_gcd(self.value, MOD).0 + MOD as i128) as usize)
     }
 }
 
