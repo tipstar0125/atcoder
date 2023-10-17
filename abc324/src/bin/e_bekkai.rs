@@ -27,8 +27,8 @@ impl Solver {
             S: [Chars; N]
         }
 
-        let mut A = vec![];
-        let mut B = vec![];
+        let mut left = vec![0; T.len() + 1];
+        let mut right = vec![0; T.len() + 1];
         let mut T_rev = T.clone();
         T_rev.reverse();
 
@@ -42,7 +42,8 @@ impl Solver {
                     break;
                 }
             }
-            A.push(i);
+            left[i] += 1;
+
             let mut i = 0;
             for si in s.iter().rev() {
                 if *si == T_rev[i] {
@@ -52,15 +53,16 @@ impl Solver {
                     break;
                 }
             }
-            B.push(i);
+            right[i] += 1;
         }
-        B.sort();
+        for i in (0..T.len()).rev() {
+            right[i] += right[i + 1];
+        }
+        right.reverse();
         let mut ans = 0_usize;
-        for a in A {
-            let num = N - B.lower_bound(&(T.len() - a));
-            ans += num;
+        for i in 0..=T.len() {
+            ans += left[i] * right[i];
         }
-
         println!("{}", ans);
     }
 }
