@@ -1,0 +1,36 @@
+---
+type: Batch
+timelimit: 2s
+match: Lines
+
+cases:
+  - name: sample1
+    in: |
+      keyofscience
+      3
+    out: |
+      7
+  - name: sample2
+    in: |
+      oofsifffence
+      3
+    out: |
+      2
+  - name: sample3
+    in: |
+      ooofff
+      5
+    out: |
+      0
+  - name: sample4
+    in: |
+      okeyencef
+      4
+    out: |
+      9
+
+extend:
+  - type: Text
+    path: "./g"
+    in: /in/*.txt
+    out: /out/*.txt

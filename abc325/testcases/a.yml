@@ -1,0 +1,22 @@
+---
+type: Batch
+timelimit: 2s
+match: Lines
+
+cases:
+  - name: sample1
+    in: |
+      Takahashi Chokudai
+    out: |
+      Takahashi san
+  - name: sample2
+    in: |
+      K Eyence
+    out: |
+      K san
+
+extend:
+  - type: Text
+    path: "./a"
+    in: /in/*.txt
+    out: /out/*.txt
