@@ -26,20 +26,6 @@ impl Solver {
             B: usize,
             mut K: usize
         }
-
-        let mut dp = vec![vec![0; B + 1]; A + 1];
-        dp[0][0] = 1;
-        for i in 0..=A {
-            for j in 0..=B {
-                if j > 0 {
-                    dp[i][j] += dp[i][j - 1];
-                }
-                if i > 0 {
-                    dp[i][j] += dp[i - 1][j];
-                }
-            }
-        }
-
         let mut a = A;
         let mut b = B;
         let mut ans = vec![];
@@ -48,7 +34,7 @@ impl Solver {
                 ans.push('b');
                 continue;
             }
-            let c = dp[a - 1][b];
+            let c = nCr(a + b - 1, b);
             if K > c {
                 ans.push('b');
                 K -= c;
@@ -60,6 +46,15 @@ impl Solver {
         }
         println!("{}", ans.iter().join(""));
     }
+}
+
+fn nCr(n: usize, r: usize) -> usize {
+    let mut ret = 1;
+    for i in 1..=r {
+        ret *= n - i + 1;
+        ret /= i;
+    }
+    ret
 }
 
 fn main() {
