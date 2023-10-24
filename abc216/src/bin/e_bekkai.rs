@@ -50,25 +50,49 @@ impl Solver {
                     ans += s;
                     m = next;
                 } else {
-                    let d = K / cnt;
+                    let mut ok = 0;
+                    let mut ng = 2e9 as usize;
+                    while ng - ok > 1 {
+                        let mid = (ok + ng) / 2;
+                        if mid * cnt <= K {
+                            ok = mid;
+                        } else {
+                            ng = mid;
+                        }
+                    }
+                    let d = ok;
                     let s = (d * m - d * (d - 1) / 2) * cnt;
                     let c = d * cnt;
                     K -= c;
                     ans += s;
                     m -= d;
-                    ans += m * (K % cnt);
-                    K = 0;
+                    while K > 0 {
+                        ans += m;
+                        K -= 1;
+                    }
                 }
             } else {
-                let d = K / cnt;
+                let mut ok = 0;
+                let mut ng = 2e9 as usize;
+                while ng - ok > 1 {
+                    let mid = (ok + ng) / 2;
+                    if mid * cnt <= K {
+                        ok = mid;
+                    } else {
+                        ng = mid;
+                    }
+                }
+                let d = ok;
                 if d * m >= d * (d - 1) / 2 {
                     let s = (d * m - d * (d - 1) / 2) * cnt;
                     let c = d * cnt;
                     K -= c;
                     ans += s;
                     m -= d;
-                    ans += m * (K % cnt);
-                    K = 0;
+                    while K > 0 {
+                        ans += m;
+                        K -= 1;
+                    }
                 } else {
                     let d = m;
                     let s = (d * m - d * (d - 1) / 2) * cnt;
