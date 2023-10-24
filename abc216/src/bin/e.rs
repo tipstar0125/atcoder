@@ -23,59 +23,43 @@ impl Solver {
     fn solve(&mut self) {
         input! {
             N: usize,
-            mut K: usize,
-            mut A: [usize; N]
+            K: usize,
+            A: [usize; N]
         }
 
-        A.sort();
-
-        let mut m = A.pop().unwrap();
-        let mut cnt = 1;
-        let mut ans = 0_usize;
-
-        while K > 0 && m > 0 {
-            if !A.is_empty() {
-                let next = *A.last().unwrap();
-                if m == next {
-                    cnt += 1;
-                    A.pop();
-                    continue;
-                }
-
-                let d = m - next;
-                let s = (d * m - d * (d - 1) / 2) * cnt;
-                let c = d * cnt;
-                if K > c {
-                    K -= c;
-                    ans += s;
-                    m = next;
-                } else {
-                    let d = K / cnt;
-                    let s = (d * m - d * (d - 1) / 2) * cnt;
-                    let c = d * cnt;
-                    K -= c;
-                    ans += s;
-                    m -= d;
-                    ans += m * (K % cnt);
-                    K = 0;
-                }
-            } else {
-                let d = K / cnt;
-                if d * m >= d * (d - 1) / 2 {
-                    let s = (d * m - d * (d - 1) / 2) * cnt;
-                    let c = d * cnt;
-                    K -= c;
-                    ans += s;
-                    m -= d;
-                    ans += m * (K % cnt);
-                    K = 0;
-                } else {
-                    let d = m;
-                    let s = (d * m - d * (d - 1) / 2) * cnt;
-                    ans += s;
-                    m = 0;
+        fn f(m: usize, A: &Vec<usize>, K: usize) -> bool {
+            let mut cnt = 0_usize;
+            for a in A {
+                if *a >= m {
+                    cnt += a - m + 1;
                 }
             }
+            K >= cnt
+        }
+
+        let mut ng = 0;
+        let mut ok = 2e9 as usize;
+        while ok - ng > 1 {
+            let m = (ok + ng) / 2;
+            if f(m, &A, K) {
+                ok = m;
+            } else {
+                ng = m;
+            }
+        }
+
+        let mut ans = 0_usize;
+        let mut cnt = 0_usize;
+        for &a in &A {
+            if a >= ok {
+                let c = a - ok + 1;
+                cnt += c;
+                ans += c * (ok + a) / 2;
+            }
+        }
+
+        if cnt < K {
+            ans += (ok - 1) * (K - cnt);
         }
         println!("{}", ans);
     }
