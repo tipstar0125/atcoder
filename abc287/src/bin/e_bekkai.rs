@@ -26,46 +26,30 @@ impl Solver {
             S: [Chars; N]
         }
 
-        let mut SI = vec![];
-        for (i, s) in S.iter().enumerate() {
-            SI.push((s, i));
-        }
-        SI.sort();
-
-        fn diff(s1: &Vec<char>, s2: &Vec<char>) -> usize {
-            let m = min!(s1.len(), s2.len());
-            for i in 0..m {
-                if s1[i] != s2[i] {
-                    return i;
-                }
-            }
-            m
-        }
-
         let mut ans = vec![0; N];
-        for i in 1..N {
-            let (s1, idx1) = SI[i - 1];
-            let (s2, idx2) = SI[i];
-            let n = diff(s1, s2);
-            ans[idx1] = max!(ans[idx1], n);
-            ans[idx2] = max!(ans[idx2], n);
-        }
+        dfs(0, (0..N).collect_vec(), &S, &mut ans);
         println!("{}", ans.iter().join("\n"));
     }
 }
 
-#[macro_export]
-macro_rules! max {
-    ($x: expr) => ($x);
-    ($x: expr, $( $y: expr ),+) => {
-        std::cmp::max($x, max!($( $y ),+))
+fn dfs(now: usize, v: Vec<usize>, S: &Vec<Vec<char>>, ans: &mut Vec<usize>) {
+    let mut mp = vec![vec![]; 26];
+    for i in v {
+        ans[i] = now;
+        if S[i].len() == now {
+            continue;
+        }
+        for j in 0..26 {
+            if S[i][now] as u8 - b'a' == j as u8 {
+                mp[j].push(i);
+            }
+        }
     }
-}
-#[macro_export]
-macro_rules! min {
-    ($x: expr) => ($x);
-    ($x: expr, $( $y: expr ),+) => {
-        std::cmp::min($x, min!($( $y ),+))
+    for i in 0..26 {
+        if mp[i].len() < 2 {
+            continue;
+        }
+        dfs(now + 1, mp[i].clone(), S, ans);
     }
 }
 
