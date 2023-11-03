@@ -8,7 +8,7 @@
 #![allow(dead_code)]
 use itertools::Itertools;
 use std::cmp::Reverse;
-use std::collections::{BTreeMap, BTreeSet, BinaryHeap, VecDeque};
+use std::collections::{BTreeMap, BTreeSet, BinaryHeap, HashMap, VecDeque};
 use superslice::Ext;
 
 use proconio::{
@@ -33,24 +33,12 @@ impl Solver {
             G[v].push(u);
         }
 
-        let mut group = BTreeSet::new();
-        let mut Q = VecDeque::new();
-        group.insert(8);
-        Q.push_back(8);
-        while let Some(pos) = Q.pop_front() {
-            for &next in &G[pos] {
-                if !group.contains(&next) {
-                    group.insert(next);
-                    Q.push_back(next);
-                }
-            }
-        }
         let mut init = vec![8; 9];
         for (i, &p) in P.iter().enumerate() {
             init[p] = i as u8;
         }
 
-        let mut status: BTreeMap<Vec<u8>, usize> = BTreeMap::new();
+        let mut status: HashMap<Vec<u8>, usize> = HashMap::new();
         let mut Q = VecDeque::new();
         *status.entry(init.clone()).or_default() = 0;
         Q.push_back(init);
