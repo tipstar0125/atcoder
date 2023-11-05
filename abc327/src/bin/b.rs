@@ -22,32 +22,16 @@ impl Solver {
     #[fastout]
     fn solve(&mut self) {
         input! {
-            N: usize,
-            M: usize,
-            H: [usize; N],
-            UV: [(Usize1, Usize1); M]
+            B: usize
         }
 
-        let mut G = vec![vec![]; N];
-        for &(u, v) in &UV {
-            G[u].push(v);
-            G[v].push(u);
+        for a in 1..=15 as usize {
+            if B == a.pow(a as u32) {
+                println!("{}", a);
+                return;
+            }
         }
-    }
-}
-
-#[macro_export]
-macro_rules! max {
-    ($x: expr) => ($x);
-    ($x: expr, $( $y: expr ),+) => {
-        std::cmp::max($x, max!($( $y ),+))
-    }
-}
-#[macro_export]
-macro_rules! min {
-    ($x: expr) => ($x);
-    ($x: expr, $( $y: expr ),+) => {
-        std::cmp::min($x, min!($( $y ),+))
+        println!("-1");
     }
 }
 

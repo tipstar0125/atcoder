@@ -23,31 +23,16 @@ impl Solver {
     fn solve(&mut self) {
         input! {
             N: usize,
-            M: usize,
-            H: [usize; N],
-            UV: [(Usize1, Usize1); M]
+            S: Chars
         }
 
-        let mut G = vec![vec![]; N];
-        for &(u, v) in &UV {
-            G[u].push(v);
-            G[v].push(u);
+        for i in 1..N {
+            if (S[i - 1] == 'a' && S[i] == 'b') || (S[i - 1] == 'b' && S[i] == 'a') {
+                println!("Yes");
+                return;
+            }
         }
-    }
-}
-
-#[macro_export]
-macro_rules! max {
-    ($x: expr) => ($x);
-    ($x: expr, $( $y: expr ),+) => {
-        std::cmp::max($x, max!($( $y ),+))
-    }
-}
-#[macro_export]
-macro_rules! min {
-    ($x: expr) => ($x);
-    ($x: expr, $( $y: expr ),+) => {
-        std::cmp::min($x, min!($( $y ),+))
+        println!("No");
     }
 }
 
