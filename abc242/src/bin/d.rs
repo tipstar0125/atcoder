@@ -51,8 +51,7 @@ fn f(t: usize, k: usize, S: &Vec<char>) -> char {
 fn g(s: char, add: usize) -> char {
     let n = (s as u8 - b'A') as usize + add;
     let n = (n % 3) as u8;
-    let ret = (b'A' + n) as char;
-    ret
+    (b'A' + n) as char
 }
 
 fn main() {
