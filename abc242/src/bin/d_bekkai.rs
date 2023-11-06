@@ -29,30 +29,23 @@ impl Solver {
         for _ in 0..Q {
             input! {
                 t: usize,
-                k: Usize1
+                mut k: Usize1
             }
 
-            let ans = f(t, k, &S);
+            let mut si = 0;
+            if t <= 60 {
+                let b = 1_usize << t;
+                si = k / b;
+                k %= b;
+            }
+
+            let r = k.count_ones() as usize;
+            let l = t - r;
+            let x = (l + 2 * r + (S[si] as u8 - b'A') as usize) % 3;
+            let ans = (b'A' + x as u8) as char;
             println!("{}", ans);
         }
     }
-}
-
-fn f(t: usize, k: usize, S: &Vec<char>) -> char {
-    if t == 0 {
-        return S[k];
-    }
-    if k == 0 {
-        return g(S[0], t);
-    }
-    g(f(t - 1, k / 2, S), k % 2 + 1)
-}
-
-fn g(s: char, add: usize) -> char {
-    let n = (s as u8 - b'A') as usize + add;
-    let n = (n % 3) as u8;
-    let ret = (b'A' + n) as char;
-    ret
 }
 
 fn main() {
