@@ -46,14 +46,25 @@ impl Solver {
                 if i == H - 1 && j == W - 1 {
                     continue;
                 }
-                let mut x = NEG_INF;
-                if i + 1 < H {
-                    x = max!(x, -dp[i + 1][j] + B[i + 1][j]);
+                if (i + j) % 2 == 0 {
+                    let mut x = NEG_INF;
+                    if i + 1 < H {
+                        x = max!(x, dp[i + 1][j] + B[i + 1][j]);
+                    }
+                    if j + 1 < W {
+                        x = max!(x, dp[i][j + 1] + B[i][j + 1]);
+                    }
+                    dp[i][j] = x;
+                } else {
+                    let mut x = INF;
+                    if i + 1 < H {
+                        x = min!(x, dp[i + 1][j] - B[i + 1][j]);
+                    }
+                    if j + 1 < W {
+                        x = min!(x, dp[i][j + 1] - B[i][j + 1]);
+                    }
+                    dp[i][j] = x;
                 }
-                if j + 1 < W {
-                    x = max!(x, -dp[i][j + 1] + B[i][j + 1]);
-                }
-                dp[i][j] = x;
             }
         }
         if dp[0][0] > 0 {
