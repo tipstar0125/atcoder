@@ -24,7 +24,7 @@ impl Solver {
         input! {
             N: usize,
             M: usize,
-            H: [usize; N],
+            H: [isize; N],
             UV: [(Usize1, Usize1); M]
         }
 
@@ -33,6 +33,32 @@ impl Solver {
             G[u].push(v);
             G[v].push(u);
         }
+
+        let INF = 1_isize << 60;
+        let mut cost = vec![INF; N];
+        let mut Q = BinaryHeap::new();
+        cost[0] = 0;
+        Q.push((Reverse(cost[0]), 0));
+        while let Some((Reverse(nc), pos)) = Q.pop() {
+            if cost[pos] != nc {
+                continue;
+            }
+            for &next in &G[pos] {
+                let mut c = 0;
+                if H[pos] < H[next] {
+                    c = H[next] - H[pos];
+                }
+                if nc + c < cost[next] {
+                    cost[next] = nc + c;
+                    Q.push((Reverse(cost[next]), next));
+                }
+            }
+        }
+        let mut ans = 0_isize;
+        for i in 0..N {
+            ans = max!(ans, H[0] - H[i] - cost[i]);
+        }
+        println!("{}", ans);
     }
 }
 
