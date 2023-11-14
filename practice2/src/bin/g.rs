@@ -23,25 +23,20 @@ impl Solver {
     fn solve(&mut self) {
         input! {
             N: usize,
-            A: [Usize1; N]
+            M: usize,
+            AB: [(usize, usize); M]
         }
 
-        let mut G = vec![vec![]; N];
-        let mut ans = 0_usize;
-        for (i, &a) in A.iter().enumerate() {
-            G[i].push(a);
-            if i == a {
-                ans += 1;
-            }
+        let mut edge = vec![vec![]; N];
+        for &(a, b) in &AB {
+            edge[a].push(b);
         }
-        let mut scc = StronglyConnectedComponent::new(&G);
+        let mut scc = StronglyConnectedComponent::new(&edge);
         let groups = scc.scc();
+        println!("{}", groups.len());
         for g in groups {
-            if g.len() > 1 {
-                ans += g.len();
-            }
+            println!("{} {}", g.len(), g.iter().join(" "));
         }
-        println!("{}", ans);
     }
 }
 

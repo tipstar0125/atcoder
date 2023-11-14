@@ -31,21 +31,14 @@ impl Solver {
         let mut ans = 1_usize << 60;
         for comb in (0..M).combinations(N - 1) {
             let mut uf = UnionFind::new(N);
-            let mut is_tree = true;
             let mut s = 0;
             for &c in &comb {
                 let (u, v, w) = UVW[c];
                 s += w;
                 s %= K;
-                if uf.is_same(u, v) {
-                    is_tree = false;
-                }
                 uf.unite(u, v);
             }
             if uf.size > 1 {
-                is_tree = false;
-            }
-            if !is_tree {
                 continue;
             }
             ans = min!(ans, s);
