@@ -6,81 +6,18 @@
 #![allow(clippy::nonminimal_bool)]
 #![allow(clippy::neg_multiply)]
 #![allow(dead_code)]
-use std::collections::BTreeMap;
-
 use itertools::Itertools;
+use std::cmp::Reverse;
+use std::collections::{BTreeMap, BTreeSet, BinaryHeap, VecDeque};
+use superslice::Ext;
+
 use proconio::{
     fastout, input,
     marker::{Chars, Usize1},
 };
 
-#[macro_export]
-macro_rules! max {
-    ($x: expr) => ($x);
-    ($x: expr, $( $y: expr ),+) => {
-        std::cmp::max($x, max!($( $y ),+))
-    }
-}
-#[macro_export]
-macro_rules! min {
-    ($x: expr) => ($x);
-    ($x: expr, $( $y: expr ),+) => {
-        std::cmp::min($x, min!($( $y ),+))
-    }
-}
-#[derive(Debug, Clone)]
-struct UnionFind {
-    parent: Vec<isize>,
-    size: usize,
-}
-impl UnionFind {
-    fn new(n: usize) -> Self {
-        UnionFind {
-            parent: vec![-1; n + 1],
-            size: n,
-        }
-    }
-    fn find(&mut self, x: usize) -> usize {
-        if self.parent[x] < 0 {
-            return x;
-        }
-        let root = self.find(self.parent[x] as usize);
-        self.parent[x] = root as isize;
-        root
-    }
-    fn unite(&mut self, x: usize, y: usize) -> Option<(usize, usize)> {
-        let root_x = self.find(x);
-        let root_y = self.find(y);
-        if root_x == root_y {
-            return None;
-        }
-        let size_x = -self.parent[root_x];
-        let size_y = -self.parent[root_y];
-        self.size -= 1;
-        if size_x >= size_y {
-            self.parent[root_x] -= size_y;
-            self.parent[root_y] = root_x as isize;
-            Some((root_x, root_y))
-        } else {
-            self.parent[root_y] -= size_x;
-            self.parent[root_x] = root_y as isize;
-            Some((root_y, root_x))
-        }
-    }
-    fn is_same(&mut self, x: usize, y: usize) -> bool {
-        self.find(x) == self.find(y)
-    }
-    fn is_root(&mut self, x: usize) -> bool {
-        self.find(x) == x
-    }
-    fn get_union_size(&mut self, x: usize) -> usize {
-        let root = self.find(x);
-        -self.parent[root] as usize
-    }
-    fn get_size(&self) -> usize {
-        self.size
-    }
-}
+const MOD: usize = 1e9 as usize + 7;
+
 #[derive(Default)]
 struct Solver {}
 impl Solver {
@@ -90,25 +27,125 @@ impl Solver {
             S: Chars
         }
 
-        let MOD = 1e9 as usize + 7;
-        let base = "chokudai".chars().collect_vec();
-        let mut dp = vec![vec![0_usize; base.len() + 1]; S.len() + 1];
-        for i in 0..S.len() + 1 {
-            dp[i][0] = 1;
+        let T = "chokudai".chars().collect_vec();
+        let mut dp = vec![vec![Mod::zero(); T.len() + 1]; S.len() + 1];
+        for i in 0..=S.len() {
+            dp[i][0] = Mod::one();
         }
 
-        for i in 1..S.len() + 1 {
-            for j in 1..base.len() + 1 {
+        for i in 1..=S.len() {
+            let s = S[i - 1];
+            for j in 1..=T.len() {
+                let t = T[j - 1];
                 dp[i][j] = dp[i - 1][j];
-                if S[i - 1] == base[j - 1] {
-                    dp[i][j] += dp[i][j - 1];
+                if s == t {
+                    let z = dp[i - 1][j - 1];
+                    dp[i][j] += z;
                 }
-                dp[i][j] %= MOD;
             }
         }
-        println!("{}", dp[S.len()][base.len()]);
+        println!("{}", dp[S.len()][T.len()].value());
     }
 }
+
+type Mod = ModInt;
+#[derive(Debug, Clone, Copy, Default)]
+struct ModInt {
+    value: usize,
+}
+
+impl ModInt {
+    fn new(n: usize) -> Self {
+        ModInt { value: n % MOD }
+    }
+    fn zero() -> Self {
+        ModInt { value: 0 }
+    }
+    fn one() -> Self {
+        ModInt { value: 1 }
+    }
+    fn value(&self) -> usize {
+        self.value
+    }
+    fn pow(&self, n: usize) -> Self {
+        let mut p = *self;
+        let mut ret = ModInt::one();
+        let mut nn = n;
+        while nn > 0 {
+            if nn & 1 == 1 {
+                ret *= p;
+            }
+            p *= p;
+            nn >>= 1;
+        }
+        ret
+    }
+    fn inv(&self) -> Self {
+        fn ext_gcd(a: usize, b: usize) -> (isize, isize, usize) {
+            if a == 0 {
+                return (0, 1, b);
+            }
+            let (x, y, g) = ext_gcd(b % a, a);
+            (y - b as isize / a as isize * x, x, g)
+        }
+
+        ModInt::new((ext_gcd(self.value, MOD).0 + MOD as isize) as usize)
+    }
+}
+
+impl std::ops::Add for ModInt {
+    type Output = ModInt;
+    fn add(self, other: Self) -> Self {
+        ModInt::new(self.value + other.value)
+    }
+}
+
+impl std::ops::Sub for ModInt {
+    type Output = ModInt;
+    fn sub(self, other: Self) -> Self {
+        ModInt::new(MOD + self.value - other.value)
+    }
+}
+
+impl std::ops::Mul for ModInt {
+    type Output = ModInt;
+    fn mul(self, other: Self) -> Self {
+        ModInt::new(self.value * other.value)
+    }
+}
+
+#[allow(clippy::suspicious_arithmetic_impl)]
+impl std::ops::Div for ModInt {
+    type Output = ModInt;
+    fn div(self, other: Self) -> Self {
+        self * other.inv()
+    }
+}
+
+impl std::ops::AddAssign for ModInt {
+    fn add_assign(&mut self, other: Self) {
+        *self = *self + other;
+    }
+}
+
+impl std::ops::SubAssign for ModInt {
+    fn sub_assign(&mut self, other: Self) {
+        *self = *self - other;
+    }
+}
+
+impl std::ops::MulAssign for ModInt {
+    fn mul_assign(&mut self, other: Self) {
+        *self = *self * other;
+    }
+}
+
+impl std::ops::DivAssign for ModInt {
+    fn div_assign(&mut self, other: Self) {
+        *self = *self / other;
+    }
+}
+
 fn main() {
     std::thread::Builder::new()
         .stack_size(128 * 1024 * 1024)
@@ -116,73 +153,4 @@ fn main() {
         .unwrap()
         .join()
         .unwrap();
-}
-
-fn eratosthenes(n: usize) -> Vec<bool> {
-    let mut is_prime_list = vec![true; n + 1];
-    is_prime_list[0] = false;
-    is_prime_list[1] = false;
-    let mut i = 2;
-    while i * i <= n {
-        if is_prime_list[i] {
-            let mut j = i * i;
-            while j <= n {
-                is_prime_list[j] = false;
-                j += i;
-            }
-        }
-        i += 1
-    }
-    is_prime_list
-}
-
-fn mod_pow(a: usize, b: usize, m: usize) -> usize {
-    let mut p = a;
-    let mut ret = 1;
-    let mut n = b;
-    while n > 0 {
-        if n & 1 == 1 {
-            ret = ret * p % m;
-        }
-        p = p * p % m;
-        n >>= 1;
-    }
-    ret
-}
-
-fn mod_div(a: usize, b: usize, m: usize) -> usize {
-    (a * mod_pow(b, m - 2, m)) % m
-}
-
-fn prime_factorize(n: usize) -> BTreeMap<usize, usize> {
-    let mut nn = n;
-    let mut i = 2;
-    let mut pf: BTreeMap<usize, usize> = BTreeMap::new();
-    while i * i <= n {
-        while nn % i == 0 {
-            *pf.entry(i).or_default() += 1;
-            nn /= i;
-        }
-        i += 1;
-    }
-    if nn != 1 {
-        *pf.entry(nn).or_default() += 1;
-    }
-    pf
-}
-
-fn enum_dividers(n: usize) -> Vec<usize> {
-    let mut i = 1_usize;
-    let mut ret = vec![];
-    while i * i <= n {
-        if n % i == 0 {
-            ret.push(i);
-            if i != n / i {
-                ret.push(n / i);
-            }
-        }
-        i += 1;
-    }
-    ret.sort();
-    ret
 }
