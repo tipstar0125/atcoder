@@ -38,53 +38,53 @@ impl Solver {
                 G[u].push(v);
                 G[v].push(u);
             }
-            let mut visited = vec![false; N];
-            let mut color = vec![];
-            let mut colors = BTreeSet::new();
             let INF = 1_usize << 60;
-            let mut ans = INF;
-            visited[0] = true;
-            // color.push(C[0]);
-            dfs(0, &G, &C, &mut visited, &mut color, &mut colors, &mut ans);
-            if ans == INF {
-                println!("-1");
-            } else {
-                println!("{}", ans);
+            let mut dist = vec![vec![INF; N]; N];
+            let mut Q = VecDeque::new();
+            Q.push_back((0, N - 1));
+            dist[0][N - 1] = 0;
+            while let Some((a, b)) = Q.pop_front() {
+                let mut a_red = vec![];
+                let mut a_blue = vec![];
+                for &na in &G[a] {
+                    if C[na] == 0 {
+                        a_red.push(na);
+                    } else {
+                        a_blue.push(na);
+                    }
+                }
+                let mut b_red = vec![];
+                let mut b_blue = vec![];
+                for &nb in &G[b] {
+                    if C[nb] == 0 {
+                        b_red.push(nb);
+                    } else {
+                        b_blue.push(nb);
+                    }
+                }
+                for &na in &a_red {
+                    for &nb in &b_blue {
+                        if dist[a][b] + 1 < dist[na][nb] {
+                            dist[na][nb] = dist[a][b] + 1;
+                            Q.push_back((na, nb));
+                        }
+                    }
+                }
+                for &na in &a_blue {
+                    for &nb in &b_red {
+                        if dist[a][b] + 1 < dist[na][nb] {
+                            dist[na][nb] = dist[a][b] + 1;
+                            Q.push_back((na, nb));
+                        }
+                    }
+                }
             }
-        }
-    }
-}
 
-fn dfs(
-    pos: usize,
-    G: &Vec<Vec<usize>>,
-    C: &Vec<usize>,
-    visited: &mut Vec<bool>,
-    color: &mut Vec<usize>,
-    colors: &mut BTreeSet<Vec<usize>>,
-    ans: &mut usize,
-) {
-    let N = G.len();
-    if pos == N - 1 {
-        let mut rev_color = color.clone();
-        rev_color.pop();
-        rev_color.reverse();
-        rev_color.push(C[0]);
-        rev_color = rev_color.iter().map(|x| x ^ 1).collect();
-        colors.insert(rev_color);
-        if colors.contains(color) {
-            *ans = min!(*ans, color.len());
-        }
-        return;
-    }
-
-    for &next in &G[pos] {
-        if !visited[next] {
-            visited[next] = true;
-            color.push(C[next]);
-            dfs(next, G, C, visited, color, colors, ans);
-            color.pop();
-            visited[next] = false;
+            if dist[N - 1][0] < INF {
+                println!("{}", dist[N - 1][0]);
+            } else {
+                println!("-1");
+            }
         }
     }
 }
