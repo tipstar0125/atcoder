@@ -88,7 +88,65 @@ impl Solver {
         }
     }
 }
+#[derive(Debug, Clone)]
+struct KthSum {
+    N: usize,
+    K: usize,
+    S: isize,
+    large: BTreeSet<(isize, usize)>,
+    small: BTreeSet<(isize, usize)>,
+}
 
+impl KthSum {
+    fn new(N: usize, K: usize) -> Self {
+        let mut large = BTreeSet::new();
+        let mut small = BTreeSet::new();
+        for i in 0..K {
+            large.insert((0, i));
+        }
+        for i in K..N {
+            small.insert((0, i));
+        }
+        KthSum {
+            N,
+            K,
+            S: 0,
+            large,
+            small,
+        }
+    }
+    fn balance(&mut self) {
+        while self.large.len() > self.K {
+            let p = *self.large.iter().next().unwrap();
+            self.large.remove(&p);
+            self.small.insert(p);
+            self.S -= p.0;
+        }
+        if self.small.is_empty() {
+            return;
+        }
+        while self.large.iter().next().unwrap().0 < self.small.iter().next_back().unwrap().0 {
+            let large_min = *self.large.iter().next().unwrap();
+            let small_max = *self.small.iter().next_back().unwrap();
+            self.large.remove(&large_min);
+            self.small.remove(&small_max);
+            self.large.insert(small_max);
+            self.small.insert(large_min);
+            self.S += small_max.0 - large_min.0;
+        }
+    }
+    fn add(&mut self, p: (isize, usize)) {
+        self.large.insert(p);
+        self.S += p.0;
+    }
+    fn remove(&mut self, p: (isize, usize)) {
+        if self.large.remove(&p) {
+            self.S -= p.0;
+        } else {
+            self.small.remove(&p);
+        }
+    }
+}
 #[macro_export]
 macro_rules! max {
     ($x: expr) => ($x);

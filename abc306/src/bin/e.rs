@@ -50,7 +50,7 @@ impl KthSum {
             self.small.insert(p);
             self.S -= p.0;
         }
-        if self.small.is_empty() {
+        if self.small.is_empty() || self.large.is_empty() {
             return;
         }
         while self.large.iter().next().unwrap().0 < self.small.iter().next_back().unwrap().0 {
@@ -66,6 +66,7 @@ impl KthSum {
     fn add(&mut self, p: (isize, usize)) {
         self.large.insert(p);
         self.S += p.0;
+        self.balance();
     }
     fn remove(&mut self, p: (isize, usize)) {
         if self.large.remove(&p) {
@@ -73,6 +74,7 @@ impl KthSum {
         } else {
             self.small.remove(&p);
         }
+        self.balance();
     }
 }
 
@@ -93,7 +95,6 @@ impl Solver {
         for &(x, y) in &XY {
             kth_sum.remove((A[x], x));
             kth_sum.add((y, x));
-            kth_sum.balance();
             A[x] = y;
             println!("{}", kth_sum.S);
         }
