@@ -28,6 +28,35 @@ impl Solver {
             A: [usize; N],
             UV: [(Usize1, Usize1); M]
         }
+
+        let mut G = vec![vec![]; N];
+        for &(mut u, mut v) in UV.iter() {
+            if A[u] > A[v] {
+                std::mem::swap(&mut u, &mut v);
+            }
+            if A[u] == A[v] {
+                G[u].push((v, 0));
+                G[v].push((u, 0));
+            } else {
+                G[u].push((v, 1));
+            }
+        }
+        let mut score = vec![0; N];
+        let mut Q = BinaryHeap::new();
+        score[0] = 1;
+        Q.push((Reverse((A[0], -score[0])), 0));
+        while let Some((Reverse((_, s)), pos)) = Q.pop() {
+            if score[pos] != -s {
+                continue;
+            }
+            for &(next, ns) in &G[pos] {
+                if score[pos] + ns > score[next] {
+                    score[next] = score[pos] + ns;
+                    Q.push((Reverse((A[next], -score[next])), next));
+                }
+            }
+        }
+        println!("{}", score[N - 1]);
     }
 }
 
