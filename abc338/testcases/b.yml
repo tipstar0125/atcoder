@@ -1,0 +1,27 @@
+---
+type: Batch
+timelimit: 2s
+match: Lines
+
+cases:
+  - name: sample1
+    in: |
+      frequency
+    out: |
+      e
+  - name: sample2
+    in: |
+      atcoder
+    out: |
+      a
+  - name: sample3
+    in: |
+      pseudopseudohypoparathyroidism
+    out: |
+      o
+
+extend:
+  - type: Text
+    path: "./b"
+    in: /in/*.txt
+    out: /out/*.txt

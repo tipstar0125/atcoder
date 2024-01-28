@@ -1,0 +1,22 @@
+---
+type: Batch
+timelimit: 2s
+match: Lines
+
+cases:
+  - name: sample1
+    in: |
+      1+2*34
+    out: |
+      197
+  - name: sample2
+    in: |
+      338*3338*33338*333338+3333338*33333338+333333338
+    out: |
+      527930018
+
+extend:
+  - type: Text
+    path: "./g"
+    in: /in/*.txt
+    out: /out/*.txt
