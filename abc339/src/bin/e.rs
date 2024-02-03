@@ -23,16 +23,16 @@ impl Solver {
     fn solve(&mut self) {
         input! {
             N: usize,
-            D: isize,
-            A: [isize; N]
+            D: usize,
+            A: [usize; N]
         }
-        let MAX = 5e5 as usize + 10;
+        let MAX = 1e6 as usize + 10;
         let mut seg = Segtree::<Max<usize>>::new(MAX);
         for &a in &A {
-            let l = max!(0, a - D) as usize;
-            let r = min!(MAX as isize - 1, a + D) as usize;
+            let l = a.saturating_sub(D);
+            let r = a + D;
             let mx = seg.prod(l..=r);
-            seg.set(a as usize, mx + 1);
+            seg.set(a, mx + 1);
         }
         let ans = seg.all_prod();
         println!("{}", ans);
