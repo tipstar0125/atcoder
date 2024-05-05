@@ -1,0 +1,47 @@
+---
+type: Batch
+timelimit: 2s
+match: Lines
+
+cases:
+  - name: sample1
+    in: |
+      4 3
+      3 3
+      1 2 3
+      2 2
+      1 2
+      3 4
+      1 3 4
+    out: |
+      9
+  - name: sample2
+    in: |
+      3 2
+      2 1
+      1 2
+      2 1
+      1 2
+    out: |
+      -1
+  - name: sample3
+    in: |
+      10 5
+      6 158260522
+      1 3 6 8 9 10
+      10 877914575
+      1 2 3 4 5 6 7 8 9 10
+      4 602436426
+      2 6 7 9
+      6 24979445
+      2 3 4 5 8 10
+      4 861648772
+      2 4 8 9
+    out: |
+      1202115217
+
+extend:
+  - type: Text
+    path: "./e"
+    in: /in/*.txt
+    out: /out/*.txt
