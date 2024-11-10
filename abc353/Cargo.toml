@@ -1,43 +1,43 @@
 [package]
-name = "abc352"
+name = "abc353"
 version = "0.1.0"
 edition = "2018"
 
 [package.metadata.cargo-compete.bin]
-abc352-a = { alias = "a", problem = "https://atcoder.jp/contests/abc352/tasks/abc352_a" }
-abc352-b = { alias = "b", problem = "https://atcoder.jp/contests/abc352/tasks/abc352_b" }
-abc352-c = { alias = "c", problem = "https://atcoder.jp/contests/abc352/tasks/abc352_c" }
-abc352-d = { alias = "d", problem = "https://atcoder.jp/contests/abc352/tasks/abc352_d" }
-abc352-e = { alias = "e", problem = "https://atcoder.jp/contests/abc352/tasks/abc352_e" }
-abc352-f = { alias = "f", problem = "https://atcoder.jp/contests/abc352/tasks/abc352_f" }
-abc352-g = { alias = "g", problem = "https://atcoder.jp/contests/abc352/tasks/abc352_g" }
+abc353-a = { alias = "a", problem = "https://atcoder.jp/contests/abc353/tasks/abc353_a" }
+abc353-b = { alias = "b", problem = "https://atcoder.jp/contests/abc353/tasks/abc353_b" }
+abc353-c = { alias = "c", problem = "https://atcoder.jp/contests/abc353/tasks/abc353_c" }
+abc353-d = { alias = "d", problem = "https://atcoder.jp/contests/abc353/tasks/abc353_d" }
+abc353-e = { alias = "e", problem = "https://atcoder.jp/contests/abc353/tasks/abc353_e" }
+abc353-f = { alias = "f", problem = "https://atcoder.jp/contests/abc353/tasks/abc353_f" }
+abc353-g = { alias = "g", problem = "https://atcoder.jp/contests/abc353/tasks/abc353_g" }
 
 [[bin]]
-name = "abc352-a"
+name = "abc353-a"
 path = "src/bin/a.rs"
 
 [[bin]]
-name = "abc352-b"
+name = "abc353-b"
 path = "src/bin/b.rs"
 
 [[bin]]
-name = "abc352-c"
+name = "abc353-c"
 path = "src/bin/c.rs"
 
 [[bin]]
-name = "abc352-d"
+name = "abc353-d"
 path = "src/bin/d.rs"
 
 [[bin]]
-name = "abc352-e"
+name = "abc353-e"
 path = "src/bin/e.rs"
 
 [[bin]]
-name = "abc352-f"
+name = "abc353-f"
 path = "src/bin/f.rs"
 
 [[bin]]
-name = "abc352-g"
+name = "abc353-g"
 path = "src/bin/g.rs"
 
 [dependencies]
@@ -145,12 +145,6 @@ rustc-hash = "=1.1.0"
 smallvec = "=1.11.0"
 
 [dev-dependencies]
-
-[features]
-local = []
-
-[profile.dev]
-opt-level = 3
 
 [features]
 local = []
